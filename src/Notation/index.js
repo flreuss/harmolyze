@@ -52,6 +52,7 @@ class Notation extends Component {
     };
     this.notesHighlighted = [];
 
+    //TODO: fix problem with highlighting and entering chord that occurs in Chrome
     var lowestAdjacentNote = this.highlightAdjacentNotesOf(abcelem);
 
     if (lowestAdjacentNote.chord) {
