@@ -52,11 +52,11 @@ class Notation extends Component {
     };
     this.notesHighlighted = [];
 
-    //TODO: fix problem with highlighting and entering chord that occurs in Chrome
+    //TODO: fix problem with timing when highlighting and entering chord that occurs in Chrome
     var lowestAdjacentNote = this.highlightAdjacentNotesOf(abcelem);
 
     if (lowestAdjacentNote.chord) {
-      //TODO: Edit chord, that's already existing
+      //TODO: Edit chord, that's already existing. Aber nicht die als Lösung bereits vorgegebenen!
     } else if (!abcelem.rest) {
       var riemannFunc = prompt("Bitte Funktion angeben:", "D7");
       if (riemannFunc) {

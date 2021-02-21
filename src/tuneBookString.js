@@ -19,4 +19,14 @@ V:3
  B, C D C/B,/ | A, D B, D | D G,/A,/ B, z |] %3
 V:4
  G, F, B,, "_D⁷"C, | D, D, "_⛶"G, B,,/C,/ | D, E, B,, z |] %3
+
+X:1
+T: Cooley's
+M: 4/4
+L: 1/8
+K: Emin
+|:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|
+EBBA B2 EB|B2 AB defg|afe^c dBAF|DEFD E2:|
+|:gf|eB B2 efge|eB B2 gedB|A2 FA DAFA|A2 FA defg|
+eB B2 eBgB|eB B2 defg|afe^c dBAF|DEFD E2:|
 `;

@@ -1,4 +1,4 @@
-import { HomeSVGIcon, TvSVGIcon } from "react-md";
+import { HomeSVGIcon, MusicNoteSVGIcon } from "react-md";
 
 class NavItems {
     /**
@@ -24,7 +24,7 @@ static fromTuneBook(tuneBook){
 
     for(const tune of tuneBook.tunes){
         const tunePathName = "/exercise/" + tune.id;
-        navItems[tunePathName] = this.createRoute(tunePathName, tune.title, <TvSVGIcon />);
+        navItems[tunePathName] = this.createRoute(tunePathName, tune.title, <MusicNoteSVGIcon />);
     }
 
     return navItems;

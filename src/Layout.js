@@ -23,11 +23,12 @@ export default function MyLayout(props) {
       navHeaderTitle="Exercises"
       treeProps={useLayoutNavigation(props.navItems, pathname, Link)}
       mainProps={transitionProps}
+      
     >
       <Switch>
       <Route 
         path="/exercise/:tuneId"
-        render={
+        component={
           routeProps => <Notation {...routeProps} initialAbcString={props.tuneBook.getTuneById(+routeProps.match.params.tuneId).abc} solutionAbcString={props.tuneBook.getTuneById(+routeProps.match.params.tuneId).abc}/>} />
         <Route path="/" component={Home} />
       </Switch>
