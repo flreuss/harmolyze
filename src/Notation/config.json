@@ -1,0 +1,17 @@
+{
+  "paddingbottom": 30,
+  "paddingleft": 15,
+  "paddingright": 50,
+  "paddingtop": 15,
+  "responsive": "resize",
+  "scale": 1,
+  "selectionColor": "rgb(33,150,243)",
+  "staffwidth": 740,
+  "header_only": false,
+  "hint_measures": false,
+  "print": false,
+  "stop_on_warning": false,
+  "oneSvgPerLine": false,
+  "scrollHorizontal": false,
+  "viewportHorizontal": false
+}

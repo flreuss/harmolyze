@@ -3,11 +3,10 @@ import { Layout, useLayoutNavigation } from "react-md";
 import { useLocation, Link, Switch, Route } from "react-router-dom";
 import { ENTER, useCrossFade } from "@react-md/transition";
 
-import navItems from "./navItems";
-import App from "./App";
-import App2 from "./App2";
+import Notation from "./Notation";
+import Home from "./Home";
 
-export default function MyLayout() {
+export default function MyLayout(props) {
   const { pathname } = useLocation();
 
   const [_rendered, transitionProps, dispatch] = useCrossFade();
@@ -18,17 +17,19 @@ export default function MyLayout() {
       dispatch(ENTER);
     }
 
-
   return (
     <Layout
       title="Riemann App"
       navHeaderTitle="Exercises"
-      treeProps={useLayoutNavigation(navItems, pathname, Link)}
+      treeProps={useLayoutNavigation(props.navItems, pathname, Link)}
       mainProps={transitionProps}
     >
       <Switch>
-        <Route path="/exercise" component={App} />
-        <Route path="/" component={App2} />
+      <Route 
+        path="/exercise/:tuneId"
+        render={
+          routeProps => <Notation {...routeProps} initialAbcString={props.tuneBook.getTuneById(+routeProps.match.params.tuneId).abc} solutionAbcString={props.tuneBook.getTuneById(+routeProps.match.params.tuneId).abc}/>} />
+        <Route path="/" component={Home} />
       </Switch>
     </Layout>
   );

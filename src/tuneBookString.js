@@ -1,5 +1,5 @@
 export default `
-X:1
+X:0
 T:Des Goldschmieds Töchterlein
 C:Volkslied, 16. Jh. (Satz nach Robert Kahn)
 %%score { ( 1 2 ) | ( 3 4 ) }

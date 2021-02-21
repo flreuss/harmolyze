@@ -1,25 +1,34 @@
-import { ReactNode } from "react";
 import { HomeSVGIcon, TvSVGIcon } from "react-md";
 
-/**
+class NavItems {
+    /**
  * Note: The `parentId` **must** be defaulted to `null` for the navigation tree
  * to render correctly since this uses the @react-md/tree package behind the
  * scenes. Each item that has a `parentId` set to `null` will appear at the root
  * level of your navigation tree.
  */
-function createRoute(pathname, children, leftAddon, parentId = null) {
+static createRoute(pathname, children, leftAddon, parentId = null) {
     return {
+        children: children,
         itemId: pathname,
+        leftAddon: leftAddon,
         parentId: parentId,
         to: pathname,
-        children: children,
-        leftAddon: leftAddon,
     };
 }
 
-const navItems = {
-    "/": createRoute("/", "Home", <HomeSVGIcon />),
-    "/exercise": createRoute("/exercise", "Des Goldschmieds Töchterlein", <TvSVGIcon />),
-};
+static fromTuneBook(tuneBook){
+    let navItems = {
+        "/": this.createRoute("/", "Home", <HomeSVGIcon />),
+    };
 
-export default navItems;
+    for(const tune of tuneBook.tunes){
+        const tunePathName = "/exercise/" + tune.id;
+        navItems[tunePathName] = this.createRoute(tunePathName, tune.title, <TvSVGIcon />);
+    }
+
+    return navItems;
+}
+}
+
+export default NavItems;
