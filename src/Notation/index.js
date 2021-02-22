@@ -10,8 +10,16 @@ class Notation extends Component {
     super(props);
 
     this.renderVisualObjs = this.renderVisualObjs.bind(this);
-    this.simultaneousNotes = simultaneousNotes(this.props.initialAbcString);
     this.config = config;
+    this.config.clickListener = this.handleClick.bind(this);
+    this.notesHighlighted = [];
+    this.visualObjs = abc.renderAbc(
+      "*",
+      this.props.initialAbcString,
+      this.config
+    );
+    this.voicesArray = this.visualObjs[0].makeVoicesArray();
+    this.simultaneousNotes = this.analyseSimultaneousNotes();
 
     this.state = {
       abcString: this.props.initialAbcString,
@@ -26,8 +34,52 @@ class Notation extends Component {
     this.renderVisualObjs();
   }
 
-  lowestAdjacentNote(abcelem){
-    const voicesArray = this.visualObjs[0].makeVoicesArray();
+  analyseSimultaneousNotes() {
+    const voicesArray = this.voicesArray;
+
+    let countTotal = 0;
+    let result = new Map();
+
+    let current = Array.from({
+      length: voicesArray.length
+    }, (_) => ({
+      "noteIndex": 0,
+      "countTotal": 0
+    }));
+
+    while (existsUnclassifiedNote(voicesArray, current)) {
+
+      let adjacentVoicesArrayIndices = [];
+
+      for (let i = 0; i < voicesArray.length; i++) {
+        while (voicesArray[i][current[i].noteIndex] && voicesArray[i][current[i].noteIndex].elem.type !== 'note' && voicesArray[i][current[i].noteIndex].elem.type !== 'rest') {
+          current[i].noteIndex++;
+        }
+        console.log(voicesArray[i][current[i].noteIndex] && current[i].countTotal === countTotal);
+        if (voicesArray[i][current[i].noteIndex] && current[i].countTotal === countTotal) {
+          adjacentVoicesArrayIndices.push({
+            voice: i,
+            noteTotal: current[i].noteIndex
+          });
+
+          current[i].countTotal += voicesArray[i][current[i].noteIndex].elem.duration;
+          current[i].noteIndex++;
+        }
+      }
+
+      for (let voiceArrayIndex of adjacentVoicesArrayIndices) {
+        const currentNoteElem = voicesArray[voiceArrayIndex.voice][voiceArrayIndex.noteTotal].elem;
+        result.set(JSON.stringify(currentNoteElem.counters), adjacentVoicesArrayIndices);
+      }
+
+      countTotal = Math.min(...current.map((voice) => voice.countTotal));
+    }
+
+    return result;
+  }
+
+  lowestAdjacentNote(abcelem) {
+    const voicesArray = this.voicesArray;
     const adjacentNotes = this.simultaneousNotes.get(JSON.stringify(abcelem.abselem.counters));
 
     const lowestAdjacentNote = adjacentNotes[adjacentNotes.length - 1];
@@ -36,7 +88,7 @@ class Notation extends Component {
 
   highlightAdjacentNotesOf(abcelem) {
     let notesHighlighted = [];
-    const voicesArray = this.visualObjs[0].makeVoicesArray();
+    const voicesArray = this.voicesArray;
     const adjacentNotes = this.simultaneousNotes.get(JSON.stringify(abcelem.abselem.counters));
 
     for (let adjacentNote of adjacentNotes) {
@@ -70,13 +122,13 @@ class Notation extends Component {
   }
 
   renderVisualObjs() {
-    this.config.clickListener = this.handleClick.bind(this);
-
     this.visualObjs = abc.renderAbc(
       this.props.el || this.el,
-      this.state.abcString, 
-      config
+      this.state.abcString,
+      this.config
     );
+
+    this.voicesArray = this.visualObjs[0].makeVoicesArray();
   }
 
   render() {
@@ -91,6 +143,7 @@ class Notation extends Component {
   }
 }
 
+//Helper functions
 function insert(main_string, ins_string, pos) {
   if (typeof (pos) == "undefined") {
     pos = 0;
@@ -106,51 +159,6 @@ function existsUnclassifiedNote(voicesArray, current) {
 
   for (let i = 0; i < voicesArray.length; i++) {
     result = result && (current[i].noteIndex < voicesArray[i].length);
-  }
-
-  return result;
-}
-
-function simultaneousNotes(abcString) {
-  const visualObjs = abc.renderAbc("*", abcString);
-  const voicesArray = visualObjs[0].makeVoicesArray();
-
-  let countTotal = 0;
-  let result = new Map();
-
-  let current = Array.from({
-    length: voicesArray.length
-  }, (_) => ({
-    "noteIndex": 0,
-    "countTotal": 0
-  }));
-
-  while (existsUnclassifiedNote(voicesArray, current)) {
-
-    let adjacentVoicesArrayIndices = [];
-
-    for (let i = 0; i < voicesArray.length; i++) {
-      while (voicesArray[i][current[i].noteIndex] && voicesArray[i][current[i].noteIndex].elem.type !== 'note' && voicesArray[i][current[i].noteIndex].elem.type !== 'rest') {
-        current[i].noteIndex++;
-      }
-      console.log(voicesArray[i][current[i].noteIndex] && current[i].countTotal === countTotal);
-      if (voicesArray[i][current[i].noteIndex] && current[i].countTotal === countTotal) {
-        adjacentVoicesArrayIndices.push({
-          voice: i,
-          noteTotal: current[i].noteIndex
-        });
-
-        current[i].countTotal += voicesArray[i][current[i].noteIndex].elem.duration;
-        current[i].noteIndex++;
-      }
-    }
-
-    for (let voiceArrayIndex of adjacentVoicesArrayIndices) {
-      const currentNoteElem = voicesArray[voiceArrayIndex.voice][voiceArrayIndex.noteTotal].elem;
-      result.set(JSON.stringify(currentNoteElem.counters), adjacentVoicesArrayIndices);
-    }
-
-    countTotal = Math.min(...current.map((voice) => voice.countTotal));
   }
 
   return result;
