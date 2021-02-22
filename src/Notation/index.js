@@ -13,6 +13,7 @@ class Notation extends Component {
     this.config = config;
     this.config.clickListener = this.handleClick.bind(this);
     this.notesHighlighted = [];
+    //TODO: #10 Add 'initial' prop, that stores initial visualObjs and initial voices Array
     this.visualObjs = abc.renderAbc(
       "*",
       this.props.initialAbcString,
