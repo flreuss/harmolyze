@@ -4,6 +4,7 @@ import React, {
 } from 'react';
 
 import config from "./config.json";
+import "./Score.css";
 
 class Score extends Component {
     constructor(props) {

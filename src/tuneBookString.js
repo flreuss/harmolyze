@@ -18,7 +18,7 @@ V:2
 V:3
  B, C D C/B,/ | A, D B, D | D G,/A,/ B, z |] %3
 V:4
- G, F, B,, "_D⁷"C, | D, D, "_⛶"G, B,,/C,/ | D, E, B,, z |] %3
+ G, F, B,, "_D-7"C, | D, D, "_T"G, B,,/C,/ | D, E, B,, z |] %3
 
 X:1
 T: Cooley's
