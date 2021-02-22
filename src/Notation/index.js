@@ -5,6 +5,20 @@ import React, {
 
 import config from "./config.json";
 
+function NotationWrapper(props){
+  const initialVisualObjs = abc.renderAbc(
+    "*",
+    props.initialAbcString,
+    config
+  );
+  const initial = {
+    visualObjs: initialVisualObjs,
+    voicesArray: initialVisualObjs[0].makeVoicesArray(),
+  };
+
+  return <Notation {...props} initial={initial}/>
+}
+
 class Notation extends Component {
   constructor(props) {
     super(props);
@@ -13,13 +27,8 @@ class Notation extends Component {
     this.config = config;
     this.config.clickListener = this.handleClick.bind(this);
     this.notesHighlighted = [];
-    //TODO: #10 Add 'initial' prop, that stores initial visualObjs and initial voices Array
-    this.visualObjs = abc.renderAbc(
-      "*",
-      this.props.initialAbcString,
-      this.config
-    );
-    this.voicesArray = this.visualObjs[0].makeVoicesArray();
+    this.visualObjs = this.props.initial.visualObjs;
+    this.voicesArray = this.props.initial.voicesArray;
     this.simultaneousNotes = this.analyseSimultaneousNotes();
 
     this.state = {
@@ -165,4 +174,4 @@ function existsUnclassifiedNote(voicesArray, current) {
   return result;
 }
 
-export default Notation;
+export default NotationWrapper;
