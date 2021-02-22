@@ -146,8 +146,8 @@ function simultaneousNotes(abcString) {
     }
 
     for (let voiceArrayIndex of adjacentVoicesArrayIndices) {
-      //TODO: #4 note represented by voiceArrayIndex itself shouldn't be added to itself's result
-      result.set(JSON.stringify(voicesArray[voiceArrayIndex.voice][voiceArrayIndex.noteTotal].elem.counters), adjacentVoicesArrayIndices);
+      const currentNoteElem = voicesArray[voiceArrayIndex.voice][voiceArrayIndex.noteTotal].elem;
+      result.set(JSON.stringify(currentNoteElem.counters), adjacentVoicesArrayIndices);
     }
 
     countTotal = Math.min(...current.map((voice) => voice.countTotal));
