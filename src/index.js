@@ -7,8 +7,6 @@ import abc from 'abcjs';
 import Layout from './Layout';
 
 import NavItems from "./navItems";
-//TODO: Move application to next.js
-//TODO: Create tunebookString from tunes in abcFiles folder on buildTime (Use Next.js respectively babel and babel-plugin-preval to achieve this)
 import tuneBookString from './tuneBookString';
 
 import './react-md.scss';

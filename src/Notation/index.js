@@ -1,6 +1,3 @@
-//TODO: Documentation
-//TODO: Write Unit tests
-
 import abc from 'abcjs';
 import React, {
   Component
@@ -29,7 +26,14 @@ class Notation extends Component {
     this.renderVisualObjs();
   }
 
-  //returns abcelem of lowest AdjacentNote
+  lowestAdjacentNote(abcelem){
+    const voicesArray = this.visualObjs[0].makeVoicesArray();
+    const adjacentNotes = this.simultaneousNotes.get(JSON.stringify(abcelem.abselem.counters));
+
+    const lowestAdjacentNote = adjacentNotes[adjacentNotes.length - 1];
+    return voicesArray[lowestAdjacentNote.voice][lowestAdjacentNote.noteTotal].elem.abcelem;
+  }
+
   highlightAdjacentNotesOf(abcelem) {
     let notesHighlighted = [];
     const voicesArray = this.visualObjs[0].makeVoicesArray();
@@ -41,9 +45,6 @@ class Notation extends Component {
     }
 
     this.notesHighlighted = notesHighlighted;
-
-    const lowestAdjacentNote = adjacentNotes[adjacentNotes.length - 1];
-    return voicesArray[lowestAdjacentNote.voice][lowestAdjacentNote.noteTotal].elem.abcelem;
   }
 
   handleClick(abcelem, tuneNumber, classes, analysis, drag, mouseEvent) {
@@ -52,11 +53,12 @@ class Notation extends Component {
     };
     this.notesHighlighted = [];
 
-    //TODO: fix problem with timing when highlighting and entering chord that occurs in Chrome
-    var lowestAdjacentNote = this.highlightAdjacentNotesOf(abcelem);
+    //TODO: #1 fix problem with timing when highlighting and entering chord that occurs in Chrome
+    var lowestAdjacentNote = this.lowestAdjacentNote(abcelem);
+    this.highlightAdjacentNotesOf(abcelem);
 
     if (lowestAdjacentNote.chord) {
-      //TODO: Edit chord, that's already existing. Aber nicht die als Lösung bereits vorgegebenen!
+      //TODO: #5 Edit chord, that's already existing. But only, if it wasn't already given as part of the initial abc string.
     } else if (!abcelem.rest) {
       var riemannFunc = prompt("Bitte Funktion angeben:", "D7");
       if (riemannFunc) {
@@ -122,7 +124,7 @@ function simultaneousNotes(abcString) {
     "noteIndex": 0,
     "countTotal": 0
   }));
-  //Array(voicesArray.length).fill({"noteIndex": 0, "countTotal": 0});
+
   while (existsUnclassifiedNote(voicesArray, current)) {
 
     let adjacentVoicesArrayIndices = [];
@@ -143,9 +145,8 @@ function simultaneousNotes(abcString) {
       }
     }
 
-    //Adjazenzmatrix bilden!
     for (let voiceArrayIndex of adjacentVoicesArrayIndices) {
-      //remove note itself
+      //TODO: #4 note represented by voiceArrayIndex itself shouldn't be added to itself's result
       result.set(JSON.stringify(voicesArray[voiceArrayIndex.voice][voiceArrayIndex.noteTotal].elem.counters), adjacentVoicesArrayIndices);
     }
 
