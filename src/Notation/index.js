@@ -89,11 +89,15 @@ class Notation extends Component {
   }
 
   lowestAdjacentNote(abcelem) {
-    const voicesArray = this.voicesArray;
     const adjacentNotes = this.simultaneousNotes.get(JSON.stringify(abcelem.abselem.counters));
-
     const lowestAdjacentNote = adjacentNotes[adjacentNotes.length - 1];
-    return voicesArray[lowestAdjacentNote.voice][lowestAdjacentNote.noteTotal].elem.abcelem;
+
+    return lowestAdjacentNote;
+  }
+
+  chordInitiallyFilled(voiceArrayIndex) {
+    const voicesArray = this.voicesArray;
+    return this.props.initial.voicesArray[voiceArrayIndex.voice][voiceArrayIndex.noteTotal].elem.abcelem.chord
   }
 
   highlightAdjacentNotesOf(abcelem) {
@@ -116,17 +120,28 @@ class Notation extends Component {
     this.notesHighlighted = [];
 
     //TODO: #1 fix problem with timing when highlighting and entering chord that occurs in Chrome
-    var lowestAdjacentNote = this.lowestAdjacentNote(abcelem);
+    const lowestAdjacentNoteIndex = this.lowestAdjacentNote(abcelem);
     this.highlightAdjacentNotesOf(abcelem);
+    const lowestAdjacentNote = this.voicesArray[lowestAdjacentNoteIndex.voice][lowestAdjacentNoteIndex.noteTotal].elem.abcelem;
+    const chordInitiallyFilled = this.chordInitiallyFilled(lowestAdjacentNoteIndex);
 
-    if (lowestAdjacentNote.chord) {
-      //TODO: #5 Edit chord, that's already existing. But only, if it wasn't already given as part of the initial abc string.
-    } else if (!abcelem.rest) {
-      var riemannFunc = prompt("Bitte Funktion angeben:", "D7");
+    if (!chordInitiallyFilled && !abcelem.rest) {
+      if(lowestAdjacentNote.chord){
+        const riemannFunc = prompt("Bitte Funktion angeben:", lowestAdjacentNote.chord[0].name);
+        const chordLength = lowestAdjacentNote.chord[0].name.length;
+        if (riemannFunc) {
+          this.setState({
+            abcString: replace(this.state.abcString, `"_${riemannFunc}"`, lowestAdjacentNote.startChar, chordLength+3)
+          });
+        }
+        //edit chord dialog 
+      } else {
+      const riemannFunc = prompt("Bitte Funktion angeben:");
       if (riemannFunc) {
         this.setState({
           abcString: insert(this.state.abcString, `"_${riemannFunc}"`, lowestAdjacentNote.startChar)
         });
+      }
       }
     }
   }
@@ -162,6 +177,16 @@ function insert(main_string, ins_string, pos) {
     ins_string = '';
   }
   return main_string.slice(0, pos) + ins_string + main_string.slice(pos);
+}
+
+function replace(main_string, repl_string, pos, len) {
+  if (typeof (pos) == "undefined") {
+    pos = 0;
+  }
+  if (typeof (repl_string) == "undefined") {
+    repl_string = '';
+  }
+  return main_string.slice(0, pos) + repl_string + main_string.slice(pos+len);
 }
 
 function existsUnclassifiedNote(voicesArray, current) {
