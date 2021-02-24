@@ -7,7 +7,6 @@ import { useRouter } from "next/router";
 
 import "../styles/globals.css";
 
-// import NavItems from "../lib/navItems";
 import tuneBookString from "../lib/tuneBookString";
 
 const theme = {

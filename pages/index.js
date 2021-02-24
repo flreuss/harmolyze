@@ -2,13 +2,13 @@ import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
 import { useRouter } from "next/router";
 
 export default function Home(props) {
-  const data = props.tuneBook.tunes;
+  const tunes = props.tuneBook.tunes;
   const router = useRouter();
 
   return (
     <Box pad="large" background="dark-1" height="100%">
       <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
-        {data.map((tune) => (
+        {tunes.map((tune) => (
           <Card
             key={tune.id}
             onClick={() => router.push(`/exercise/${tune.id}`)}
