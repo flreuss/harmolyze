@@ -13,7 +13,7 @@ export default function CustomDialogContent(props) {
           dialog.close(value);
         }}
       >
-        <Box pad="medium" gap="small" width="medium">
+        <Box pad="medium" gap="small">
           <Heading level={3} margin="none">
             Riemann Function
           </Heading>
