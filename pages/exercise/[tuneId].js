@@ -5,17 +5,15 @@ import {
 
 import Score from "../../components/Score";
 
-
-function Notation(props) {
+function Exercise(props) {
   const router = useRouter();
   const {
     tuneId
   } = router.query;
 
-    // const initialAbcString = props.tuneBook.getTuneById(+tuneId).abc;
-    const initialAbcString = props.tuneBook.getTuneById(0).abc;
+    const initialAbcString = props.tuneBook.getTuneById(+tuneId).abc;
 
     return <Score abcString = {initialAbcString}/>;
 }
 
-export default Notation;
+export default Exercise;

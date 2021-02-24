@@ -9,5 +9,12 @@
         "name": "Launch Chrome against localhost",
         "url": "http://localhost:3000",
         "webRoot": "${workspaceFolder}"
-    }]
+    },
+    {
+        "type": "node",
+        "request": "attach",
+        "name": "Launch Program",
+        "skipFiles": ["<node_internals>/**"],
+        "port": 9229
+      }]
 }

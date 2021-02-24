@@ -1,60 +1,41 @@
 import Link from 'next/link';
-
+import { Box, Grid, Card, CardBody, CardFooter, Text } from 'grommet';
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
-export default function Home() {
+export default function Home(props) {
+  const data =props.tuneBook.tunes;
+  const router = useRouter();
+
   return (
-    <div>
-      <Head>
-        <title>Riemann App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Box pad="large" background="dark-1" height="100%">
 
-      <main>
-        <h1>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+    <Grid gap="medium" columns={{ count: 'fit', size: 'small' }}>
 
-        <p>
-          Get started by editing{' '}
-          <code>pages/index.js</code>
-        </p>
+      {data.map(tune => (
 
-        <div>
-          <a href="https://nextjs.org/docs">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+        <Card
+          key={tune.id}
+          onClick={() => router.push(`/exercise/${tune.id}`)}
 
-          <a href="https://nextjs.org/learn">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+        >
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+          <CardBody pad="small">
+            <Text size="medium">{tune.title}</Text>
+          </CardBody>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+          <CardFooter pad={{ horizontal: 'medium', vertical: 'small' }}>
 
-      <footer>
-      <div><Link href="/exercise/0">
-        <a>Go to exercise 0</a>
-      </Link>
-      </div>
-      </footer>
-    </div>
+            <Text size="xsmall">Exercise {tune.id}</Text>
+
+          </CardFooter>
+
+        </Card>
+
+      ))}
+
+    </Grid>
+
+  </Box>
   )
 }

@@ -1,3 +1,7 @@
+body {
+         margin: 0;
+       }
+
 @font-face {
   font-family: 'Riemann';
   /* Base64-encoded because Firefox has issues fetching local resources */
@@ -12,4 +16,12 @@
   font-weight: normal;
   font-style: normal;
   font-feature-settings: "liga";
+}
+
+.abcjs-note:hover {
+  cursor: pointer;
+}
+
+.abcjs-annotation:hover{
+  cursor: default;
 }
