@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
-import Head from "next/head";
 import { useRouter } from "next/router";
 
 export default function Home(props) {
