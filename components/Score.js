@@ -73,7 +73,6 @@ class Score extends Component {
     }
     this.notesHighlighted = [];
 
-    //TODO: #1 fix problem with timing when highlighting and entering chord that occurs in Chrome
     this.highlightAdjacentNotesOf(abcelem);
 
     const lowestAdjacentNotePos = this.lowestAdjacentNote(abcelem);
