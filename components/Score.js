@@ -15,7 +15,23 @@ class Score extends Component {
       this.config.clickListener = this.handleClick.bind(this);
       this.notesHighlighted = [];
 
-      const initialVisualObjs = abc.renderAbc("*", props.abcString);
+      //TODO: soll auch bei resize passieren
+      switch (props.size) {
+        case "small":
+          this.config.staffwidth = window.innerWidth;
+          break;
+        case "medium":
+          this.config.staffwidth = window.innerWidth / 1.5;
+          break;
+        default:
+          this.config.staffwidth = window.innerWidth / 2;
+      }
+
+      const initialVisualObjs = abc.renderAbc(
+        "*",
+        props.abcString,
+        this.config
+      );
       const voicesArray = initialVisualObjs[0].makeVoicesArray();
 
       this.initial = {

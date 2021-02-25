@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { Box } from "grommet";
+import { Box, ResponsiveContext  } from "grommet";
 import { CustomDialog } from "react-st-modal";
 
 import Score from "../../components/Score";
@@ -14,6 +14,8 @@ function Exercise(props) {
 
   return (
     <Box fill align="center" justify="center">
+      <ResponsiveContext.Consumer>
+      {size => (
       <Score
         abcString={initialAbcString}
         openDialog={async (defaultValue) => {
@@ -21,7 +23,10 @@ function Exercise(props) {
             <RiemannFuncSelectionPanel defaultValue={defaultValue} />
           );
         }}
+        size={size}
       />
+      )}
+      </ResponsiveContext.Consumer>
     </Box>
   );
 }
