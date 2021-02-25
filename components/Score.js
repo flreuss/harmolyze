@@ -2,7 +2,8 @@ import abc from "abcjs";
 import React, { Component } from "react";
 
 import config from "../components/Score.config.json";
-import VoiceArrayPosition from "../lib/VoiceArrayPosition";
+import RiemannFunc from "../lib/RiemannFunc";
+import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
 class Score extends Component {
   constructor(props) {

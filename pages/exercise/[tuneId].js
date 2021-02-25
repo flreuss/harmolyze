@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/router";
-import { Box, Button, Heading, Keyboard, Text, TextInput } from "grommet";
-import { CustomDialog, useDialog } from "react-st-modal";
+import { Box } from "grommet";
+import { CustomDialog } from "react-st-modal";
 
 import Score from "../../components/Score";
 import RiemannFuncSelectionPanel from "../../components/RiemannFuncSelectionPanel";
