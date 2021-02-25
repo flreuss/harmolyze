@@ -12,6 +12,10 @@ export default function CustomDialogContent(props) {
           // Сlose the dialog and return the value
           dialog.close(value);
         }}
+        onEsc={() => {
+          // Сlose the dialog and return the value
+          dialog.close(value);
+        }}
       >
         <Box pad="medium" gap="small">
           <Heading level={3} margin="none">

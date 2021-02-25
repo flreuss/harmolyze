@@ -1,7 +1,7 @@
 import abc from "abcjs";
 import React, { Component } from "react";
 
-import config from "../components/Score.config.json";
+import config from "./Score.config.json";
 import RiemannFunc from "../lib/RiemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
@@ -30,6 +30,7 @@ class Score extends Component {
           this.config.staffwidth = window.innerWidth / 2.5;
       }
 
+      //TODO: Muss in Bezug auf den viewport gerendert werden, damit die line counters stimmen (wrapping)
       const initialVisualObjs = abc.renderAbc(
         "*",
         props.abcString,

@@ -6,10 +6,16 @@ export default function Home(props) {
   const router = useRouter();
 
   return (
-    <Box pad="large" background="dark-1" height="100%">
+    <Box
+      pad="large"
+      background="url(https://blog.hdwallsource.com/wp-content/uploads/2014/11/gradient-26052-26737-hd-wallpapers.jpg.png)"
+      height="100%"
+    >
       <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
         {tunes.map((tune) => (
           <Card
+            background="white"
+            animation={{ type: "fadeIn", size: "medium" }}
             key={tune.id}
             onClick={() => router.push(`/exercise/${tune.id}`)}
           >

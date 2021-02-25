@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { Box, ResponsiveContext  } from "grommet";
+import { Box, ResponsiveContext } from "grommet";
 import { CustomDialog } from "react-st-modal";
 
 import Score from "../../components/Score";
@@ -13,19 +13,24 @@ function Exercise(props) {
   const initialAbcString = props.tuneBook.getTuneById(+tuneId).abc;
 
   return (
-    <Box fill align="center" justify="center">
+    <Box
+      animation={{ type: "fadeIn", size: "medium" }}
+      fill
+      align="center"
+      justify="center"
+    >
       <ResponsiveContext.Consumer>
-      {size => (
-      <Score
-        abcString={initialAbcString}
-        openDialog={async (defaultValue) => {
-          return await CustomDialog(
-            <RiemannFuncSelectionPanel defaultValue={defaultValue} />
-          );
-        }}
-        size={size}
-      />
-      )}
+        {(size) => (
+          <Score
+            abcString={initialAbcString}
+            openDialog={async (defaultValue) => {
+              return await CustomDialog(
+                <RiemannFuncSelectionPanel defaultValue={defaultValue} />
+              );
+            }}
+            size={size}
+          />
+        )}
       </ResponsiveContext.Consumer>
     </Box>
   );

@@ -5,12 +5,12 @@ import {
   Button,
   Heading,
   Grommet,
-  Keyboard,
+  Grid,
   Header,
   Main,
   Nav,
   Avatar,
-  Anchor
+  Anchor,
 } from "grommet";
 import { Home } from "grommet-icons";
 import Link from "next/link";
@@ -25,15 +25,23 @@ import RiemannFunc from "../lib/RiemannFunc";
 const gravatarSrc =
   "//s.gravatar.com/avatar/b7fb138d53ba0f573212ccce38a7c43b?s=80";
 
-function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const tuneBook = new abc.TuneBook(tuneBookString);
   // const navItems = NavItems.fromTuneBook(tuneBook);
 
   return (
-    <Grommet theme={grommet}>
-      <Keyboard target="document" onEsc={() => router.push(`/`)}>
-        <Header background="brand" pad="small">
+    <Grommet full theme={grommet}>
+      <Grid
+        fill
+        rows={["auto", "flex"]}
+        columns={["auto", "flex"]}
+        areas={[
+          { name: "header", start: [0, 0], end: [1, 0] },
+          { name: "main", start: [1, 1], end: [1, 1] },
+        ]}
+      >
+        <Header gridArea="header" background="brand" pad="small">
           <Nav gap="small" direction="row">
             <Link href="/" passHref>
               <Button
@@ -52,12 +60,10 @@ function MyApp({ Component, pageProps }) {
             </Anchor>
           </Box>
         </Header>
-        <Main pad="small">
+        <Main gridArea="main">
           <Component {...pageProps} tuneBook={tuneBook} />
         </Main>
-      </Keyboard>
+      </Grid>
     </Grommet>
   );
 }
-
-export default MyApp;
