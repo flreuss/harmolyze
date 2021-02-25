@@ -15,7 +15,7 @@ class Score extends Component {
       this.config.clickListener = this.handleClick.bind(this);
       this.notesHighlighted = [];
 
-      //TODO: soll auch bei resize passieren
+      //TODO: #21 staffwidth Änderung soll auch bei resize passieren
       switch (props.size) {
         case "small":
           this.config.staffwidth = window.innerWidth;
@@ -23,8 +23,11 @@ class Score extends Component {
         case "medium":
           this.config.staffwidth = window.innerWidth / 1.5;
           break;
-        default:
+        case "large":
           this.config.staffwidth = window.innerWidth / 2;
+          break;
+        default:
+          this.config.staffwidth = window.innerWidth / 2.5;
       }
 
       const initialVisualObjs = abc.renderAbc(
@@ -86,7 +89,7 @@ class Score extends Component {
 
   handleClick(abcelem, _tuneNumber, _classes, _analysis, _drag, _mouseEvent) {
     if (this.notesHighlighted) {
-      this.notesHighlighted.forEach((el) => el.unhighlight(undefined, "black"));
+      this.notesHighlighted.forEach((el) => el.unhighlight(undefined, "currentColor"));
     }
     this.notesHighlighted = [];
 
