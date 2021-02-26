@@ -7,6 +7,7 @@ import Score from "../../components/score";
 import RiemannFuncSelectionPanel from "../../components/riemannFuncSelectionPanel";
 
 import { getTunes, getTuneById } from "../../lib/tunes";
+import { removeSolutions } from "../../lib/solutions";
 
 export default function Exercise({ initialAbcString, solutionAbcString }) {
   return (
@@ -40,7 +41,7 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       //TODO: #26 add function that extracts initial string from solution following specific rules
-      initialAbcString: getTuneById(params.tuneId).abc,
+      initialAbcString: removeSolutions(getTuneById(params.tuneId).abc),
       solutionAbcString: getTuneById(params.tuneId).abc,
     },
   };
