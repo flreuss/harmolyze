@@ -1,17 +1,14 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { Box, ResponsiveContext } from "grommet";
-import { CustomDialog } from "react-st-modal";
+// import { CustomDialog, useDialog } from "react-st-modal";
 
-import Score from "../../components/Score";
-import RiemannFuncSelectionPanel from "../../components/RiemannFuncSelectionPanel";
+import Score from "../../components/score";
+import RiemannFuncSelectionPanel from "../../components/riemannFuncSelectionPanel";
 
-function Exercise(props) {
-  const router = useRouter();
-  const { tuneId } = router.query;
+import { getTunes, getTuneById } from "../../lib/tunes";
 
-  const initialAbcString = props.tuneBook.getTuneById(+tuneId).abc;
-
+export default function Exercise({ initialAbcString, solutionAbcString }) {
   return (
     <Box
       animation={{ type: "fadeIn", size: "medium" }}
@@ -23,11 +20,14 @@ function Exercise(props) {
         {(size) => (
           <Score
             abcString={initialAbcString}
-            openDialog={async (defaultValue) => {
-              return await CustomDialog(
-                <RiemannFuncSelectionPanel defaultValue={defaultValue} />
-              );
-            }}
+            // openDialog={async (defaultValue) => {
+            //   return await CustomDialog(
+            //     <RiemannFuncSelectionPanel
+            //       dialog={useDialog()}
+            //       defaultValue={defaultValue}
+            //     />
+            //   );
+            // }}
             size={size}
           />
         )}
@@ -36,4 +36,26 @@ function Exercise(props) {
   );
 }
 
-export default Exercise;
+export async function getStaticProps({ params }) {
+  return {
+    props: {
+      //TODO: #26 add function that extracts initial string from solution following specific rules
+      initialAbcString: getTuneById(params.tuneId).abc,
+      solutionAbcString: getTuneById(params.tuneId).abc,
+    },
+  };
+}
+
+export async function getStaticPaths() {
+  const tunes = getTunes();
+  return {
+    paths: tunes.map((tune) => {
+      return {
+        params: {
+          tuneId: tune.id,
+        },
+      };
+    }),
+    fallback: false,
+  };
+}

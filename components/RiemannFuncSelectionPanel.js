@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Box, Button, Heading, Keyboard, Text, TextInput } from "grommet";
-import { useDialog } from "react-st-modal";
 
 export default function CustomDialogContent(props) {
-    const dialog = useDialog();
+    const dialog = props.dialog;
     const [value, setValue] = useState(props.defaultValue);
   
     return (

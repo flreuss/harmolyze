@@ -30,7 +30,7 @@ class Score extends Component {
           this.config.staffwidth = window.innerWidth / 2.5;
       }
 
-      //TODO: Muss in Bezug auf den viewport gerendert werden, damit die line counters stimmen (wrapping)
+      //TODO: Muss in Bezug auf den viewport gerendert werden, damit die line counters stimmen (wrapping) -> useEffect mit Überprüfung ob resizehook callt
       const initialVisualObjs = abc.renderAbc(
         "*",
         props.abcString,

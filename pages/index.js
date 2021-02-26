@@ -1,8 +1,9 @@
 import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
 import { useRouter } from "next/router";
 
-export default function Home(props) {
-  const tunes = props.tuneBook.tunes;
+import { getTunes } from "../lib/tunes";
+
+export default function Home({ tunes }) {
   const router = useRouter();
 
   return (
@@ -31,4 +32,12 @@ export default function Home(props) {
       </Grid>
     </Box>
   );
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      tunes: getTunes(true),
+    },
+  };
 }

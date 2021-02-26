@@ -19,7 +19,6 @@ import { grommet } from "grommet/themes";
 
 import "../styles/globals.css";
 
-import tuneBookString from "../lib/tuneBookString";
 import RiemannFunc from "../lib/RiemannFunc";
 
 const gravatarSrc =
@@ -27,8 +26,6 @@ const gravatarSrc =
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
-  const tuneBook = new abc.TuneBook(tuneBookString);
-  // const navItems = NavItems.fromTuneBook(tuneBook);
 
   return (
     <Grommet full theme={grommet}>
@@ -61,7 +58,7 @@ export default function MyApp({ Component, pageProps }) {
           </Box>
         </Header>
         <Main gridArea="main">
-          <Component {...pageProps} tuneBook={tuneBook} />
+          <Component {...pageProps} />
         </Main>
       </Grid>
     </Grommet>
