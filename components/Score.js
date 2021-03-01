@@ -1,188 +1,183 @@
 import abc from "abcjs";
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
+import { Grommet } from "grommet";
 
-import config from "./Score.config.json";
+import RiemannFuncSelectionPanel from "../components/riemannFuncSelectionPanel";
+
+import configFromFile from "./Score.config.json";
 import RiemannFunc from "../lib/RiemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
-class Score extends Component {
-  constructor(props) {
-    super(props);
+export default function Score(props) {
+  //TODO: Global variables cause side effects...
+  var visualObjs;
+  var voicesArray;
+  var notesHighlighted = [];
 
-    if (typeof window !== "undefined") {
-      this.renderVisualObjs = this.renderVisualObjs.bind(this);
-      this.config = config;
-      this.config.clickListener = this.handleClick.bind(this);
-      this.notesHighlighted = [];
+  //TODO: initial should be set only once and stay read-only after being set and shouldn't be recalculated on each render
+  var simultaneousNotesArray;
+  var initialVoicesArray;
+  useEffect(() => {
+    initialVoicesArray = abc
+      .renderAbc("*", props.abcString)[0]
+      .makeVoicesArray();
+    simultaneousNotesArray = makeSimultaneousNotesArray(initialVoicesArray);
+  });
 
-      //TODO: #21 staffwidth Änderung soll auch bei resize passieren
-      switch (props.size) {
-        case "small":
-          this.config.staffwidth = window.innerWidth;
-          break;
-        case "medium":
-          this.config.staffwidth = window.innerWidth / 1.5;
-          break;
-        case "large":
-          this.config.staffwidth = window.innerWidth / 2;
-          break;
-        default:
-          this.config.staffwidth = window.innerWidth / 2.5;
-      }
+  const [abcString, setAbcString] = useState(props.abcString);
+  useEffect(() => {
+    renderVisualObjs();
+  }, [props, abcString]);
 
-      //TODO: Muss in Bezug auf den viewport gerendert werden, damit die line counters stimmen (wrapping) -> useEffect mit Überprüfung ob resizehook callt
-      const initialVisualObjs = abc.renderAbc(
-        "*",
-        props.abcString,
-        this.config
-      );
-      const voicesArray = initialVisualObjs[0].makeVoicesArray();
+  const [openModal, setOpenModal] = useState(undefined);
 
-      this.initial = {
-        abcString: props.abcString,
-        visualObjs: initialVisualObjs,
-        voicesArray: voicesArray,
-        simultaneousNotesArray: makeSimultaneousNotesArray(voicesArray),
-      };
-
-      this.state = {
-        abcString: this.initial.abcString,
-      };
-    }
-  }
-
-  componentDidMount() {
-    this.renderVisualObjs();
-  }
-
-  componentDidUpdate() {
-    this.renderVisualObjs();
-  }
-
-  lowestAdjacentNote(abcelem) {
-    const adjacentNotes = this.initial.simultaneousNotesArray.get(
+  //Methods
+  const initialChordOf = (abcelem) => {
+    const adjacentNotes = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
     );
-    const lowestAdjacentNote = adjacentNotes[adjacentNotes.length - 1];
+    const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
 
-    return lowestAdjacentNote;
-  }
+    return initialVoicesArray[lowestAdjacentNotePos.voice][
+      lowestAdjacentNotePos.noteTotal
+    ].elem.abcelem.chord;
+  };
 
-  highlightAdjacentNotesOf(abcelem) {
-    let notesHighlighted = [];
-    const voicesArray = this.voicesArray;
-    const adjacentNotes = this.initial.simultaneousNotesArray.get(
+  const lowestAdjacentNoteOf = (abcelem) => {
+    var adjacentNotes = simultaneousNotesArray.get(
+      JSON.stringify(abcelem.abselem.counters)
+    );
+
+    const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
+
+    return voicesArray[lowestAdjacentNotePos.voice][
+      lowestAdjacentNotePos.noteTotal
+    ].elem;
+  };
+
+  const highlightAdjacentNotesOf = (abcelem, multiselect = false) => {
+    if (!multiselect && notesHighlighted.length > 0) {
+      notesHighlighted.forEach((el) =>
+        el.unhighlight(undefined, "currentColor")
+      );
+      notesHighlighted = [];
+    }
+
+    const adjacentNotes = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
     );
 
     for (let adjacentNote of adjacentNotes) {
       voicesArray[adjacentNote.voice][adjacentNote.noteTotal].elem.highlight(
         undefined,
-        this.config.selectionColor
+        configFromFile.selectionColor
       );
       notesHighlighted.push(
         voicesArray[adjacentNote.voice][adjacentNote.noteTotal].elem
       );
     }
+  };
 
-    this.notesHighlighted = notesHighlighted;
-  }
+  const handleClick = (
+    abcelem,
+    _tuneNumber,
+    _classes,
+    _analysis,
+    _drag,
+    _mouseEvent
+  ) => {
+    highlightAdjacentNotesOf(abcelem);
 
-  handleClick(abcelem, _tuneNumber, _classes, _analysis, _drag, _mouseEvent) {
-    if (this.notesHighlighted) {
-      this.notesHighlighted.forEach((el) => el.unhighlight(undefined, "currentColor"));
-    }
-    this.notesHighlighted = [];
+    const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
-    this.highlightAdjacentNotesOf(abcelem);
-
-    const lowestAdjacentNotePos = this.lowestAdjacentNote(abcelem);
-    const lowestAdjacentNote = this.voicesArray[lowestAdjacentNotePos.voice][
-      lowestAdjacentNotePos.noteTotal
-    ].elem.abcelem;
-    const initialLowestAdjacentNote = this.initial.voicesArray[
-      lowestAdjacentNotePos.voice
-    ][lowestAdjacentNotePos.noteTotal].elem.abcelem;
-
-    if (!initialLowestAdjacentNote.chord && !abcelem.rest) {
+    if (!initialChordOf(abcelem) && !abcelem.rest) {
       if (lowestAdjacentNote.chord) {
-        this.props
-          .openDialog(lowestAdjacentNote.chord[0].name)
-          .then((riemannFunc) => {
+        setOpenModal({
+          onClose: (riemannFunc) => {
             const chordLength = lowestAdjacentNote.chord[0].name.length;
             if (
               riemannFunc &&
               riemannFunc !== lowestAdjacentNote.chord[0].name
             ) {
-              this.setState({
-                abcString: replace(
-                  this.state.abcString,
+              setAbcString(
+                replace(
+                  abcString,
                   `"_${riemannFunc}"`,
                   lowestAdjacentNote.startChar,
                   chordLength + 3
-                ),
-              });
+                )
+              );
             }
-          });
+            setOpenModal(undefined);
+          },
+          defaultValue: lowestAdjacentNote.chord[0].name,
+        });
       } else {
-        this.props.openDialog().then((riemannFunc) => {
-          if (riemannFunc) {
-            this.setState({
-              abcString: insert(
-                this.state.abcString,
-                `"_${riemannFunc}"`,
-                lowestAdjacentNote.startChar
-              ),
-            });
-          }
+        setOpenModal({
+          onClose: (riemannFunc) => {
+            if (riemannFunc) {
+              setAbcString(
+                insert(
+                  abcString,
+                  `"_${riemannFunc}"`,
+                  lowestAdjacentNote.startChar
+                )
+              );
+            }
+            setOpenModal(undefined);
+          },
+          defaultValue: "",
         });
       }
     }
-  }
+  };
 
-  renderVisualObjs() {
-    if (typeof window !== "undefined") {
-      this.visualObjs = abc.renderAbc(
-        this.props.el || this.el,
-        this.state.abcString,
-        this.config
-      );
-
-      this.voicesArray = this.visualObjs[0].makeVoicesArray();
+  const renderVisualObjs = () => {
+    let config = configFromFile;
+    config.clickListener = handleClick;
+    //TODO: #21 staffwidth Änderung soll auch bei resize passieren
+    switch (props.size) {
+      case "small":
+        config.staffwidth = window.innerWidth;
+        break;
+      case "medium":
+        config.staffwidth = window.innerWidth / 1.5;
+        break;
+      case "large":
+        config.staffwidth = window.innerWidth / 2;
+        break;
+      default:
+        config.staffwidth = window.innerWidth / 2.5;
     }
-  }
 
-  render() {
-    return (
-      <div
-        ref={(input) => {
-          this.el = input;
-        }}
-      />
-    );
-  }
+    visualObjs = abc.renderAbc("scoreContainer", abcString, config);
+    voicesArray = visualObjs[0].makeVoicesArray();
+  };
+
+  return (
+    <Grommet full>
+      <div id="scoreContainer" />
+      {openModal && (
+        <RiemannFuncSelectionPanel
+          onClose={openModal.onClose}
+          defaultValue={openModal.defaultValue}
+        />
+      )}
+    </Grommet>
+  );
 }
 
+//===========================================================
+
 //Helper functions
-function insert(main_string, ins_string, pos) {
-  if (typeof pos == "undefined") {
-    pos = 0;
-  }
-  if (typeof ins_string == "undefined") {
-    ins_string = "";
-  }
+function insert(main_string, ins_string = "", pos = 0) {
   return main_string.slice(0, pos) + ins_string + main_string.slice(pos);
 }
 
-function replace(main_string, repl_string, pos, len) {
-  if (typeof len == "undefined") {
-    len = 0;
-  }
-  if (typeof pos == "undefined") {
-    pos = 0;
-  }
-  if (typeof repl_string == "undefined") {
-    repl_string = "";
+function replace(main_string, repl_string = "", pos = 0, len = 0) {
+  //workaround for chords
+  if (main_string[pos] === "[") {
+    pos -= len;
   }
   return main_string.slice(0, pos) + repl_string + main_string.slice(pos + len);
 }
@@ -251,5 +246,3 @@ function existsUnclassifiedNote(voicesArray, current) {
 
   return result;
 }
-
-export default Score;

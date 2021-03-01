@@ -4,7 +4,6 @@ import { Box, ResponsiveContext } from "grommet";
 // import { CustomDialog, useDialog } from "react-st-modal";
 
 import Score from "../../components/score";
-import RiemannFuncSelectionPanel from "../../components/riemannFuncSelectionPanel";
 
 import { getTunes, getTuneById } from "../../lib/tunes";
 import { removeSolutions } from "../../lib/solutions";
@@ -21,14 +20,6 @@ export default function Exercise({ initialAbcString, solutionAbcString }) {
         {(size) => (
           <Score
             abcString={initialAbcString}
-            // openDialog={async (defaultValue) => {
-            //   return await CustomDialog(
-            //     <RiemannFuncSelectionPanel
-            //       dialog={useDialog()}
-            //       defaultValue={defaultValue}
-            //     />
-            //   );
-            // }}
             size={size}
           />
         )}
@@ -40,7 +31,6 @@ export default function Exercise({ initialAbcString, solutionAbcString }) {
 export async function getStaticProps({ params }) {
   return {
     props: {
-      //TODO: #26 add function that extracts initial string from solution following specific rules
       initialAbcString: removeSolutions(getTuneById(params.tuneId).abc),
       solutionAbcString: getTuneById(params.tuneId).abc,
     },
