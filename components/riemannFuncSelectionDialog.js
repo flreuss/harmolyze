@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Heading, Layer, Text, TextInput } from "grommet";
 
-import RiemannFunc from "../lib/RiemannFunc";
+import RiemannFunc from "../lib/riemannFunc";
 
 export default function RiemannFuncSelectionDialog({
   defaultValue,

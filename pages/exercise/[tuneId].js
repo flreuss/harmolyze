@@ -1,7 +1,5 @@
 import React from "react";
-import { useRouter } from "next/router";
 import { Box, ResponsiveContext } from "grommet";
-// import { CustomDialog, useDialog } from "react-st-modal";
 
 import Score from "../../components/score";
 

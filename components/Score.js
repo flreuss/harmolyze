@@ -1,12 +1,12 @@
 import abc from "abcjs";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
 import RiemannFuncSelectionDialog from "./riemannFuncSelectionDialog";
 import Notification from "../components/notification";
 
-import configFromFile from "./Score.config.json";
-import RiemannFunc from "../lib/RiemannFunc";
+import configFromFile from "./score.config.json";
+import RiemannFunc from "../lib/riemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
 export default function Score({ initialAbcString, solution, size }) {

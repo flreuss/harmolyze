@@ -1,9 +1,7 @@
 import React from "react";
-import abc from "abcjs";
 import {
   Box,
   Button,
-  Heading,
   Grommet,
   Grid,
   Header,
@@ -14,19 +12,14 @@ import {
 } from "grommet";
 import { Home } from "grommet-icons";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { grommet } from "grommet/themes";
 
 import "../styles/globals.css";
 
-import RiemannFunc from "../lib/RiemannFunc";
-
 const gravatarSrc =
   "//s.gravatar.com/avatar/b7fb138d53ba0f573212ccce38a7c43b?s=80";
 
-export default function MyApp({ Component, pageProps }) {
-  const router = useRouter();
-
+export default function RiemannApp({ Component, pageProps }) {
   return (
     <Grommet full theme={grommet}>
       <Grid
