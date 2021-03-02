@@ -21,6 +21,7 @@ export default function Exercise({ initialAbcString, solutionAbcString }) {
           <Score
             abcString={initialAbcString}
             size={size}
+            solution={solutionAbcString}
           />
         )}
       </ResponsiveContext.Consumer>

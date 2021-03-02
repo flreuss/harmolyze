@@ -1,6 +1,6 @@
 import abc from "abcjs";
 import React, { useState, useEffect, useRef } from "react";
-import { Box } from "grommet";
+import { Box, Button, Text } from "grommet";
 
 import RiemannFuncSelectionDialog from "./riemannFuncSelectionDialog";
 import Notification from "../components/notification";
@@ -92,7 +92,9 @@ export default function Score(props) {
 
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
-    if (!initialChordOf(abcelem) && !abcelem.rest) {
+    if (initialChordOf(abcelem)) {
+      setOpenNotification(true);
+    } else if (!abcelem.rest) {
       if (lowestAdjacentNote.chord) {
         setOpenModalDialog({
           onClose: (riemannFunc) => {
@@ -128,8 +130,6 @@ export default function Score(props) {
           defaultValue: new RiemannFunc(),
         });
       }
-    } else {
-      setOpenNotification(true);
     }
   };
 
@@ -173,6 +173,18 @@ export default function Score(props) {
           timeout={3000}
         />
       )}
+      <Button
+        type="submit"
+        label={
+          <Text color="white">
+            <strong>Überprüfen</strong>
+          </Text>
+        }
+        onClick={() => {
+          alert(abcString === props.solution);
+        }}
+        primary
+      />
     </Box>
   );
 }
@@ -181,6 +193,9 @@ export default function Score(props) {
 
 //Helper functions
 function insert(main_string, ins_string = "", pos = 0) {
+  while (main_string[pos] === " ") {
+    pos += 1;
+  }
   return main_string.slice(0, pos) + ins_string + main_string.slice(pos);
 }
 
