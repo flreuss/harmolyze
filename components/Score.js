@@ -135,7 +135,6 @@ export default function Score(props) {
   const renderVisualObjs = () => {
     let config = configFromFile;
     config.clickListener = handleClick;
-    //TODO: #21 staffwidth Änderung soll auch bei resize passieren
     switch (props.size) {
       case "small":
         config.staffwidth = window.innerWidth;
