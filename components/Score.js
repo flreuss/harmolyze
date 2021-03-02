@@ -136,6 +136,7 @@ export default function Score(props) {
   const renderVisualObjs = () => {
     let config = configFromFile;
     config.clickListener = handleClick;
+    //TODO: #32 Problem: config.staffwidth wird an den Breakpoints des ResizeContext auf window.innerWidth gesetzt. Verhindert stufenloses resizen am PC
     switch (props.size) {
       case "small":
         config.staffwidth = window.innerWidth;

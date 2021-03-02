@@ -6,7 +6,7 @@ import { Box, ResponsiveContext } from "grommet";
 import Score from "../../components/score";
 
 import { getTunes, getTuneById } from "../../lib/tunes";
-import { removeSolutions } from "../../lib/solutions";
+import { getInitial, getSolution } from "../../lib/solutions";
 
 export default function Exercise({ initialAbcString, solutionAbcString }) {
   return (
@@ -31,8 +31,8 @@ export default function Exercise({ initialAbcString, solutionAbcString }) {
 export async function getStaticProps({ params }) {
   return {
     props: {
-      initialAbcString: removeSolutions(getTuneById(params.tuneId).abc),
-      solutionAbcString: getTuneById(params.tuneId).abc,
+      initialAbcString: getInitial(getTuneById(params.tuneId).abc),
+      solutionAbcString: getSolution(getTuneById(params.tuneId).abc),
     },
   };
 }
