@@ -1,18 +1,18 @@
-import React, { useEffect } from 'react';
-import { FormClose } from 'grommet-icons';
-import { Box, Button, Layer, Text } from 'grommet';
+import React, { useEffect } from "react";
+import { FormClose } from "grommet-icons";
+import { Box, Button, Layer, Text } from "grommet";
 
-export default function Notification(props) {
-    useEffect(() => {
-        setTimeout(props.onClose,props.timeout);
-    });
+export default function Notification({ onClose, timeout, text }) {
+  useEffect(() => {
+    setTimeout(onClose, timeout);
+  });
 
   return (
     <Layer
       position="bottom"
       modal={false}
       margin={{ vertical: "medium", horizontal: "small" }}
-      onEsc={props.onClose}
+      onEsc={onClose}
       responsive={false}
       plain
     >
@@ -27,15 +27,9 @@ export default function Notification(props) {
         background="brand"
       >
         <Box align="center" direction="row" gap="xsmall">
-          <Text>
-            {props.text}
-          </Text>
+          <Text>{text}</Text>
         </Box>
-        <Button
-          icon={<FormClose />}
-          onClick={props.onClose}
-          plain
-        />
+        <Button icon={<FormClose />} onClick={onClose} plain />
       </Box>
     </Layer>
   );

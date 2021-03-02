@@ -9,7 +9,7 @@ import configFromFile from "./Score.config.json";
 import RiemannFunc from "../lib/RiemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
-export default function Score(props) {
+export default function Score({ initialAbcString, solution, size }) {
   const ref = React.useRef();
 
   //TODO: Global variables cause side effects...
@@ -21,14 +21,14 @@ export default function Score(props) {
   var initialVoicesArray;
   useEffect(() => {
     initialVoicesArray = abc
-      .renderAbc("*", props.abcString)[0]
+      .renderAbc("*", initialAbcString)[0]
       .makeVoicesArray();
   });
 
-  const [abcString, setAbcString] = useState(props.abcString);
+  const [abcString, setAbcString] = useState(initialAbcString);
   useEffect(() => {
     renderVisualObjs();
-  }, [props, abcString]);
+  }, [initialAbcString, size, solution, abcString]);
 
   const [openModalDialog, setOpenModalDialog] = useState(undefined);
   const [openNotification, setOpenNotification] = useState(undefined);
@@ -36,7 +36,7 @@ export default function Score(props) {
   //Methods
   const validateSolution = (abcString, solutionAbcString) => {
     alert(abcString === solutionAbcString);
-  }
+  };
 
   const initialChordOf = (abcelem) => {
     const adjacentNotes = simultaneousNotesArray.get(
@@ -141,7 +141,7 @@ export default function Score(props) {
     let config = configFromFile;
     config.clickListener = handleClick;
     //TODO: #32 Problem: config.staffwidth wird an den Breakpoints des ResizeContext auf window.innerWidth gesetzt. Verhindert stufenloses resizen am PC
-    switch (props.size) {
+    switch (size) {
       case "small":
         config.staffwidth = window.innerWidth;
         break;
@@ -184,7 +184,7 @@ export default function Score(props) {
             <strong>Überprüfen</strong>
           </Text>
         }
-        onClick={() => validateSolution(abcString,props.solution)}
+        onClick={() => validateSolution(abcString, solution)}
         primary
       />
     </Box>

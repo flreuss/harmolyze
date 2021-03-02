@@ -3,15 +3,19 @@ import { Box, Button, Heading, Layer, Text, TextInput } from "grommet";
 
 import RiemannFunc from "../lib/RiemannFunc";
 
-export default function RiemannFuncSelectionDialog(props) {
-  const [riemannFunc, setRiemannFunc] = useState(props.defaultValue);
+export default function RiemannFuncSelectionDialog({
+  defaultValue,
+  onClose,
+  target,
+}) {
+  const [riemannFunc, setRiemannFunc] = useState(defaultValue);
 
   return (
     <Layer
       position="center"
-      onClickOutside={() => props.onClose(riemannFunc)}
-      onEsc={() => props.onClose(riemannFunc)}
-      target={props.target}
+      onClickOutside={() => onClose(riemannFunc)}
+      onEsc={() => onClose(riemannFunc)}
+      target={target}
     >
       <Box pad="medium" gap="small">
         <Heading level={3} margin="none">
@@ -37,12 +41,16 @@ export default function RiemannFuncSelectionDialog(props) {
         <TextInput
           placeholder="base"
           value={riemannFunc.base}
-          onChange={(event) => setRiemannFunc(new RiemannFunc(
-            riemannFunc.baseFunc,
-            riemannFunc.addTones,
-            event.target.value,
-            riemannFunc.isSecondaryDominant
-          ))}
+          onChange={(event) =>
+            setRiemannFunc(
+              new RiemannFunc(
+                riemannFunc.baseFunc,
+                riemannFunc.addTones,
+                event.target.value,
+                riemannFunc.isSecondaryDominant
+              )
+            )
+          }
         />
         <Box
           as="footer"
@@ -61,7 +69,7 @@ export default function RiemannFuncSelectionDialog(props) {
             }
             onClick={() => {
               // Сlose the dialog and return the value
-              props.onClose(riemannFunc);
+              onClose(riemannFunc);
             }}
             primary
           />
