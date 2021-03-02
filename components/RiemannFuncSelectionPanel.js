@@ -11,6 +11,7 @@ export default function RiemannFuncSelectionPanel(props) {
       position="center"
       onClickOutside={() => props.onClose(riemannFunc)}
       onEsc={() => props.onClose(riemannFunc)}
+      target={props.target}
     >
       <Box pad="medium" gap="small">
         <Heading level={3} margin="none">

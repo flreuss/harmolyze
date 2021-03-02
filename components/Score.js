@@ -1,6 +1,6 @@
 import abc from "abcjs";
-import React, { useState, useEffect } from "react";
-import { Grommet } from "grommet";
+import React, { useState, useEffect, useRef } from "react";
+import { Box } from "grommet";
 
 import RiemannFuncSelectionPanel from "../components/riemannFuncSelectionPanel";
 
@@ -9,6 +9,8 @@ import RiemannFunc from "../lib/RiemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
 export default function Score(props) {
+  const ref = React.useRef();
+
   //TODO: Global variables cause side effects...
   var voicesArray;
   var simultaneousNotesArray;
@@ -150,15 +152,16 @@ export default function Score(props) {
   };
 
   return (
-    <Grommet full>
+    <Box fill align="center" justify="center" ref={ref}>
       <div id="scoreContainer" />
       {openModal && (
         <RiemannFuncSelectionPanel
           onClose={openModal.onClose}
           defaultValue={openModal.defaultValue}
+          target={ref.current}
         />
       )}
-    </Grommet>
+    </Box>
   );
 }
 
