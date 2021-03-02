@@ -3,7 +3,7 @@ import { Box, Button, Heading, Layer, Text, TextInput } from "grommet";
 
 import RiemannFunc from "../lib/RiemannFunc";
 
-export default function RiemannFuncSelectionPanel(props) {
+export default function RiemannFuncSelectionDialog(props) {
   const [riemannFunc, setRiemannFunc] = useState(props.defaultValue);
 
   return (

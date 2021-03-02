@@ -2,7 +2,8 @@ import abc from "abcjs";
 import React, { useState, useEffect, useRef } from "react";
 import { Box } from "grommet";
 
-import RiemannFuncSelectionPanel from "../components/riemannFuncSelectionPanel";
+import RiemannFuncSelectionDialog from "./riemannFuncSelectionDialog";
+import Notification from "../components/notification";
 
 import configFromFile from "./Score.config.json";
 import RiemannFunc from "../lib/RiemannFunc";
@@ -29,7 +30,8 @@ export default function Score(props) {
     renderVisualObjs();
   }, [props, abcString]);
 
-  const [openModal, setOpenModal] = useState(undefined);
+  const [openModalDialog, setOpenModalDialog] = useState(undefined);
+  const [openNotification, setOpenNotification] = useState(undefined);
 
   //Methods
   const initialChordOf = (abcelem) => {
@@ -92,7 +94,7 @@ export default function Score(props) {
 
     if (!initialChordOf(abcelem) && !abcelem.rest) {
       if (lowestAdjacentNote.chord) {
-        setOpenModal({
+        setOpenModalDialog({
           onClose: (riemannFunc) => {
             const chordLength = lowestAdjacentNote.chord[0].name.length;
             if (riemannFunc.toString() !== lowestAdjacentNote.chord[0].name) {
@@ -105,14 +107,14 @@ export default function Score(props) {
                 )
               );
             }
-            setOpenModal(undefined);
+            setOpenModalDialog(undefined);
           },
           defaultValue: RiemannFunc.fromString(
             lowestAdjacentNote.chord[0].name
           ),
         });
       } else {
-        setOpenModal({
+        setOpenModalDialog({
           onClose: (riemannFunc) => {
             setAbcString(
               insert(
@@ -121,11 +123,13 @@ export default function Score(props) {
                 lowestAdjacentNote.startChar
               )
             );
-            setOpenModal(undefined);
+            setOpenModalDialog(undefined);
           },
           defaultValue: new RiemannFunc(),
         });
       }
+    } else {
+      setOpenNotification(true);
     }
   };
 
@@ -154,11 +158,18 @@ export default function Score(props) {
   return (
     <Box fill align="center" justify="center" ref={ref}>
       <div id="scoreContainer" />
-      {openModal && (
-        <RiemannFuncSelectionPanel
-          onClose={openModal.onClose}
-          defaultValue={openModal.defaultValue}
+      {openModalDialog && (
+        <RiemannFuncSelectionDialog
+          onClose={openModalDialog.onClose}
+          defaultValue={openModalDialog.defaultValue}
           target={ref.current}
+        />
+      )}
+      {openNotification && (
+        <Notification
+          onClose={() => setOpenNotification(undefined)}
+          text="Diese Funktion ist Teil der vorgegebenen Lösung."
+          timeout={3000}
         />
       )}
     </Box>
