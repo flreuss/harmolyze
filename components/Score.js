@@ -10,18 +10,16 @@ import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
 export default function Score(props) {
   //TODO: Global variables cause side effects...
-  var visualObjs;
   var voicesArray;
+  var simultaneousNotesArray;
   var notesHighlighted = [];
 
   //TODO: initial should be set only once and stay read-only after being set and shouldn't be recalculated on each render
-  var simultaneousNotesArray;
   var initialVoicesArray;
   useEffect(() => {
     initialVoicesArray = abc
       .renderAbc("*", props.abcString)[0]
       .makeVoicesArray();
-    simultaneousNotesArray = makeSimultaneousNotesArray(initialVoicesArray);
   });
 
   const [abcString, setAbcString] = useState(props.abcString);
@@ -95,9 +93,7 @@ export default function Score(props) {
         setOpenModal({
           onClose: (riemannFunc) => {
             const chordLength = lowestAdjacentNote.chord[0].name.length;
-            if (
-              riemannFunc.toString() !== lowestAdjacentNote.chord[0].name
-            ) {
+            if (riemannFunc.toString() !== lowestAdjacentNote.chord[0].name) {
               setAbcString(
                 replace(
                   abcString,
@@ -109,18 +105,20 @@ export default function Score(props) {
             }
             setOpenModal(undefined);
           },
-          defaultValue: RiemannFunc.fromString(lowestAdjacentNote.chord[0].name),
+          defaultValue: RiemannFunc.fromString(
+            lowestAdjacentNote.chord[0].name
+          ),
         });
       } else {
         setOpenModal({
           onClose: (riemannFunc) => {
-              setAbcString(
-                insert(
-                  abcString,
-                  `"_${riemannFunc}"`,
-                  lowestAdjacentNote.startChar
-                )
-              );
+            setAbcString(
+              insert(
+                abcString,
+                `"_${riemannFunc}"`,
+                lowestAdjacentNote.startChar
+              )
+            );
             setOpenModal(undefined);
           },
           defaultValue: new RiemannFunc(),
@@ -146,8 +144,9 @@ export default function Score(props) {
         config.staffwidth = window.innerWidth / 2.5;
     }
 
-    visualObjs = abc.renderAbc("scoreContainer", abcString, config);
+    const visualObjs = abc.renderAbc("scoreContainer", abcString, config);
     voicesArray = visualObjs[0].makeVoicesArray();
+    simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
   };
 
   return (
