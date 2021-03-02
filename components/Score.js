@@ -96,8 +96,7 @@ export default function Score(props) {
           onClose: (riemannFunc) => {
             const chordLength = lowestAdjacentNote.chord[0].name.length;
             if (
-              riemannFunc &&
-              riemannFunc !== lowestAdjacentNote.chord[0].name
+              riemannFunc.toString() !== lowestAdjacentNote.chord[0].name
             ) {
               setAbcString(
                 replace(
@@ -110,12 +109,11 @@ export default function Score(props) {
             }
             setOpenModal(undefined);
           },
-          defaultValue: lowestAdjacentNote.chord[0].name,
+          defaultValue: RiemannFunc.fromString(lowestAdjacentNote.chord[0].name),
         });
       } else {
         setOpenModal({
           onClose: (riemannFunc) => {
-            if (riemannFunc) {
               setAbcString(
                 insert(
                   abcString,
@@ -123,10 +121,9 @@ export default function Score(props) {
                   lowestAdjacentNote.startChar
                 )
               );
-            }
             setOpenModal(undefined);
           },
-          defaultValue: "",
+          defaultValue: new RiemannFunc(),
         });
       }
     }
