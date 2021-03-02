@@ -34,6 +34,10 @@ export default function Score(props) {
   const [openNotification, setOpenNotification] = useState(undefined);
 
   //Methods
+  const validateSolution = (abcString, solutionAbcString) => {
+    alert(abcString === solutionAbcString);
+  }
+
   const initialChordOf = (abcelem) => {
     const adjacentNotes = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
@@ -180,9 +184,7 @@ export default function Score(props) {
             <strong>Überprüfen</strong>
           </Text>
         }
-        onClick={() => {
-          alert(abcString === props.solution);
-        }}
+        onClick={() => validateSolution(abcString,props.solution)}
         primary
       />
     </Box>
