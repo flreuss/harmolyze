@@ -10,6 +10,7 @@ import RiemannFunc from "../lib/riemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
 export default function Score({ initialAbcString, solution, size }) {
+  //Attributes
   const ref = React.useRef();
 
   //TODO: Global variables cause side effects...
