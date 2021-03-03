@@ -34,10 +34,20 @@ export default function Score({ initialAbcString, solution, size }) {
   const [openNotification, setOpenNotification] = useState(undefined);
 
   //Methods
+  /**
+   * 
+   * @param {string} abcString 
+   * @param {string} solutionAbcString 
+   */
   const validateSolution = (abcString, solutionAbcString) => {
     alert(abcString === solutionAbcString);
+    return (abcString === solutionAbcString);
   };
 
+  /**
+   * 
+   * @returns {string}
+   */
   const initialChordOf = (abcelem) => {
     const adjacentNotes = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
@@ -194,19 +204,19 @@ export default function Score({ initialAbcString, solution, size }) {
 //===========================================================
 
 //Helper functions
-function insert(main_string, ins_string = "", pos = 0) {
-  while (main_string[pos] === " ") {
+function insert(mainString, insString = "", pos = 0) {
+  while (mainString[pos] === " ") {
     pos += 1;
   }
-  return main_string.slice(0, pos) + ins_string + main_string.slice(pos);
+  return mainString.slice(0, pos) + insString + mainString.slice(pos);
 }
 
-function replace(main_string, repl_string = "", pos = 0, len = 0) {
+function replace(mainString, replString = "", pos = 0, len = 0) {
   //workaround for chords
-  if (main_string[pos] === "[") {
+  if (mainString[pos] === "[") {
     pos -= len;
   }
-  return main_string.slice(0, pos) + repl_string + main_string.slice(pos + len);
+  return mainString.slice(0, pos) + replString + mainString.slice(pos + len);
 }
 
 function makeSimultaneousNotesArray(voicesArray) {
