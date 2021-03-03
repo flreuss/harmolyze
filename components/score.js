@@ -9,7 +9,7 @@ import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 
-export default function Score({ initialAbcString, solution, size }) {
+export default function Score({ initialAbcString, solutionAbcString, size }) {
   //Attributes
   const ref = React.useRef();
 
@@ -21,7 +21,7 @@ export default function Score({ initialAbcString, solution, size }) {
   const [abcString, setAbcString] = useState(initialAbcString);
   useEffect(() => {
     renderVisualObjs();
-  }, [initialAbcString, size, solution, abcString]);
+  }, [initialAbcString, size, solutionAbcString, abcString]);
 
   const [openModalDialog, setOpenModalDialog] = useState(undefined);
   const [openNotification, setOpenNotification] = useState(undefined);
@@ -31,7 +31,7 @@ export default function Score({ initialAbcString, solution, size }) {
     renderVisualObjs();
 
     const solutionVoicesArray = abc
-      .renderAbc("*", solution)[0]
+      .renderAbc("*", solutionAbcString)[0]
       .makeVoicesArray();
 
     let success = true;
@@ -63,16 +63,16 @@ export default function Score({ initialAbcString, solution, size }) {
 
   /**
    *
-   * @returns {string}
+   * @returns {string} chord of the element corresponding to abcelem in abcString
    */
-  const initialChordOf = (abcelem) => {
+  const chordOf = (abcelem, abcString) => {
     const adjacentNotes = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
     );
     const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
 
     const initialVoicesArray = abc
-      .renderAbc("*", initialAbcString)[0]
+      .renderAbc("*", abcString)[0]
       .makeVoicesArray();
 
     return initialVoicesArray[lowestAdjacentNotePos.voice][
@@ -137,7 +137,7 @@ export default function Score({ initialAbcString, solution, size }) {
 
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
-    if (initialChordOf(abcelem)) {
+    if (chordOf(abcelem, initialAbcString) || !chordOf(abcelem, solutionAbcString)) {
       setOpenNotification(true);
     } else if (!abcelem.rest) {
       if (lowestAdjacentNote.chord) {
@@ -225,7 +225,7 @@ export default function Score({ initialAbcString, solution, size }) {
             <strong>Überprüfen</strong>
           </Text>
         }
-        onClick={() => validateSolution(voicesArray, solution)}
+        onClick={() => validateSolution(voicesArray, solutionAbcString)}
         primary
       />
     </Box>
