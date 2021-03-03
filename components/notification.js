@@ -24,7 +24,7 @@ export default function Notification({ onClose, timeout, text }) {
         round="medium"
         elevation="medium"
         pad={{ vertical: "xsmall", horizontal: "small" }}
-        background="brand"
+        background={{color: "brand", opacity: "medium"}}
       >
         <Box align="center" direction="row" gap="xsmall">
           <Text>{text}</Text>
