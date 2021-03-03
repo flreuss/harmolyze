@@ -32,11 +32,11 @@ export default function Score({ initialAbcString, solution, size }) {
    * @param {string} abcString
    * @param {string} solutionAbcString
    */
-  const validateSolution = (voicesArray, solutionAbcString) => {
-    unHighlightAllNotes();
+  const validateSolution = () => {
+    renderVisualObjs();
 
     const solutionVoicesArray = abc
-      .renderAbc("*", solutionAbcString)[0]
+      .renderAbc("*", solution)[0]
       .makeVoicesArray();
 
     voicesArray.forEach((voice, voiceIndex) => {
