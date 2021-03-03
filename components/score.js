@@ -27,11 +27,6 @@ export default function Score({ initialAbcString, solution, size }) {
   const [openNotification, setOpenNotification] = useState(undefined);
 
   //Methods
-  /**
-   *
-   * @param {string} abcString
-   * @param {string} solutionAbcString
-   */
   const validateSolution = () => {
     renderVisualObjs();
 
@@ -39,19 +34,31 @@ export default function Score({ initialAbcString, solution, size }) {
       .renderAbc("*", solution)[0]
       .makeVoicesArray();
 
+    let success = true;
     voicesArray.forEach((voice, voiceIndex) => {
       voice.forEach((note, noteIndex) => {
-        const solutionNote = solutionVoicesArray[voiceIndex][noteIndex];
+        if (note.elem.type === "note") {
+          const solutionNote = solutionVoicesArray[voiceIndex][noteIndex];
 
-        //TODO: Problem wenn der Knopf Überprüfen gedrückt wird muss alles unhighlighted werden
-        if (note.elem.abcelem.chord && solutionNote.elem.abcelem.chord) {
-          note.elem.abcelem.chord[0].name ===
-          solutionNote.elem.abcelem.chord[0].name
-            ? highlightAdjacentNotesOf(note.elem.abcelem, "rgb(0,200,0)", true)
-            : highlightAdjacentNotesOf(note.elem.abcelem, "rgb(200,0,0)", true);
+          let selectionColor = "rgb(0,200,0)";
+          if (
+            (!note.elem.abcelem.chord && solutionNote.elem.abcelem.chord) ||
+            (note.elem.abcelem.chord && !solutionNote.elem.abcelem.chord) ||
+            (note.elem.abcelem.chord &&
+              solutionNote.elem.abcelem.chord &&
+              note.elem.abcelem.chord[0].name !==
+                solutionNote.elem.abcelem.chord[0].name)
+          ) {
+            selectionColor = "rgb(200,0,0)";
+            success = false;
+          }
+
+          highlightAdjacentNotesOf(note.elem.abcelem, selectionColor, true);
         }
       });
     });
+
+    if (success) alert("Geschafft!");
   };
 
   /**
