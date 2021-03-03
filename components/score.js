@@ -18,14 +18,6 @@ export default function Score({ initialAbcString, solution, size }) {
   var simultaneousNotesArray;
   var notesHighlighted = [];
 
-  //TODO: initial should be set only once and stay read-only after being set and shouldn't be recalculated on each render
-  var initialVoicesArray;
-  useEffect(() => {
-    initialVoicesArray = abc
-      .renderAbc("*", initialAbcString)[0]
-      .makeVoicesArray();
-  });
-
   const [abcString, setAbcString] = useState(initialAbcString);
   useEffect(() => {
     renderVisualObjs();
@@ -40,9 +32,26 @@ export default function Score({ initialAbcString, solution, size }) {
    * @param {string} abcString
    * @param {string} solutionAbcString
    */
-  const validateSolution = (abcString, solutionAbcString) => {
-    alert(abcString === solutionAbcString);
-    return abcString === solutionAbcString;
+  const validateSolution = (voicesArray, solutionAbcString) => {
+    unHighlightAllNotes();
+
+    const solutionVoicesArray = abc
+      .renderAbc("*", solutionAbcString)[0]
+      .makeVoicesArray();
+
+    voicesArray.forEach((voice, voiceIndex) => {
+      voice.forEach((note, noteIndex) => {
+        const solutionNote = solutionVoicesArray[voiceIndex][noteIndex];
+
+        //TODO: Problem wenn der Knopf Überprüfen gedrückt wird muss alles unhighlighted werden
+        if (note.elem.abcelem.chord && solutionNote.elem.abcelem.chord) {
+          note.elem.abcelem.chord[0].name ===
+          solutionNote.elem.abcelem.chord[0].name
+            ? highlightAdjacentNotesOf(note.elem.abcelem, "rgb(0,200,0)", true)
+            : highlightAdjacentNotesOf(note.elem.abcelem, "rgb(200,0,0)", true);
+        }
+      });
+    });
   };
 
   /**
@@ -54,6 +63,10 @@ export default function Score({ initialAbcString, solution, size }) {
       JSON.stringify(abcelem.abselem.counters)
     );
     const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
+
+    const initialVoicesArray = abc
+      .renderAbc("*", initialAbcString)[0]
+      .makeVoicesArray();
 
     return initialVoicesArray[lowestAdjacentNotePos.voice][
       lowestAdjacentNotePos.noteTotal
@@ -72,12 +85,22 @@ export default function Score({ initialAbcString, solution, size }) {
     ].elem;
   };
 
-  const highlightAdjacentNotesOf = (abcelem, multiselect = false) => {
-    if (!multiselect && notesHighlighted.length > 0) {
+  const unHighlightAllNotes = () => {
+    if (notesHighlighted.length > 0) {
       notesHighlighted.forEach((el) =>
         el.unhighlight(undefined, "currentColor")
       );
       notesHighlighted = [];
+    }
+  };
+
+  const highlightAdjacentNotesOf = (
+    abcelem,
+    selectionColor,
+    multiselect = false
+  ) => {
+    if (!multiselect) {
+      unHighlightAllNotes();
     }
 
     const adjacentNotes = simultaneousNotesArray.get(
@@ -87,7 +110,7 @@ export default function Score({ initialAbcString, solution, size }) {
     for (let adjacentNote of adjacentNotes) {
       voicesArray[adjacentNote.voice][adjacentNote.noteTotal].elem.highlight(
         undefined,
-        configFromFile.selectionColor
+        selectionColor
       );
       notesHighlighted.push(
         voicesArray[adjacentNote.voice][adjacentNote.noteTotal].elem
@@ -103,7 +126,7 @@ export default function Score({ initialAbcString, solution, size }) {
     _drag,
     _mouseEvent
   ) => {
-    highlightAdjacentNotesOf(abcelem);
+    highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
 
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
@@ -195,7 +218,7 @@ export default function Score({ initialAbcString, solution, size }) {
             <strong>Überprüfen</strong>
           </Text>
         }
-        onClick={() => validateSolution(abcString, solution)}
+        onClick={() => validateSolution(voicesArray, solution)}
         primary
       />
     </Box>
@@ -216,6 +239,9 @@ function replace(mainString, replString = "", pos = 0, len = 0) {
   //workaround for chords
   if (mainString[pos] === "[") {
     pos -= len;
+  }
+  while (mainString[pos] === " ") {
+    pos += 1;
   }
   return mainString.slice(0, pos) + replString + mainString.slice(pos + len);
 }
