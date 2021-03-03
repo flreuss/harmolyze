@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Heading, Layer, Text, TextInput } from "grommet";
+import { Box, Button, Heading, Layer, Text, TextInput, Select } from "grommet";
 
 import RiemannFunc from "../lib/riemannFunc";
 
@@ -24,13 +24,13 @@ export default function RiemannFuncSelectionDialog({
 
         <Text>Enter Riemann Function:</Text>
 
-        <TextInput
-          placeholder="baseFunc"
+        <Select
+          options={riemannFunc.validBaseFuncs}
           value={riemannFunc.baseFunc}
-          onChange={(event) =>
+          onChange={({ option }) =>
             setRiemannFunc(
               new RiemannFunc(
-                event.target.value,
+                option,
                 riemannFunc.addTones,
                 riemannFunc.base,
                 riemannFunc.isSecondaryDominant
