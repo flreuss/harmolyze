@@ -9,7 +9,7 @@ export default function Home({ tunes }) {
   return (
     <Box
       pad="large"
-      background="url(https://blog.hdwallsource.com/wp-content/uploads/2014/11/gradient-26052-26737-hd-wallpapers.jpg.png)"
+      background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
       height="100%"
     >
       <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
