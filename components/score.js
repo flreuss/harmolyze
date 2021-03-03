@@ -35,17 +35,17 @@ export default function Score({ initialAbcString, solution, size }) {
 
   //Methods
   /**
-   * 
-   * @param {string} abcString 
-   * @param {string} solutionAbcString 
+   *
+   * @param {string} abcString
+   * @param {string} solutionAbcString
    */
   const validateSolution = (abcString, solutionAbcString) => {
     alert(abcString === solutionAbcString);
-    return (abcString === solutionAbcString);
+    return abcString === solutionAbcString;
   };
 
   /**
-   * 
+   *
    * @returns {string}
    */
   const initialChordOf = (abcelem) => {
