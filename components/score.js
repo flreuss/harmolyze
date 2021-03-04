@@ -37,17 +37,17 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     let success = true;
     voicesArray.forEach((voice, voiceIndex) => {
       voice.forEach((note, noteIndex) => {
-        if (note.elem.type === "note") {
-          const solutionNote = solutionVoicesArray[voiceIndex][noteIndex];
+        const filledInChord = note.elem.abcelem.chord;
+        const solutionChord =
+          solutionVoicesArray[voiceIndex][noteIndex].elem.abcelem.chord;
+
+        if (note.elem.type === "note" && solutionChord) {
+          const solutionChords = solutionChord[0].name.split("\n");
 
           let selectionColor = "rgb(0,200,0)";
           if (
-            (!note.elem.abcelem.chord && solutionNote.elem.abcelem.chord) ||
-            (note.elem.abcelem.chord && !solutionNote.elem.abcelem.chord) ||
-            (note.elem.abcelem.chord &&
-              solutionNote.elem.abcelem.chord &&
-              note.elem.abcelem.chord[0].name !==
-                solutionNote.elem.abcelem.chord[0].name)
+            !filledInChord ||
+            !solutionChords.includes(filledInChord[0].name)
           ) {
             selectionColor = "rgb(200,0,0)";
             success = false;
