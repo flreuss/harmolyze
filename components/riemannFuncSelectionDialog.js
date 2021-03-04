@@ -38,7 +38,7 @@ export default function RiemannFuncSelectionDialog({
         <NumberMultiSelector
           options={RiemannFunc.validAddTones}
           selected={addTones}
-          onChange={(values) => setAddTones(values)}
+          onChange={(values) => setAddTones(values.sort())}
           max={2}
         />
 
