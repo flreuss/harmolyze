@@ -23,7 +23,7 @@ export default function NumberSelector({ options, value, onChange, name }) {
         else background = "light-2";
 
         return (
-          <Box background={background} pad="xsmall" round="xsmall">
+          <Box background={background} pad="xsmall" round="xsmall" border>
             <Text>{option.label}</Text>
           </Box>
         );

@@ -3,6 +3,7 @@ import { Box, Button, Heading, Layer, Text, Select } from "grommet";
 
 import RiemannFunc from "../lib/riemannFunc";
 import NumberSelector from "./numberSelector";
+import NumberMultiSelector from "./numberMultiSelector";
 
 export default function RiemannFuncSelectionDialog({
   defaultValue,
@@ -34,11 +35,11 @@ export default function RiemannFuncSelectionDialog({
 
         <Text>Enter Riemann Function:</Text>
 
-        <NumberSelector
+        <NumberMultiSelector
           options={RiemannFunc.validAddTones}
-          name="addTonesSelector"
-          value={addTones[0] || 0}
-          onChange={(event) => setAddTones([+event.target.value])}
+          selected={addTones}
+          onChange={(values) => setAddTones(values)}
+          max={2}
         />
 
         <Select
@@ -53,6 +54,7 @@ export default function RiemannFuncSelectionDialog({
           value={base}
           onChange={(event) => setBase(+event.target.value)}
         />
+
         <Box
           as="footer"
           gap="small"

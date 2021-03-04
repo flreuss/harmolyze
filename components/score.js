@@ -137,7 +137,10 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
 
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
-    if (chordOf(abcelem, initialAbcString) || !chordOf(abcelem, solutionAbcString)) {
+    if (
+      chordOf(abcelem, initialAbcString) ||
+      !chordOf(abcelem, solutionAbcString)
+    ) {
       setOpenNotification(true);
     } else if (!abcelem.rest) {
       if (lowestAdjacentNote.chord) {
