@@ -23,7 +23,7 @@ export default function NumberMultiSelector({
   };
 
   return (
-    <Box direction="row" gap="xsmall" justify="between">
+    <Box direction="row" pad="xsmall" gap="none" justify="stretch" fill="horizontal">
       {options.map((el) => (
         <Field
           value={el}
@@ -48,11 +48,12 @@ function Field({ value, onClick, selected }) {
           : "light-4"
       }
       pad="xsmall"
-      round="xsmall"
+      round="xxsmall"
       border
+      fill
       onClick={() => onClick(value)}
     >
-      <Text>{value.toString()}</Text>
+      <Text textAlign="center">{value.toString()}</Text>
     </Box>
   );
 }
