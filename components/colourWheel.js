@@ -233,20 +233,22 @@ class ColourWheel extends Component {
         colourToRgbObj(colour).b === rgb.b
     );
 
-    this.props.onValueSelected(clicked.values[0]);
+    if (clicked) {
+      this.props.onValueSelected(clicked.values[0]);
 
-    this.setState(
-      {
-        option: clicked,
-        value: 0,
-        innerWheelOpen: true,
-        centerCircleOpen: true,
-      },
-      () => {
-        this.drawInnerWheel();
-        this.drawCenterCircle();
-      }
-    );
+      this.setState(
+        {
+          option: clicked,
+          value: 0,
+          innerWheelOpen: true,
+          centerCircleOpen: true,
+        },
+        () => {
+          this.drawInnerWheel();
+          this.drawCenterCircle();
+        }
+      );
+    }
   }
 
   innerWheelClicked(evtPos) {
@@ -267,18 +269,20 @@ class ColourWheel extends Component {
       }
     }
 
-    this.props.onValueSelected(clicked.values[0]);
+    if (clicked) {
+      this.props.onValueSelected(clicked.values[0]);
 
-    this.setState(
-      {
-        option: clicked,
-        value: 0,
-        centerCircleOpen: true,
-      },
-      () => {
-        this.drawCenterCircle();
-      }
-    );
+      this.setState(
+        {
+          option: clicked,
+          value: 0,
+          centerCircleOpen: true,
+        },
+        () => {
+          this.drawCenterCircle();
+        }
+      );
+    }
   }
 
   centerCircleClicked() {
