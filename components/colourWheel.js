@@ -45,9 +45,8 @@ class ColourWheel extends Component {
     super();
 
     this.state = {
-      rgb: null,
-      value: null,
-      shades: [],
+      option: null,
+      value: 0,
       innerWheelOpen: false,
       centerCircleOpen: false,
     };
@@ -149,23 +148,23 @@ class ColourWheel extends Component {
 
     if (this.props.preset) {
       let colour = null;
-      let shades = [];
-      for (let val of this.props.values) {
-        if (val.value === this.props.presetValue) {
-          colour = val.colour;
-          shades = val.shades;
+      let children = [];
+      for (let opt of this.props.options) {
+        if (opt.value === this.props.presetValue) {
+          colour = opt.colour;
+          children = opt.children;
         }
-        for (let shade in val.shades) {
-          if (shade.value === this.props.presetValue) {
-            colour = shade.colour;
-            shades = val.shades;
+        for (let child in opt.children) {
+          if (child.value === this.props.presetValue) {
+            colour = child.colour;
+            children = opt.children;
           }
         }
       }
 
       const rgb = colourToRgbObj(colour);
 
-      this.setState({ rgb, value: this.props.presetValue, shades }, () => {
+      this.setState({ rgb, value: this.props.presetValue, children }, () => {
         this.drawOuterWheel();
         this.drawInnerWheel();
         this.drawCenterCircle();
@@ -227,25 +226,19 @@ class ColourWheel extends Component {
     const [r, g, b] = rgbaArr;
     const rgb = { r, g, b };
 
-    const value = this.props.values.find(
+    const clicked = this.props.options.find(
       ({ colour }) =>
         colourToRgbObj(colour).r === rgb.r &&
         colourToRgbObj(colour).g === rgb.g &&
         colourToRgbObj(colour).b === rgb.b
-    ).value;
+    );
 
-    this.props.onValueSelected(value);
+    this.props.onValueSelected(clicked.values[0]);
 
     this.setState(
       {
-        rgb,
-        value,
-        shades: this.props.values.find(
-          ({ colour }) =>
-            colourToRgbObj(colour).r === rgb.r &&
-            colourToRgbObj(colour).g === rgb.g &&
-            colourToRgbObj(colour).b === rgb.b
-        ).shades,
+        option: clicked,
+        value: 0,
         innerWheelOpen: true,
         centerCircleOpen: true,
       },
@@ -261,19 +254,25 @@ class ColourWheel extends Component {
     const [r, g, b] = rgbaArr;
     const rgb = { r, g, b };
 
-    const value = this.state.shades.find(
-      ({ colour }) =>
-        colourToRgbObj(colour).r === rgb.r &&
-        colourToRgbObj(colour).g === rgb.g &&
-        colourToRgbObj(colour).b === rgb.b
-    ).value;
+    let clicked = null;
+    for (let opt of this.props.options) {
+      for (let child of opt.children) {
+        if (
+          colourToRgbObj(child.colour).r === rgb.r &&
+          colourToRgbObj(child.colour).g === rgb.g &&
+          colourToRgbObj(child.colour).b === rgb.b
+        ) {
+          clicked = child;
+        }
+      }
+    }
 
-    this.props.onValueSelected(value);
+    this.props.onValueSelected(clicked.values[0]);
 
     this.setState(
       {
-        rgb,
-        value,
+        option: clicked,
+        value: 0,
         centerCircleOpen: true,
       },
       () => {
@@ -283,10 +282,11 @@ class ColourWheel extends Component {
   }
 
   centerCircleClicked() {
-    let value = this.state.value;
-    value = value.replace(/([a-z]+)|([A-Z]+)/g, (match, chr) => chr ? match.toUpperCase() : match.toLowerCase());
-    this.props.onValueSelected(value);
-
+    const value =
+      this.state.value < this.state.option.values.length - 1
+        ? this.state.value + 1
+        : 0;
+    this.props.onValueSelected(this.state.option.values[value]);
     this.setState(
       {
         value,
@@ -316,7 +316,7 @@ class ColourWheel extends Component {
   // MARK - Drawing:
   drawOuterWheel() {
     // TODO: Draw outline; separate method.
-    const { radius, values, lineWidth } = this.props;
+    const { radius, options, lineWidth } = this.props;
     const height = radius * 2;
     const width = radius * 2;
 
@@ -324,9 +324,9 @@ class ColourWheel extends Component {
     const effectiveRadius = getEffectiveRadius(radius, lineWidth);
 
     // Converting each colour into a relative rgb-object we can iterate through.
-    const rgbArr = values.map(({ colour, value }) => ({
+    const rgbArr = options.map(({ colour, values }) => ({
       rgb: colourToRgbObj(colour),
-      value: value,
+      value: values[0],
     }));
 
     rgbArr.forEach(({ rgb, value }, i) => {
@@ -409,10 +409,8 @@ class ColourWheel extends Component {
       window.msRequestAnimationFrame;
     window.requestAnimationFrame = requestAnimationFrame;
 
-    const {
-      rgb: { r, g, b },
-    } = this.state;
-    const { radius, lineWidth, values, animated } = this.props;
+    const rgb = this.state.option.colour;
+    const { radius, lineWidth, options, animated } = this.props;
 
     const height = radius * 2;
     const width = radius * 2;
@@ -428,7 +426,7 @@ class ColourWheel extends Component {
     this.drawOuterWheel();
     this.drawSpacers();
 
-    const rgbShades = this.state.shades;
+    const rgbShades = this.state.option.children;
 
     // Different functions for drawing our inner-wheel of shades.
     function drawShades() {
@@ -471,7 +469,7 @@ class ColourWheel extends Component {
     }
 
     function animateShades() {
-      rgbShades.forEach(({ colour, value }, i) => {
+      rgbShades.forEach(({ colour, values }, i) => {
         const rgb = colourToRgbObj(colour);
         this.ctx.beginPath();
 
@@ -501,7 +499,7 @@ class ColourWheel extends Component {
         this.ctx.font = `${lineWidth / 1.7}px Riemann`;
         this.ctx.fillStyle = "white";
         this.ctx.fillText(
-          value,
+          values[0],
           effectiveRadius * Math.cos(midAngle) + width / 2,
           effectiveRadius * Math.sin(midAngle) + height / 2,
           lineWidth
@@ -527,7 +525,8 @@ class ColourWheel extends Component {
   }
 
   drawCenterCircle() {
-    const { rgb, value } = this.state;
+    const { option, value } = this.state;
+    const rgb = option.colour;
     const { radius } = this.props;
 
     const height = radius * 2;
@@ -542,7 +541,7 @@ class ColourWheel extends Component {
       0,
       2 * Math.PI
     );
-    this.ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    this.ctx.fillStyle = rgb;
     this.ctx.fill();
     this.ctx.lineWidth = 0.1;
     this.ctx.strokeStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
@@ -553,7 +552,7 @@ class ColourWheel extends Component {
     this.ctx.textBaseline = "middle";
     this.ctx.font = `${this.centerCircleRadius / 1.7}px Riemann`;
     this.ctx.fillStyle = "white";
-    this.ctx.fillText(value, width / 2, height / 2);
+    this.ctx.fillText(option.values[value], width / 2, height / 2);
   }
 
   render() {

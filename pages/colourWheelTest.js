@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import {
-  produceRgbShades,
-} from "../lib/tinycolorUtils";
+import { produceRgbShades } from "../lib/tinycolorUtils";
 
 // react-colour-wheel:
 import ColourWheel from "../components/colourWheel";
@@ -42,31 +40,35 @@ class ColourWheelTest extends Component {
         </div>
 
         <ColourWheel
-          values={[
+          options={[
             {
               colour: "rgb(255,0,0)",
-              value: "D",
-              shades: [
-                { colour: "rgb(255,51,51)", value: "Dp" },
-                { colour: "rgb(179,0,0)", value: "Dg" },
-                { colour: "rgb(255,25,51)", value: "(D)" },
-                { colour: "rgb(179,25,25)", value: "/D" },
+              values: ["D", "(D)", "/D", "d"],
+              children: [
+                { colour: "rgb(179,0,0)", values: ["Dp", "DP", "dG", "dg"] },
+                { colour: "rgb(255,25,51)", values: ["Dg", "DG", "dP", "dp"] },
               ],
             },
             {
               colour: "rgb(0,255,0)",
-              value: "S",
-              shades: [
-                { colour: "rgb(51, 255, 51)", value: "Sp" },
-                { colour: "rgb(0, 179, 0)", value: "Sg" },
+              values: ["S", "s"],
+              children: [
+                {
+                  colour: "rgb(51, 255, 51)",
+                  values: ["Sp", "SP", "sG", "sg"],
+                },
+                { colour: "rgb(0, 179, 0)", values: ["Sg", "SG", "sP", "sp"] },
               ],
             },
             {
               colour: "rgb(0,0,255)",
-              value: "T",
-              shades: [
-                { colour: "rgb(51, 51, 255)", value: "Tp" },
-                { colour: "rgb(0, 0, 179)", value: "Tg" },
+              values: ["T", "t"],
+              children: [
+                {
+                  colour: "rgb(51, 51, 255)",
+                  values: ["Tp", "TP", "tG", "tg"],
+                },
+                { colour: "rgb(0, 0, 179)", values: ["Tg", "TG", "tP", "tp"] },
               ],
             },
           ]}
@@ -80,8 +82,8 @@ class ColourWheelTest extends Component {
             shadowColour: "grey",
             shadowBlur: 5,
           }}
-          preset // You can set this bool depending on whether you have a pre-selected colour in state.
-          presetValue={this.state.selectedValue}
+          //preset // You can set this bool depending on whether you have a pre-selected colour in state.
+          // presetValue={this.state.selectedValue}
           animated
         />
 
