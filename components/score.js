@@ -2,7 +2,7 @@ import abc from "abcjs";
 import React, { useState, useEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
-import RiemannFuncSelectionDialog from "./riemannFuncSelectionDialog";
+import SelectionDialog from "./riemannFunc/selectionDialog";
 import Notification from "../components/notification";
 
 import configFromFile from "./score.config.json";
@@ -208,7 +208,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     <Box fill align="center" justify="center" ref={ref}>
       <div id="scoreContainer" />
       {openModalDialog && (
-        <RiemannFuncSelectionDialog
+        <SelectionDialog
           onClose={openModalDialog.onClose}
           defaultValue={openModalDialog.defaultValue}
           target={ref.current}

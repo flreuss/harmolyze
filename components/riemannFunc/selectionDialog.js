@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Box, Button, Heading, Layer, Text, Select } from "grommet";
 
-import RiemannFunc from "../lib/riemannFunc";
-import NumberSelector from "./numberSelector";
-import NumberMultiSelector from "./numberMultiSelector";
+import RiemannFunc from "../../lib/riemannFunc";
+import NumberSelector from "../numberSelector";
+import NumberMultiSelector from "../numberMultiSelector";
+import SelectionWheel from "./selectionWheel";
 
 export default function RiemannFuncSelectionDialog({
   defaultValue,
@@ -42,10 +43,16 @@ export default function RiemannFuncSelectionDialog({
           max={2}
         />
 
-        <Select
+        {/* <Select
           options={RiemannFunc.validBaseFuncs}
           value={baseFunc}
           onChange={({ option }) => setBaseFunc(option)}
+        /> */}
+
+        <SelectionWheel
+          value={baseFunc}
+          onChange={(value) => setBaseFunc(value)}
+          radius={175}
         />
 
         <NumberSelector
