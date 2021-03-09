@@ -3,7 +3,7 @@ body {
 }
 
 @font-face {
-  font-family: "Riemann";
+  font-family: "/fonts/Riemann";
   /* If you want to debug the code with Firefox, pass a base64-encoded string instead, because Firefox has issues fetching local resources */
   src: url("/Riemann.woff") format("woff");
   font-weight: normal;
