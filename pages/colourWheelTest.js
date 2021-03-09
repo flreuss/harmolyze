@@ -82,8 +82,8 @@ class ColourWheelTest extends Component {
             shadowColour: "grey",
             shadowBlur: 5,
           }}
-          //preset // You can set this bool depending on whether you have a pre-selected colour in state.
-          // presetValue={this.state.selectedValue}
+          preset
+          presetValue={this.state.selectedValue}
           animated
         />
 

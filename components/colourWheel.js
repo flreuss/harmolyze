@@ -143,29 +143,47 @@ class ColourWheel extends Component {
     this.ctx = this.canvasEl.getContext("2d");
 
     if (this.props.preset) {
-      let colour = null;
-      let children = [];
       for (let opt of this.props.options) {
-        if (opt.value === this.props.presetValue) {
-          colour = opt.colour;
-          children = opt.children;
+        if (opt.values && opt.values.indexOf(this.props.presetValue) >= 0) {
+          this.setState(
+            {
+              option: opt,
+              value: opt.values.indexOf(this.props.presetValue),
+              innerWheelOpen: true,
+              centerCircleOpen: true,
+            },
+            () => {
+              this.drawOuterWheel();
+              this.drawInnerWheel();
+              this.drawCenterCircle();
+              this.drawSpacers();
+            }
+          );
         }
-        for (let child in opt.children) {
-          if (child.value === this.props.presetValue) {
-            colour = child.colour;
-            children = opt.children;
+        for (let child of opt.children) {
+          if (
+            child.values &&
+            child.values.indexOf(this.props.presetValue) >= 0
+          ) {
+            this.setState({ option: opt }, () => {
+              this.drawOuterWheel();
+              this.drawInnerWheel();
+              this.setState(
+                {
+                  option: child,
+                  value: child.values.indexOf(this.props.presetValue),
+                  innerWheelOpen: true,
+                  centerCircleOpen: true,
+                },
+                () => {
+                  this.drawCenterCircle();
+                  this.drawSpacers();
+                }
+              );
+            });
           }
         }
       }
-
-      const rgb = colourToRgbObj(colour);
-
-      this.setState({ rgb, value: this.props.presetValue, children }, () => {
-        this.drawOuterWheel();
-        this.drawInnerWheel();
-        this.drawCenterCircle();
-        this.drawSpacers();
-      });
     } else {
       this.drawOuterWheel();
       this.drawSpacers();
@@ -409,8 +427,7 @@ class ColourWheel extends Component {
       window.msRequestAnimationFrame;
     window.requestAnimationFrame = requestAnimationFrame;
 
-    const rgb = this.state.option.colour;
-    const { radius, lineWidth, options, animated } = this.props;
+    const { radius, lineWidth, animated } = this.props;
 
     const height = radius * 2;
     const width = radius * 2;
