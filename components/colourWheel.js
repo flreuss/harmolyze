@@ -9,8 +9,6 @@ import {
   colourToRgbObj,
   getEffectiveRadius,
   calculateBounds,
-  produceRgbShades,
-  convertObjToString,
 } from "../lib/tinycolorUtils";
 
 // Prop-types:
@@ -41,8 +39,8 @@ const fullCircle = 2 * Math.PI;
 const quarterCircle = fullCircle / 4;
 
 class ColourWheel extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       option: null,
@@ -69,6 +67,31 @@ class ColourWheel extends Component {
     // Bindings:
     this.onCanvasHover = this.onCanvasHover.bind(this);
     this.onCanvasClick = this.onCanvasClick.bind(this);
+
+    const { radius, lineWidth, padding } = props;
+
+    // Setting effective radii:
+    this.outerWheelRadius = radius;
+    this.innerWheelRadius = this.outerWheelRadius - lineWidth - padding;
+    this.centerCircleRadius = this.innerWheelRadius - lineWidth - padding;
+    this.firstSpacerRadius = this.outerWheelRadius - lineWidth; // NOTE: effectiveRadius will take into account padding as lineWidth.
+    this.secondSpacerRadius = this.innerWheelRadius - lineWidth;
+
+    // Defining our bounds-objects, exposes a .inside(e) -> boolean method:
+    this.outerWheelBounds = calculateBounds(radius - lineWidth, radius); // Draw this one out to illustrate
+    this.innerWheelBounds = calculateBounds(
+      this.innerWheelRadius - lineWidth,
+      this.innerWheelRadius
+    );
+    this.centerCircleBounds = calculateBounds(0, this.centerCircleRadius);
+    this.firstSpacerBounds = calculateBounds(
+      this.firstSpacerRadius - padding,
+      this.firstSpacerRadius
+    );
+    this.secondSpacerBounds = calculateBounds(
+      this.secondSpacerRadius - padding,
+      this.secondSpacerRadius
+    );
   }
 
   // MARK - Common:
@@ -111,33 +134,6 @@ class ColourWheel extends Component {
   }
 
   // MARK - Life-cycle methods:
-  componentWillMount() {
-    const { radius, lineWidth, padding } = this.props;
-
-    // Setting effective radii:
-    this.outerWheelRadius = radius;
-    this.innerWheelRadius = this.outerWheelRadius - lineWidth - padding;
-    this.centerCircleRadius = this.innerWheelRadius - lineWidth - padding;
-    this.firstSpacerRadius = this.outerWheelRadius - lineWidth; // NOTE: effectiveRadius will take into account padding as lineWidth.
-    this.secondSpacerRadius = this.innerWheelRadius - lineWidth;
-
-    // Defining our bounds-objects, exposes a .inside(e) -> boolean method:
-    this.outerWheelBounds = calculateBounds(radius - lineWidth, radius); // Draw this one out to illustrate
-    this.innerWheelBounds = calculateBounds(
-      this.innerWheelRadius - lineWidth,
-      this.innerWheelRadius
-    );
-    this.centerCircleBounds = calculateBounds(0, this.centerCircleRadius);
-    this.firstSpacerBounds = calculateBounds(
-      this.firstSpacerRadius - padding,
-      this.firstSpacerRadius
-    );
-    this.secondSpacerBounds = calculateBounds(
-      this.secondSpacerRadius - padding,
-      this.secondSpacerRadius
-    );
-  }
-
   componentDidMount() {
     // Giving this context to our parent component.
     if (this.props.onRef) this.props.onRef(this);
