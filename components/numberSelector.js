@@ -13,7 +13,7 @@ export default function NumberSelector({ options, value, onChange, name }) {
         label: el.toString(),
       }))}
       value={value}
-      onChange={onChange}
+      onChange={event => onChange(+event.target.value)}
     >
       {(option, { checked, hover }) => {
         let background;

@@ -43,23 +43,18 @@ export default function RiemannFuncSelectionDialog({
           max={2}
         />
 
-        {/* <Select
-          options={RiemannFunc.validBaseFuncs}
-          value={baseFunc}
-          onChange={({ option }) => setBaseFunc(option)}
-        /> */}
-
         <SelectionWheel
           value={baseFunc}
-          onChange={(value) => setBaseFunc(value)}
+          onChange={(val) => setBaseFunc(val)}
           radius={175}
+          major
         />
 
         <NumberSelector
           name="baseSelector"
           options={RiemannFunc.validBaseNotes}
           value={base}
-          onChange={(event) => setBase(+event.target.value)}
+          onChange={(val) => setBase(val)}
         />
 
         <Box

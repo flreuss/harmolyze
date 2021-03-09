@@ -3,7 +3,8 @@ import React from "react";
 
 import ColourWheel from "../colourWheel";
 
-export default function SelectionWheel({ value, onChange, radius }) {
+export default function SelectionWheel({ value, onChange, radius, major, minor }) {
+  // Important global variable! Do not delete!
   let colourWheel;
 
   return (
