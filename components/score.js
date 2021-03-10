@@ -158,6 +158,10 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
       chordOf(abcelem, initialAbcString) ||
       !chordOf(abcelem, solutionAbcString)
     ) {
+      highlightAdjacentNotesOf(
+        abcelem,
+        getComputedStyle(document.querySelector(".abcjs-note_given")).fill
+      );
       setOpenNotification(true);
     } else if (!abcelem.rest) {
       highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
