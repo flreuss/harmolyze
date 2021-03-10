@@ -147,16 +147,18 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
       if (lowestAdjacentNote.chord) {
         setOpenModalDialog({
           onClose: (riemannFunc) => {
-            const chordLength = lowestAdjacentNote.chord[0].name.length;
-            if (riemannFunc.toString() !== lowestAdjacentNote.chord[0].name) {
-              setAbcString(
-                replace(
-                  abcString,
-                  `"_${riemannFunc}"`,
-                  lowestAdjacentNote.startChar,
-                  chordLength + 3
-                )
-              );
+            if (riemannFunc) {
+              const chordLength = lowestAdjacentNote.chord[0].name.length;
+              if (riemannFunc.toString() !== lowestAdjacentNote.chord[0].name) {
+                setAbcString(
+                  replace(
+                    abcString,
+                    `"_${riemannFunc}"`,
+                    lowestAdjacentNote.startChar,
+                    chordLength + 3
+                  )
+                );
+              }
             }
             setOpenModalDialog(undefined);
           },
@@ -168,13 +170,15 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
       } else {
         setOpenModalDialog({
           onClose: (riemannFunc) => {
-            setAbcString(
-              insert(
-                abcString,
-                `"_${riemannFunc}"`,
-                lowestAdjacentNote.startChar
-              )
-            );
+            if (riemannFunc) {
+              setAbcString(
+                insert(
+                  abcString,
+                  `"_${riemannFunc}"`,
+                  lowestAdjacentNote.startChar
+                )
+              );
+            }
             setOpenModalDialog(undefined);
           },
           defaultValue: new RiemannFunc(),

@@ -24,13 +24,15 @@ export default function RiemannFuncSelectionDialog({
 
   const handleClose = () => {
     onClose(
-      new RiemannFunc(
-        baseFunc,
-        addTones,
-        base,
-        isSecondaryDominant,
-        missingFundamental
-      )
+      baseFunc
+        ? new RiemannFunc(
+            baseFunc,
+            addTones,
+            base,
+            isSecondaryDominant,
+            missingFundamental
+          )
+        : undefined
     );
   };
 
