@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Heading, Layer, Text, Select } from "grommet";
+import { Box, Button, Heading, Layer, Text } from "grommet";
 
 import RiemannFunc from "../../lib/riemannFunc";
 import NumberSelector from "../numberSelector";
@@ -17,24 +17,33 @@ export default function RiemannFuncSelectionDialog({
   const [isSecondaryDominant, setIsSecondaryDominant] = useState(
     defaultValue.isSecondaryDominant
   );
+  const [missingFundamental, setMissingFundamental] = useState(
+    defaultValue.missingFundamental
+  );
+
+  const handleClose = () => {
+    onClose(
+      new RiemannFunc(
+        baseFunc,
+        addTones,
+        base,
+        isSecondaryDominant,
+        missingFundamental
+      )
+    );
+  };
 
   return (
     <Layer
       position="center"
-      onClickOutside={() =>
-        onClose(new RiemannFunc(baseFunc, addTones, base, isSecondaryDominant))
-      }
-      onEsc={() =>
-        onClose(new RiemannFunc(baseFunc, addTones, base, isSecondaryDominant))
-      }
+      onClickOutside={handleClose}
+      onEsc={handleClose}
       target={target}
     >
-      <Box pad="medium" gap="small">
+      <Box pad="medium" gap="medium">
         <Heading level={3} margin="none">
           Riemann Function
         </Heading>
-
-        <Text>Enter Riemann Function:</Text>
 
         <NumberMultiSelector
           options={RiemannFunc.validAddTones}
@@ -44,8 +53,24 @@ export default function RiemannFuncSelectionDialog({
         />
 
         <SelectionWheel
-          value={baseFunc}
-          onChange={(val) => setBaseFunc(val)}
+          value={
+            isSecondaryDominant
+              ? `(${baseFunc})`
+              : missingFundamental
+              ? `/${baseFunc}`
+              : baseFunc
+          }
+          onChange={(val) => {
+            setBaseFunc(
+              val.startsWith("(")
+                ? val.slice(1, -1)
+                : val.startsWith("/")
+                ? val.slice(1)
+                : val
+            );
+            setIsSecondaryDominant(val.startsWith("("));
+            setMissingFundamental(val.startsWith("/"));
+          }}
           radius={175}
           major
         />
@@ -72,11 +97,7 @@ export default function RiemannFuncSelectionDialog({
                 <strong>OK</strong>
               </Text>
             }
-            onClick={() => {
-              onClose(
-                new RiemannFunc(baseFunc, addTones, base, isSecondaryDominant)
-              );
-            }}
+            onClick={handleClose}
             primary
           />
         </Box>

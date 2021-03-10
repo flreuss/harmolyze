@@ -3,12 +3,7 @@ import React from "react";
 
 import ColourWheel from "../colourWheel";
 
-export default function SelectionWheel({
-  value,
-  onChange,
-  radius,
-  minor,
-}) {
+export default function SelectionWheel({ value, onChange, radius, minor }) {
   // Important global variable! Do not delete!
   let colourWheel;
 
@@ -38,7 +33,7 @@ export default function SelectionWheel({
                   },
                   {
                     colour: "rgb(0, 179, 0)",
-                    values: ["sP","sp","Sg","SG"],
+                    values: ["sP", "sp", "Sg", "SG"],
                   },
                 ],
               },
@@ -109,7 +104,7 @@ export default function SelectionWheel({
         shadowColour: "grey",
         shadowBlur: 5,
       }}
-      preset={true}
+      preset={value ? true : false}
       presetValue={value}
       animated
     />
