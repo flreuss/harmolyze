@@ -126,6 +126,24 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     }
   };
 
+  const handleOpenModalDialogClose = (abcelem, riemannFunc) => {
+    if (riemannFunc) {
+      if (!abcelem.chord) {
+        setAbcString(insert(abcString, `"_${riemannFunc}"`, abcelem.startChar));
+      } else if (riemannFunc.toString() !== abcelem.chord[0].name) {
+        setAbcString(
+          replace(
+            abcString,
+            `"_${riemannFunc}"`,
+            abcelem.startChar,
+            abcelem.chord[0].name.length + 3
+          )
+        );
+      }
+    }
+    setOpenModalDialog(undefined);
+  };
+
   const handleClick = (
     abcelem,
     _tuneNumber,
@@ -144,47 +162,14 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     ) {
       setOpenNotification(true);
     } else if (!abcelem.rest) {
-      if (lowestAdjacentNote.chord) {
-        setOpenModalDialog({
-          onClose: (riemannFunc) => {
-            if (riemannFunc) {
-              const chordLength = lowestAdjacentNote.chord[0].name.length;
-              if (riemannFunc.toString() !== lowestAdjacentNote.chord[0].name) {
-                setAbcString(
-                  replace(
-                    abcString,
-                    `"_${riemannFunc}"`,
-                    lowestAdjacentNote.startChar,
-                    chordLength + 3
-                  )
-                );
-              }
-            }
-            setOpenModalDialog(undefined);
-          },
-          defaultValue: RiemannFunc.fromString(
-            lowestAdjacentNote.chord[0].name
-          ),
-          mode: visualObjs[0].getKeySignature().mode,
-        });
-      } else {
-        setOpenModalDialog({
-          onClose: (riemannFunc) => {
-            if (riemannFunc) {
-              setAbcString(
-                insert(
-                  abcString,
-                  `"_${riemannFunc}"`,
-                  lowestAdjacentNote.startChar
-                )
-              );
-            }
-            setOpenModalDialog(undefined);
-          },
-          defaultValue: new RiemannFunc(),
-          mode: visualObjs[0].getKeySignature().mode,
-        });
-      }
+      setOpenModalDialog({
+        onClose: (riemannFunc) =>
+          handleOpenModalDialogClose(lowestAdjacentNote, riemannFunc),
+        defaultValue: lowestAdjacentNote.chord
+          ? RiemannFunc.fromString(lowestAdjacentNote.chord[0].name)
+          : new RiemannFunc(),
+        mode: visualObjs[0].getKeySignature().mode,
+      });
     }
   };
 
