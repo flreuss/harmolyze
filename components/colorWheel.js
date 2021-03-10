@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 
 // Utils:
 import {
-  colourToRgbObj,
+  colorToRgbObj,
   getEffectiveRadius,
   calculateBounds,
 } from "../lib/tinycolorUtils";
@@ -38,7 +38,7 @@ const defaultProps = {
 const fullCircle = 2 * Math.PI;
 const quarterCircle = fullCircle / 4;
 
-class ColourWheel extends Component {
+class ColorWheel extends Component {
   constructor(props) {
     super(props);
 
@@ -139,7 +139,7 @@ class ColourWheel extends Component {
     if (this.props.onRef) this.props.onRef(this);
 
     // Initialising our canvas & context objs.
-    this.canvasEl = document.getElementById("colour-picker");
+    this.canvasEl = document.getElementById("color-picker");
     this.ctx = this.canvasEl.getContext("2d");
 
     if (this.props.preset) {
@@ -241,10 +241,10 @@ class ColourWheel extends Component {
     const rgb = { r, g, b };
 
     const clicked = this.props.options.find(
-      ({ colour }) =>
-        colourToRgbObj(colour).r === rgb.r &&
-        colourToRgbObj(colour).g === rgb.g &&
-        colourToRgbObj(colour).b === rgb.b
+      ({ color }) =>
+        colorToRgbObj(color).r === rgb.r &&
+        colorToRgbObj(color).g === rgb.g &&
+        colorToRgbObj(color).b === rgb.b
     );
 
     if (clicked) {
@@ -274,9 +274,9 @@ class ColourWheel extends Component {
     for (let opt of this.props.options) {
       for (let child of opt.children) {
         if (
-          colourToRgbObj(child.colour).r === rgb.r &&
-          colourToRgbObj(child.colour).g === rgb.g &&
-          colourToRgbObj(child.colour).b === rgb.b
+          colorToRgbObj(child.color).r === rgb.r &&
+          colorToRgbObj(child.color).g === rgb.g &&
+          colorToRgbObj(child.color).b === rgb.b
         ) {
           clicked = child;
         }
@@ -341,9 +341,9 @@ class ColourWheel extends Component {
     // This value ensures that the stroke accounts for the lineWidth provided to produce an accurately represented radius.
     const effectiveRadius = getEffectiveRadius(radius, lineWidth);
 
-    // Converting each colour into a relative rgb-object we can iterate through.
-    const rgbArr = options.map(({ colour, values }) => ({
-      rgb: colourToRgbObj(colour),
+    // Converting each color into a relative rgb-object we can iterate through.
+    const rgbArr = options.map(({ color, values }) => ({
+      rgb: colorToRgbObj(color),
       value: values[0],
     }));
 
@@ -395,7 +395,7 @@ class ColourWheel extends Component {
     const {
       radius,
       padding,
-      spacers: { colour, shadowColour, shadowBlur },
+      spacers: { color, shadowColor, shadowBlur },
     } = this.props;
 
     const height = radius * 2;
@@ -408,9 +408,9 @@ class ColourWheel extends Component {
     this.ctx.arc(width / 2, height / 2, effectiveRadius, 0, fullCircle);
     this.ctx.lineWidth = padding;
 
-    this.ctx.shadowColor = shadowColour;
+    this.ctx.shadowColor = shadowColor;
     this.ctx.shadowBlur = shadowBlur;
-    this.ctx.strokeStyle = colour;
+    this.ctx.strokeStyle = color;
     this.ctx.stroke();
     this.ctx.closePath();
 
@@ -447,8 +447,8 @@ class ColourWheel extends Component {
 
     // Different functions for drawing our inner-wheel of shades.
     function drawShades() {
-      rgbShades.forEach(({ colour, value }, i) => {
-        const rgb = colourToRgbObj(colour);
+      rgbShades.forEach(({ color, value }, i) => {
+        const rgb = colorToRgbObj(color);
         this.ctx.beginPath();
 
         const startAngle = (fullCircle / rgbShades.length) * i + quarterCircle;
@@ -486,8 +486,8 @@ class ColourWheel extends Component {
     }
 
     function animateShades() {
-      rgbShades.forEach(({ colour, values }, i) => {
-        const rgb = colourToRgbObj(colour);
+      rgbShades.forEach(({ color, values }, i) => {
+        const rgb = colorToRgbObj(color);
         this.ctx.beginPath();
 
         const startAngle = (fullCircle / rgbShades.length) * i + quarterCircle;
@@ -543,7 +543,7 @@ class ColourWheel extends Component {
 
   drawCenterCircle() {
     const { option, value } = this.state;
-    const rgb = option.colour;
+    const rgb = option.color;
     const { radius } = this.props;
 
     const height = radius * 2;
@@ -577,7 +577,7 @@ class ColourWheel extends Component {
 
     return dynamicCursor ? (
       <canvas
-        id="colour-picker"
+        id="color-picker"
         onClick={this.onCanvasClick}
         onMouseMove={this.onCanvasHover}
         width={`${radius * 2}px`}
@@ -585,7 +585,7 @@ class ColourWheel extends Component {
       />
     ) : (
       <canvas
-        id="colour-picker"
+        id="color-picker"
         onClick={this.onCanvasClick}
         width={`${radius * 2}px`}
         height={`${radius * 2}px`}
@@ -594,7 +594,7 @@ class ColourWheel extends Component {
   }
 }
 
-ColourWheel.propTypes = propTypes;
-ColourWheel.defaultProps = defaultProps;
+ColorWheel.propTypes = propTypes;
+ColorWheel.defaultProps = defaultProps;
 
-export default ColourWheel;
+export default ColorWheel;
