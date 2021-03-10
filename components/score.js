@@ -14,6 +14,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   const ref = React.useRef();
 
   //TODO: Global variables cause side effects...
+  var visualObjs;
   var voicesArray;
   var simultaneousNotesArray;
   var notesHighlighted = [];
@@ -162,6 +163,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
           defaultValue: RiemannFunc.fromString(
             lowestAdjacentNote.chord[0].name
           ),
+          mode: visualObjs[0].getKeySignature().mode,
         });
       } else {
         setOpenModalDialog({
@@ -176,6 +178,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
             setOpenModalDialog(undefined);
           },
           defaultValue: new RiemannFunc(),
+          mode: visualObjs[0].getKeySignature().mode,
         });
       }
     }
@@ -199,7 +202,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         config.staffwidth = window.innerWidth / 2.5;
     }
 
-    const visualObjs = abc.renderAbc("scoreContainer", abcString, config);
+    visualObjs = abc.renderAbc("scoreContainer", abcString, config);
     voicesArray = visualObjs[0].makeVoicesArray();
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
   };
@@ -211,6 +214,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         <SelectionDialog
           onClose={openModalDialog.onClose}
           defaultValue={openModalDialog.defaultValue}
+          mode={openModalDialog.mode}
           target={ref.current}
         />
       )}

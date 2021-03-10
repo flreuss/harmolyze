@@ -10,6 +10,7 @@ export default function RiemannFuncSelectionDialog({
   defaultValue,
   onClose,
   target,
+  mode,
 }) {
   const [baseFunc, setBaseFunc] = useState(defaultValue.baseFunc);
   const [addTones, setAddTones] = useState(defaultValue.addTones);
@@ -72,7 +73,7 @@ export default function RiemannFuncSelectionDialog({
             setMissingFundamental(val.startsWith("/"));
           }}
           radius={175}
-          major
+          mode={mode}
         />
 
         <NumberSelector

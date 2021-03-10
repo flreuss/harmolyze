@@ -3,14 +3,14 @@ import React from "react";
 
 import ColourWheel from "../colourWheel";
 
-export default function SelectionWheel({ value, onChange, radius, minor }) {
+export default function SelectionWheel({ value, onChange, radius, mode }) {
   // Important global variable! Do not delete!
   let colourWheel;
 
   return (
     <ColourWheel
       options={
-        minor
+        ["m", "min", "minor"].includes(mode)
           ? [
               {
                 colour: "rgb(255,0,0)",
