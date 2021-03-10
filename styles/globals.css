@@ -25,3 +25,11 @@ body {
 .abcjs-annotation:hover {
   cursor: default;
 }
+
+.abcjs-note_given {
+  fill: gray;
+}
+
+.abcjs-note_given:hover {
+  cursor: default;
+}

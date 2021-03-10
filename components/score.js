@@ -152,8 +152,6 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     _drag,
     _mouseEvent
   ) => {
-    highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
-
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
     if (
@@ -162,6 +160,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     ) {
       setOpenNotification(true);
     } else if (!abcelem.rest) {
+      highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
       setOpenModalDialog({
         onClose: (riemannFunc) =>
           handleOpenModalDialogClose(lowestAdjacentNote, riemannFunc),
@@ -194,6 +193,19 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     visualObjs = abc.renderAbc("scoreContainer", abcString, config);
     voicesArray = visualObjs[0].makeVoicesArray();
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
+
+    //TODO: Optimize performance by generating binary matrix that identifies preffiled values
+    for (let voice of voicesArray) {
+      for (let note of voice) {
+        if (
+          (note.elem.type === "note" || note.elem.type === "rest") &&
+          (!chordOf(note.elem.abcelem, solutionAbcString) ||
+            chordOf(note.elem.abcelem, initialAbcString))
+        ) {
+          note.elem.elemset.slice(-1)[0].classList.add("abcjs-note_given");
+        }
+      }
+    }
   };
 
   return (
