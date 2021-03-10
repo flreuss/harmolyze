@@ -29,6 +29,7 @@ export default function NumberMultiSelector({
           value={el}
           onClick={(value) => handleClick(value)}
           selected={values.includes(el)}
+          key={el}
         />
       ))}
     </Box>
