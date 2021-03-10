@@ -42,7 +42,11 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         const solutionChord =
           solutionVoicesArray[voiceIndex][noteIndex].elem.abcelem.chord;
 
-        if (note.elem.type === "note" && solutionChord) {
+        if (
+          note.elem.type === "note" &&
+          solutionChord &&
+          !chordOf(note.elem.abcelem, initialAbcString)
+        ) {
           const solutionChords = solutionChord[0].name.split("\n");
 
           let selectionColor = "rgb(0,200,0)";
@@ -160,9 +164,8 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     ) {
       highlightAdjacentNotesOf(
         abcelem,
-        getComputedStyle(document.querySelector(".abcjs-note_given")).fill
+        getComputedStyle(document.querySelector(".abcjs-given")).fill
       );
-      setOpenNotification(true);
     } else if (!abcelem.rest) {
       highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
       setOpenModalDialog({
@@ -202,11 +205,14 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     for (let voice of voicesArray) {
       for (let note of voice) {
         if (
-          (note.elem.type === "note" || note.elem.type === "rest") &&
+          note.elem.type === "note" &&
           (!chordOf(note.elem.abcelem, solutionAbcString) ||
             chordOf(note.elem.abcelem, initialAbcString))
         ) {
-          note.elem.elemset.slice(-1)[0].classList.add("abcjs-note_given");
+          note.elem.elemset.slice(-1)[0].classList.add("abcjs-given");
+          if (note.elem.abcelem.chord) {
+            note.elem.children.slice(-1)[0].graphelem.classList.add("abcjs-given");
+          }
         }
       }
     }

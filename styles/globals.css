@@ -26,10 +26,14 @@ body {
   cursor: default;
 }
 
-.abcjs-note_given {
+.abcjs-given {
   fill: gray;
 }
 
-.abcjs-note_given:hover {
+.abcjs-given:hover {
   cursor: default;
+}
+
+.abcjs-rest {
+  fill: gray;
 }
