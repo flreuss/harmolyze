@@ -42,6 +42,7 @@ export default function RiemannFuncSelectionDialog({
       onClickOutside={handleClose}
       onEsc={handleClose}
       target={target}
+      background={{ color: "white", opacity: "strong" }}
     >
       <Box pad="medium" gap="medium">
         <Heading level={3} margin="none">
