@@ -8,6 +8,7 @@ import Notification from "../components/notification";
 import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
+import CursorControl from "../lib/cursorControl";
 
 export default function Score({ initialAbcString, solutionAbcString, size }) {
   //Attributes
@@ -18,6 +19,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   var voicesArray;
   var simultaneousNotesArray;
   var notesHighlighted = [];
+  var synthControl;
 
   const [abcString, setAbcString] = useState(initialAbcString);
   useEffect(() => {
@@ -220,11 +222,66 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         }
       }
     }
+
+    loadAudio(visualObjs);
   };
 
+  function loadAudio(visualObjs) {
+    if (abc.synth.supportsAudio()) {
+      synthControl = new abc.synth.SynthController();
+      synthControl.load(
+        "#audioContainer",
+        new CursorControl("#scoreContainer"),
+        {
+          displayRestart: true,
+          displayPlay: true,
+          displayProgress: true,
+          displayWarp: true,
+        }
+      );
+    } else {
+      document.querySelector("#audioContainer").innerHTML =
+        "<div class='audio-error'>Audio is not supported in this browser.</div>";
+    }
+
+    synthControl.disable(true);
+    const visualObj = visualObjs[0];
+
+    let midiBuffer = new abc.synth.CreateSynth();
+    midiBuffer
+      .init({
+        visualObj,
+      })
+      .then((response) => {
+        console.log(response);
+        if (synthControl) {
+          synthControl
+            .setTune(visualObj, false)
+            .then((response) => {
+              console.log("Audio successfully loaded.");
+            })
+            .catch((error) => {
+              console.warn("Audio problem:", error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.warn("Audio problem:", error);
+      });
+  }
+
   return (
-    <Box fill align="center" justify="center" ref={ref}>
+    <Box fill align="center" justify="center" gap="none" ref={ref}>
       <div id="scoreContainer" />
+      <Box
+        pad={{
+          horizontal: "large",
+          top: "none",
+          bottom: "medium",
+        }}
+        fill="horizontal"
+        id="audioContainer"
+      />
       {openModalDialog && (
         <SelectionDialog
           onClose={openModalDialog.onClose}
@@ -241,6 +298,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         />
       )}
       <Button
+        pad="medium"
         type="submit"
         label={
           <Text color="white">
