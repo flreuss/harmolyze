@@ -45,7 +45,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         if (
           note.elem.type === "note" &&
           solutionChord &&
-          !chordOf(note.elem.abcelem, initialAbcString)
+          !chordOf(note.elem.abcelem, abc.renderAbc("*", initialAbcString))
         ) {
           const solutionChords = solutionChord[0].name.split("\n");
 
@@ -68,19 +68,17 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
 
   /**
    *
-   * @returns {string} chord of the element corresponding to abcelem in abcString
+   * @returns {string} chord of the element corresponding to abcelem in visualObjs
    */
-  const chordOf = (abcelem, abcString) => {
+  const chordOf = (abcelem, visualObjs) => {
     const adjacentNotes = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
     );
     const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
 
-    const initialVoicesArray = abc
-      .renderAbc("*", abcString)[0]
-      .makeVoicesArray();
+    const compareToVoicesArray = visualObjs[0].makeVoicesArray();
 
-    return initialVoicesArray[lowestAdjacentNotePos.voice][
+    return compareToVoicesArray[lowestAdjacentNotePos.voice][
       lowestAdjacentNotePos.noteTotal
     ].elem.abcelem.chord;
   };
@@ -159,8 +157,8 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
     if (
-      chordOf(abcelem, initialAbcString) ||
-      !chordOf(abcelem, solutionAbcString)
+      chordOf(abcelem, abc.renderAbc("*", initialAbcString)) ||
+      !chordOf(abcelem, abc.renderAbc("*", solutionAbcString))
     ) {
       highlightAdjacentNotesOf(
         abcelem,
@@ -201,17 +199,23 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     voicesArray = visualObjs[0].makeVoicesArray();
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
 
-    //TODO: Optimize performance by generating binary matrix that identifies preffiled values
+    const solutionVisualObjs = abc.renderAbc("*", solutionAbcString);
+    const initialVisualObjs = abc.renderAbc("*", initialAbcString);
+
     for (let voice of voicesArray) {
       for (let note of voice) {
         if (
           note.elem.type === "note" &&
-          (!chordOf(note.elem.abcelem, solutionAbcString) ||
-            chordOf(note.elem.abcelem, initialAbcString))
+          (!chordOf(note.elem.abcelem, solutionVisualObjs) ||
+            chordOf(note.elem.abcelem, initialVisualObjs))
         ) {
-          note.elem.elemset.slice(-1)[0].classList.add("abcjs-given");
+          note.elem.elemset[note.elem.elemset.length - 1].classList.add(
+            "abcjs-given"
+          );
           if (note.elem.abcelem.chord) {
-            note.elem.children.slice(-1)[0].graphelem.classList.add("abcjs-given");
+            note.elem.children[
+              note.elem.children.length - 1
+            ].graphelem.classList.add("abcjs-given");
           }
         }
       }
