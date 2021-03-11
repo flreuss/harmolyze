@@ -1,5 +1,6 @@
 import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
 
@@ -15,11 +16,10 @@ export default function Home({ tunes }) {
       >
         <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
           {tunes.map((tune) => (
-            <Card
-              background="white"
-              animation={{ type: "fadeIn", size: "medium" }}
+            <AnimatedCard
               key={tune.id}
               onClick={() => router.push(`/exercise/${tune.id}`)}
+              background="white"
             >
               <CardBody pad="small">
                 <Text size="medium">{tune.title}</Text>
@@ -28,11 +28,31 @@ export default function Home({ tunes }) {
               <CardFooter pad={{ horizontal: "medium", vertical: "small" }}>
                 <Text size="xsmall">Exercise {tune.id}</Text>
               </CardFooter>
-            </Card>
+            </AnimatedCard>
           ))}
         </Grid>
       </Box>
     </Layout>
+  );
+}
+
+function AnimatedCard(props) {
+  const [animation, setAnimation] = useState({
+    type: "fadeIn",
+    size: "medium",
+  });
+
+  return (
+    <Card
+      {...props}
+      animation={animation}
+      onClick={() => {
+        setAnimation({ type: "pulse", size: "small" });
+        props.onClick();
+      }}
+    >
+      {props.children}
+    </Card>
   );
 }
 
