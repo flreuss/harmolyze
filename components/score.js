@@ -27,7 +27,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     renderVisualObjs();
   }, [initialAbcString, size, solutionAbcString, abcString]);
 
-  const [openModalDialog, setOpenModalDialog] = useState(undefined);
+  const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
   const [openNotification, setOpenNotification] = useState(undefined);
 
   //Methods
@@ -42,16 +42,21 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     voicesArray.forEach((voice, voiceIndex) => {
       voice.forEach((note, noteIndex) => {
         const filledInChord = note.elem.abcelem.chord;
-        const solutionChord = solutionVoicesArray[voiceIndex][noteIndex].elem.abcelem.chord;
+        const solutionChord =
+          solutionVoicesArray[voiceIndex][noteIndex].elem.abcelem.chord;
 
-        if (note.elem.type === "note" &&
+        if (
+          note.elem.type === "note" &&
           solutionChord &&
-          !chordOf(note.elem.abcelem, abc.renderAbc("*", initialAbcString))) {
+          !chordOf(note.elem.abcelem, abc.renderAbc("*", initialAbcString))
+        ) {
           const solutionChords = solutionChord[0].name.split("\n");
 
           let selectionColor = "rgb(0,200,0)";
-          if (!filledInChord ||
-            !solutionChords.includes(filledInChord[0].name)) {
+          if (
+            !filledInChord ||
+            !solutionChords.includes(filledInChord[0].name)
+          ) {
             selectionColor = "rgb(200,0,0)";
             success = false;
           }
@@ -61,8 +66,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
       });
     });
 
-    if (success)
-      alert("Geschafft!");
+    if (success) alert("Geschafft!");
   }
 
   /**
@@ -77,7 +81,9 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
 
     const compareToVoicesArray = visualObjs[0].makeVoicesArray();
 
-    return compareToVoicesArray[lowestAdjacentNotePos.voice][lowestAdjacentNotePos.noteTotal].elem.abcelem.chord;
+    return compareToVoicesArray[lowestAdjacentNotePos.voice][
+      lowestAdjacentNotePos.noteTotal
+    ].elem.abcelem.chord;
   }
 
   function lowestAdjacentNoteOf(abcelem) {
@@ -87,20 +93,25 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
 
     const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
 
-    return voicesArray[lowestAdjacentNotePos.voice][lowestAdjacentNotePos.noteTotal].elem;
+    return voicesArray[lowestAdjacentNotePos.voice][
+      lowestAdjacentNotePos.noteTotal
+    ].elem;
   }
 
   function unHighlightAllNotes() {
     if (notesHighlighted.length > 0) {
-      notesHighlighted.forEach((el) => el.unhighlight(undefined, "currentColor")
+      notesHighlighted.forEach((el) =>
+        el.unhighlight(undefined, "currentColor")
       );
       notesHighlighted = [];
     }
   }
 
-  function highlightAdjacentNotesOf(abcelem,
+  function highlightAdjacentNotesOf(
+    abcelem,
     selectionColor,
-    multiselect = false) {
+    multiselect = false
+  ) {
     if (!multiselect) {
       unHighlightAllNotes();
     }
@@ -120,7 +131,8 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     }
   }
 
-  function handleOpenModalDialogClose(abcelem, riemannFunc) {
+  //Event handlers
+  function handleSelectionDialogClose(abcelem, riemannFunc) {
     if (riemannFunc) {
       if (!abcelem.chord) {
         setAbcString(insert(abcString, `"_${riemannFunc}"`, abcelem.startChar));
@@ -133,29 +145,38 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
             abcelem.chord[0].name.length + 3
           )
         );
+      } else {
+        unHighlightAllNotes();
       }
+    } else {
+      unHighlightAllNotes();
     }
-    setOpenModalDialog(undefined);
+    setOpenSelectionDialog(undefined);
   }
 
-  function handleClick(abcelem,
+  function handleClick(
+    abcelem,
     _tuneNumber,
     _classes,
     _analysis,
     _drag,
-    _mouseEvent) {
+    _mouseEvent
+  ) {
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
-    if (chordOf(abcelem, abc.renderAbc("*", initialAbcString)) ||
-      !chordOf(abcelem, abc.renderAbc("*", solutionAbcString))) {
+    if (
+      chordOf(abcelem, abc.renderAbc("*", initialAbcString)) ||
+      !chordOf(abcelem, abc.renderAbc("*", solutionAbcString))
+    ) {
       highlightAdjacentNotesOf(
         abcelem,
         getComputedStyle(document.querySelector(".abcjs-given")).fill
       );
     } else if (!abcelem.rest) {
       highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
-      setOpenModalDialog({
-        onClose: (riemannFunc) => handleOpenModalDialogClose(lowestAdjacentNote, riemannFunc),
+      setOpenSelectionDialog({
+        onClose: (riemannFunc) =>
+          handleSelectionDialogClose(lowestAdjacentNote, riemannFunc),
         defaultValue: lowestAdjacentNote.chord
           ? RiemannFunc.fromString(lowestAdjacentNote.chord[0].name)
           : new RiemannFunc(),
@@ -164,6 +185,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     }
   }
 
+  //Rendering
   function renderVisualObjs() {
     let config = configFromFile;
     config.clickListener = handleClick;
@@ -191,14 +213,18 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
 
     for (let voice of voicesArray) {
       for (let note of voice) {
-        if (note.elem.type === "note" &&
+        if (
+          note.elem.type === "note" &&
           (!chordOf(note.elem.abcelem, solutionVisualObjs) ||
-            chordOf(note.elem.abcelem, initialVisualObjs))) {
+            chordOf(note.elem.abcelem, initialVisualObjs))
+        ) {
           note.elem.elemset[note.elem.elemset.length - 1].classList.add(
             "abcjs-given"
           );
           if (note.elem.abcelem.chord) {
-            note.elem.children[note.elem.children.length - 1].graphelem.classList.add("abcjs-given");
+            note.elem.children[
+              note.elem.children.length - 1
+            ].graphelem.classList.add("abcjs-given");
           }
         }
       }
@@ -263,11 +289,11 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         fill="horizontal"
         id="audioContainer"
       />
-      {openModalDialog && (
+      {openSelectionDialog && (
         <SelectionDialog
-          onClose={openModalDialog.onClose}
-          defaultValue={openModalDialog.defaultValue}
-          mode={openModalDialog.mode}
+          onClose={openSelectionDialog.onClose}
+          defaultValue={openSelectionDialog.defaultValue}
+          mode={openSelectionDialog.mode}
           target={ref.current}
         />
       )}
