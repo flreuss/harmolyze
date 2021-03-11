@@ -9,7 +9,7 @@ export default function NumberMultiSelector({
 }) {
   const [values, setValues] = useState(selected);
 
-  const handleClick = (value) => {
+  function handleClick(value) {
     let newValues = [...values];
 
     if (newValues.includes(value)) {
@@ -20,7 +20,7 @@ export default function NumberMultiSelector({
 
     setValues(newValues);
     onChange(newValues);
-  };
+  }
 
   return (
     <Box direction="row" pad="xsmall" gap="none" justify="stretch" fill="horizontal">

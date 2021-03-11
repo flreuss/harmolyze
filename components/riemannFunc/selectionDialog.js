@@ -22,19 +22,19 @@ export default function RiemannFuncSelectionDialog({
     defaultValue.missingFundamental
   );
 
-  const handleClose = () => {
+  function handleClose() {
     onClose(
       baseFunc
         ? new RiemannFunc(
-            baseFunc,
-            addTones,
-            base,
-            isSecondaryDominant,
-            missingFundamental
-          )
+          baseFunc,
+          addTones,
+          base,
+          isSecondaryDominant,
+          missingFundamental
+        )
         : undefined
     );
-  };
+  }
 
   return (
     <Layer
