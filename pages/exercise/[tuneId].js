@@ -3,8 +3,8 @@ import { Box, ResponsiveContext } from "grommet";
 
 import Score from "../../components/score";
 
-import { getTunes, getTuneById } from "../../lib/tunes";
 import { getInitial, getSolution } from "../../lib/solutions";
+import { connectToDatabase } from "../../lib/mongodb";
 
 export default function Exercise({ initialAbcString, solutionAbcString }) {
   return (
@@ -27,25 +27,20 @@ export default function Exercise({ initialAbcString, solutionAbcString }) {
   );
 }
 
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
+  const { db } = await connectToDatabase();
+
+  const tune = await db
+    .collection("Tunes")
+    .findOne(
+      { id: params.tuneId },
+      { projection: { abc: 1, _id: 0 } }
+    );
+
   return {
     props: {
-      initialAbcString: getInitial(getTuneById(params.tuneId).abc),
-      solutionAbcString: getSolution(getTuneById(params.tuneId).abc),
+      initialAbcString: getInitial(tune.abc),
+      solutionAbcString: getSolution(tune.abc),
     },
-  };
-}
-
-export async function getStaticPaths() {
-  const tunes = getTunes();
-  return {
-    paths: tunes.map((tune) => {
-      return {
-        params: {
-          tuneId: tune.id,
-        },
-      };
-    }),
-    fallback: false,
   };
 }
