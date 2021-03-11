@@ -1,7 +1,6 @@
 import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
 import { useRouter } from "next/router";
-
-import { getTunes } from "../lib/tunes";
+import { connectToDatabase } from "../lib/mongodb";
 
 export default function Home({ tunes }) {
   const router = useRouter();
@@ -34,10 +33,19 @@ export default function Home({ tunes }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
+  const { db } = await connectToDatabase();
+
+  const tunes = await db
+    .collection("Tunes")
+    .find()
+    .project({ title: 1, id: 1, _id: 0 })
+    .sort({ id: 1 })
+    .toArray();
+
   return {
     props: {
-      tunes: getTunes(true),
+      tunes,
     },
   };
 }
