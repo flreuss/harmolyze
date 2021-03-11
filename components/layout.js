@@ -9,13 +9,10 @@ import {
   Avatar,
   Anchor,
 } from "grommet";
-import { Home } from "grommet-icons";
+import { Home, Logout } from "grommet-icons";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { signIn, useSession, signOut } from "next-auth/client";
-
-const gravatarSrc =
-  "//s.gravatar.com/avatar/b7fb138d53ba0f573212ccce38a7c43b?s=80";
 
 export default function Layout({ children }) {
   const [session, loading] = useSession();
@@ -38,25 +35,26 @@ export default function Layout({ children }) {
                 size="small"
                 hoverIndicator
                 icon={<Home />}
-                onClick={() => {}}
               />
             </Link>
           </Nav>
-          <Box direction="row" align="center" gap="small">
-            <Avatar
-              src={gravatarSrc}
-              onClick={session ? () => signOut() : () => signIn()}
-            />
-            <Anchor
-              color="white"
-              onClick={session ? () => signOut() : () => signIn()}
-              label={
-                session ? session.user.name || session.user.email : "Einloggen"
-              }
-            ></Anchor>
-          </Box>
+          {session && (
+            <Box direction="row" align="center" gap="small">
+              <Avatar src={session.user.image} />
+              <Anchor
+                color="white"
+                label={session.user.name || session.user.email}
+              />
+              <Button
+                size="small"
+                hoverIndicator
+                icon={<Logout />}
+                onClick={() => signOut()}
+              />
+            </Box>
+          )}
         </Header>
-        <Main gridArea="main"> {children}</Main>
+        <Main gridArea="main">{children}</Main>
       </Grid>
     </Grommet>
   );

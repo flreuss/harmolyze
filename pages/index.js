@@ -1,4 +1,5 @@
 import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
+import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Layout from "../components/layout";
@@ -56,19 +57,29 @@ function AnimatedCard(props) {
   );
 }
 
-export async function getServerSideProps() {
-  const { db } = await connectToDatabase();
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/api/auth/signin',
+        permanent: false,
+      },
+    }
+  } else {
+    const { db } = await connectToDatabase();
 
-  const tunes = await db
-    .collection("Tunes")
-    .find()
-    .project({ title: 1, id: 1, _id: 0 })
-    .sort({ id: 1 })
-    .toArray();
+    const tunes = await db
+      .collection("Tunes")
+      .find()
+      .project({ title: 1, id: 1, _id: 0 })
+      .sort({ id: 1 })
+      .toArray();
 
-  return {
-    props: {
-      tunes,
-    },
-  };
+    return {
+      props: {
+        tunes,
+      },
+    };
+  }
 }
