@@ -20,9 +20,7 @@ export default NextAuth({
 
         const user = await db
           .collection("users")
-          .findOne(
-            { name: credentials.username }
-          );
+          .findOne({ name: credentials.username });
 
         if (user) {
           const match = await bcrypt.compare(
@@ -38,8 +36,10 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-
   jwt: {
     signingKey: process.env.JWT_SIGNING_PRIVATE_KEY,
+  },
+  pages: {
+    signIn: "/auth/signin",
   },
 });
