@@ -1,14 +1,28 @@
 import { signIn } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
-import { Box, Button, Form, FormField, Heading, TextInput } from "grommet";
+import {
+  Avatar,
+  Box,
+  Button,
+  Form,
+  FormField,
+  Heading,
+  RadioButtonGroup,
+  Text,
+  TextInput,
+} from "grommet";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export default function SignIn() {
   const [nameError, setNameError] = useState();
   const router = useRouter();
-  const [value, setValue] = useState({ name: router.query.name });
+  const [value, setValue] = useState({
+    name: router.query.name ? router.query.name : "",
+    password: "",
+    password2: "",
+  });
 
   return (
     <Layout>
@@ -83,6 +97,36 @@ export default function SignIn() {
               required
             >
               <TextInput name="password2" type="password" />
+            </FormField>
+
+            <FormField label="Avatar" name="image">
+              <RadioButtonGroup
+                name="image"
+                direction="row"
+                gap="xsmall"
+                justify="between"
+                options={[
+                  "/avatars/microphone.jpg",
+                  "/avatars/playmobil-mozart.jpg",
+                ].map((src) => ({
+                  id: `$avatar${src}`,
+                  value: src,
+                }))}
+              >
+                {(option, { checked, hover }) => {
+                  let props;
+
+                  if (checked)
+                    props = {
+                      elevation: "large",
+                      animation: { type: "pulse", size: "medium" },
+                    };
+                  else if (hover) props = { elevation: "medium" };
+                  else props = {};
+
+                  return <Avatar {...props} src={option.value} />;
+                }}
+              </RadioButtonGroup>
             </FormField>
 
             <Box direction="row" justify="between" margin={{ top: "medium" }}>

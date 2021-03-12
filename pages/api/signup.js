@@ -8,6 +8,7 @@ export default function signup(req, res) {
         _id: req.body.name,
         password: hashedPassword,
         createdAt: new Date(),
+        image: req.body.image,
       })
         .then((result) => {
           //201 Created
