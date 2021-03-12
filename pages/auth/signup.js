@@ -3,10 +3,12 @@ import Layout from "../../components/layout";
 import React, { useState } from "react";
 import { Box, Button, Form, FormField, Heading, TextInput } from "grommet";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function SignIn() {
   const [nameError, setNameError] = useState();
-  const [value, setValue] = useState({});
+  const router = useRouter();
+  const [value, setValue] = useState({ name: router.query.name });
 
   return (
     <Layout>
@@ -15,6 +17,7 @@ export default function SignIn() {
 
         <Box width="medium">
           <Form
+            value={value}
             validate="submit"
             onChange={(nextValue) => {
               setNameError(undefined);
@@ -83,7 +86,10 @@ export default function SignIn() {
             </FormField>
 
             <Box direction="row" justify="between" margin={{ top: "medium" }}>
-              <Link href="/auth/signin" passHref>
+              <Link
+                href={`/auth/signin?name=${value.name ? value.name : ""}`}
+                passHref
+              >
                 <Button label="Einloggen" secondary />
               </Link>
               <Button

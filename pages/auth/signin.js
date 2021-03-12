@@ -15,8 +15,8 @@ import { useRouter } from "next/router";
 
 export default function SignIn() {
   const [unauthorized, setUnauthorized] = useState();
-  const [value, setValue] = useState({});
   const router = useRouter();
+  const [value, setValue] = useState({ name: router.query.name });
 
   return (
     <Layout>
@@ -24,6 +24,7 @@ export default function SignIn() {
         <Heading margin="none">Einloggen</Heading>
         <Box width="medium">
           <Form
+            value={value}
             validate="submit"
             onChange={(nextValue) => {
               setValue(nextValue);
@@ -70,7 +71,10 @@ export default function SignIn() {
             </FormField>
 
             <Box direction="row" justify="between" margin={{ top: "medium" }}>
-              <Link href="/auth/signup" passHref>
+              <Link
+                href={`/auth/signup?name=${value.name ? value.name : ""}`}
+                passHref
+              >
                 <Button label="Registrieren" secondary />
               </Link>
               <Button
