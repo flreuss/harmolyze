@@ -9,13 +9,14 @@ import {
   FormField,
   Heading,
   RadioButtonGroup,
-  Text,
   TextInput,
 } from "grommet";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import fs from "fs";
+import path from "path";
 
-export default function SignIn() {
+export default function SignIn({ avatars }) {
   const [nameError, setNameError] = useState();
   const router = useRouter();
   const [value, setValue] = useState({
@@ -105,10 +106,7 @@ export default function SignIn() {
                 direction="row"
                 gap="xsmall"
                 justify="between"
-                options={[
-                  "/avatars/microphone.jpg",
-                  "/avatars/playmobil-mozart.jpg",
-                ].map((src) => ({
+                options={avatars.map((src) => ({
                   id: `$avatar${src}`,
                   value: src,
                 }))}
@@ -154,4 +152,16 @@ export default function SignIn() {
       </Box>
     </Layout>
   );
+}
+
+export async function getStaticProps() {
+  const avatarDirectory = "public/avatars";
+
+  const avatars = fs
+    .readdirSync(path.join(process.cwd(), avatarDirectory))
+    .map((filename) => `/avatars/${filename}`);
+
+  return {
+    props: { avatars }, // will be passed to the page component as props
+  };
 }
