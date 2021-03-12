@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Providers from "next-auth/providers";
 import { connectToDatabase } from "../../../lib/mongodb";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export default NextAuth({
   // Configure one or more authentication providers

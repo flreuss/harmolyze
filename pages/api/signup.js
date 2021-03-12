@@ -1,5 +1,5 @@
 import { connectToDatabase } from "../../lib/mongodb";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export default function signup(req, res) {
   let resStatus = 201;
