@@ -43,7 +43,7 @@ export default function Layout({ children }) {
               <Avatar src={session.user.image} />
               <Anchor
                 color="white"
-                label={session.user.name || session.user.email}
+                label={session.user.name}
               />
               <Button
                 size="small"

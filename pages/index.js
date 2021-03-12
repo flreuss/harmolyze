@@ -5,7 +5,7 @@ import { useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
 
-export default function Home({ tunes }) {
+export default function Home({ tunebooks }) {
   const router = useRouter();
 
   return (
@@ -15,23 +15,28 @@ export default function Home({ tunes }) {
         background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
         height="100%"
       >
-        <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
-          {tunes.map((tune) => (
-            <AnimatedCard
-              key={tune.id}
-              onClick={() => router.push(`/exercise/${tune.id}`)}
-              background="white"
-            >
-              <CardBody pad="small">
-                <Text size="medium">{tune.title}</Text>
-              </CardBody>
+        {tunebooks.map((tunebook) => (
+          <Box>
+            <Text>{tunebook.name}</Text>
+            {tunebook.tunes.map((tune) => (
+              <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
+                <AnimatedCard
+                  key={tune.id}
+                  onClick={() => router.push(`/tunebook/${tunebook._id}/tune/${tune.id}`)}
+                  background="white"
+                >
+                  <CardBody pad="small">
+                    <Text size="medium">{tune.title}</Text>
+                  </CardBody>
 
-              <CardFooter pad={{ horizontal: "medium", vertical: "small" }}>
-                <Text size="xsmall">Exercise {tune.id}</Text>
-              </CardFooter>
-            </AnimatedCard>
-          ))}
-        </Grid>
+                  <CardFooter pad={{ horizontal: "medium", vertical: "small" }}>
+                    <Text size="xsmall">Exercise {tune.id}</Text>
+                  </CardFooter>
+                </AnimatedCard>
+              </Grid>
+            ))}
+          </Box>
+        ))}
       </Box>
     </Layout>
   );
@@ -62,23 +67,22 @@ export async function getServerSideProps(context) {
   if (!session) {
     return {
       redirect: {
-        destination: '/api/auth/signin',
+        destination: "/api/auth/signin",
         permanent: false,
       },
-    }
+    };
   } else {
     const { db } = await connectToDatabase();
 
-    const tunes = await db
-      .collection("Tunes")
+    const tunebooks = await db
+      .collection("tunebooks")
       .find()
-      .project({ title: 1, id: 1, _id: 0 })
-      .sort({ id: 1 })
+      .sort({ _id: 1 })
       .toArray();
 
     return {
       props: {
-        tunes,
+        tunebooks,
       },
     };
   }

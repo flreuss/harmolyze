@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, ResponsiveContext } from "grommet";
 
-import Score from "../../components/score";
+import Score from "../../../../components/score";
 
-import { getInitial, getSolution } from "../../lib/solutions";
-import { connectToDatabase } from "../../lib/mongodb";
-import Layout from "../../components/layout";
+import { getInitial, getSolution } from "../../../../lib/solutions";
+import { connectToDatabase } from "../../../../lib/mongodb";
+import Layout from "../../../../components/layout";
 import { getSession } from "next-auth/client";
 
 export default function Exercise({ initialAbcString, solutionAbcString }) {
@@ -36,21 +36,25 @@ export async function getServerSideProps(context) {
   if (!session) {
     return {
       redirect: {
-        destination: '/api/auth/signin',
+        destination: "/api/auth/signin",
         permanent: false,
       },
-    }
+    };
   } else {
-  const { db } = await connectToDatabase();
+    const { db } = await connectToDatabase();
 
-  const tune = await db
-    .collection("Tunes")
-    .findOne({ id: context.params.tuneId }, { projection: { abc: 1, _id: 0 } });
+    //TODO: Optimize: Aggregieren, sodass nicht bei jeder Anfrage alle Tunes einer Kategorie mitgeschickt werden
+    const tunebook = await db.collection("tunebooks").findOne({
+      _id: +context.params.tunebookId,
+      "tunes.id": context.params.tuneId,
+    });
+    const tune = tunebook.tunes[+context.params.tuneId];
 
-  return {
-    props: {
-      initialAbcString: getInitial(tune.abc),
-      solutionAbcString: getSolution(tune.abc),
-    },
-  };}
+    return {
+      props: {
+        initialAbcString: getInitial(tune.abc),
+        solutionAbcString: getSolution(tune.abc),
+      },
+    };
+  }
 }

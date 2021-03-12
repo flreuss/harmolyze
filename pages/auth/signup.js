@@ -1,7 +1,7 @@
 import { signIn } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
-import { Box, Button, Form, FormField, TextInput } from "grommet";
+import { Box, Button, Form, FormField, Heading, TextInput } from "grommet";
 import Link from "next/link";
 
 export default function SignIn() {
@@ -10,10 +10,12 @@ export default function SignIn() {
 
   return (
     <Layout>
-      <Box fill align="center" justify="center">
+      <Box fill align="center" justify="center" gap="large">
+        <Heading margin="none">Benutzerkonto anlegen</Heading>
+
         <Box width="medium">
           <Form
-            validate="blur"
+            validate="submit"
             onChange={(nextValue) => {
               setNameError(undefined);
               setValue(nextValue);

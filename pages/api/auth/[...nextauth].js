@@ -28,7 +28,7 @@ export default NextAuth({
             user.password
           );
 
-          return match ? {name: user._id} : null;
+          return match ? {name: user._id, image: user.image} : null;
         } else {
           return null;
         }
