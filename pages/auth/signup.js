@@ -1,22 +1,23 @@
 import { signIn } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
-import { Box, Button, Form, FormField, Text, TextInput } from "grommet";
+import { Box, Button, Form, FormField, TextInput } from "grommet";
 import Link from "next/link";
 
 export default function SignIn() {
+  const [nameError, setNameError] = useState();
   const [value, setValue] = useState({});
-  const message =
-    value.password && value.password2 && value.password !== value.password2
-      ? "Passwörter müssen übereinstimmen"
-      : undefined;
 
   return (
     <Layout>
       <Box fill align="center" justify="center">
         <Box width="medium">
           <Form
-            onChange={(nextValue) => setValue(nextValue)}
+            validate="blur"
+            onChange={(nextValue) => {
+              setNameError(undefined);
+              setValue(nextValue);
+            }}
             onSubmit={({ value }) => {
               fetch("/api/signup", {
                 method: "POST",
@@ -27,7 +28,6 @@ export default function SignIn() {
               })
                 .then((res) => {
                   if (res.status === 201) {
-                    alert("Benutzer:in wurde angelegt");
                     signIn("credentials", {
                       name: value.name,
                       password: value.password,
@@ -36,13 +36,25 @@ export default function SignIn() {
                   }
                   return res.json();
                 })
-                .then((json) => {
+                .then((err) => {
                   //Benutzername existiert bereits
-                  console.error(json);
+                  if (err && err.code === 11000)
+                    setNameError("Der Benutzername ist bereits vergeben.");
                 });
             }}
           >
-            <FormField label="Benutzername" name="name" required>
+            <FormField
+              error={nameError}
+              label="Benutzername"
+              name="name"
+              validate={(name) => {
+                if (name.length > 15) {
+                  return "Maximal 15 Zeichen zulässig";
+                }
+                return undefined;
+              }}
+              required
+            >
               <TextInput name="name" type="name" />
             </FormField>
 
@@ -50,21 +62,40 @@ export default function SignIn() {
               <TextInput name="password" type="password" />
             </FormField>
 
-            <FormField label="Passwort (Wdh.)" name="password2" required>
+            <FormField
+              validate={(password2, value) => {
+                if (
+                  value.password &&
+                  password2 &&
+                  value.password !== password2
+                ) {
+                  return "Die Passwörter stimmen nicht überein";
+                }
+                return undefined;
+              }}
+              label="Passwort (Wdh.)"
+              name="password2"
+              required
+            >
               <TextInput name="password2" type="password" />
             </FormField>
 
-            {message && (
-              <Box pad={{ horizontal: "small" }}>
-                <Text color="status-error">{message}</Text>
-              </Box>
-            )}
-
             <Box direction="row" justify="between" margin={{ top: "medium" }}>
-              <Link href="/api/auth/signin" passHref>
+              <Link href="/auth/signin" passHref>
                 <Button label="Einloggen" secondary />
               </Link>
-              <Button type="submit" label="Registrieren" primary />
+              <Button
+                type="submit"
+                label="Registrieren"
+                disabled={
+                  !value ||
+                  !value.name ||
+                  !value.password ||
+                  !value.password2 ||
+                  nameError
+                }
+                primary
+              />
             </Box>
           </Form>
         </Box>
