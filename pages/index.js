@@ -18,11 +18,11 @@ export default function Home({ tunebooks }) {
         {tunebooks.map((tunebook) => (
           <Box>
             <Text>{tunebook.name}</Text>
-            {tunebook.tunes.map((tune) => (
+            {tunebook.tunes_docs.map((tune) => (
               <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
                 <AnimatedCard
-                  key={tune.id}
-                  onClick={() => router.push(`/tunebook/${tunebook._id}/tune/${tune.id}`)}
+                  key={tune._id}
+                  onClick={() => router.push(`/tune/${tune._id}`)}
                   background="white"
                 >
                   <CardBody pad="small">
@@ -30,7 +30,7 @@ export default function Home({ tunebooks }) {
                   </CardBody>
 
                   <CardFooter pad={{ horizontal: "medium", vertical: "small" }}>
-                    <Text size="xsmall">Exercise {tune.id}</Text>
+                    <Text size="xsmall">Exercise {tune._id}</Text>
                   </CardFooter>
                 </AnimatedCard>
               </Grid>
@@ -76,9 +76,41 @@ export async function getServerSideProps(context) {
 
     const tunebooks = await db
       .collection("tunebooks")
-      .find()
-      .sort({ _id: 1 })
+      .aggregate([
+        {
+          $lookup: {
+            from: "tunes",
+            localField: "tunes",
+            foreignField: "_id",
+            as: "tunes_docs",
+          },
+        },
+      //TODO: sort tunes ascending by difficulty
+      //   {
+      //     $lookup: {
+      //       from: "tunes",
+      //       let: { tunes: "$tunes" },
+      //       pipeline: [
+      //         { $match: { $expr: { $eq: ["$$tunes", "$_id"] } } },
+      //         { $sort: { difficulty: -1 } },
+      //       ],
+      //       as: "tunes_docs",
+      //     },
+      //   },
+      ])
+      .project({
+        name: 1,
+        "tunes_docs.title": 1,
+        "tunes_docs.difficulty": 1,
+        "tunes_docs._id": 1,
+      })
       .toArray();
+
+    for (let tunebook of tunebooks) {
+      for (let tune of tunebook.tunes_docs) {
+        tune._id = tune._id.toString();
+      }
+    }
 
     return {
       props: {
