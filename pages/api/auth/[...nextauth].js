@@ -20,7 +20,7 @@ export default NextAuth({
 
         const user = await db
           .collection("users")
-          .findOne({ name: credentials.name });
+          .findOne({ _id: credentials.name });
 
         if (user) {
           const match = await bcrypt.compare(
@@ -28,7 +28,7 @@ export default NextAuth({
             user.password
           );
 
-          return match ? user : null;
+          return match ? {name: user._id} : null;
         } else {
           return null;
         }

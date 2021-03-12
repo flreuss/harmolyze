@@ -1,11 +1,10 @@
 import { signIn } from "next-auth/client";
 import Layout from "../../components/layout";
-import React, { useState } from "react";
+import React from "react";
 import { Anchor, Box, Button, Form, FormField, TextInput } from "grommet";
+import Link from "next/link";
 
 export default function SignIn() {
-  const [value, setValue] = useState();
-
   return (
     <Layout>
       <Box fill align="center" justify="center">
@@ -29,28 +28,17 @@ export default function SignIn() {
             </FormField>
 
             <Box direction="row" justify="between" margin={{ top: "medium" }}>
-              <Button
-                label="Registrieren"
-                onClick={() => {
-                  fetch("/api/signup", {
-                    method: "POST",
-                    body: JSON.stringify(value),
-                    headers: {
-                      "Content-type": "application/json",
-                    },
-                  })
-                    .then((res) => {
-                        if(res.status === 201) {
-                            alert("Benutzer:in wurde angelegt");
-                            //TODO: Submit form automatically
-                        }
-                    })
-                }}
-              />
+              <Link href="/auth/signup" passHref>
+                <Button label="Registrieren" secondary />
+              </Link>
               <Button type="submit" label="Einloggen" primary />
             </Box>
             <Box direction="row" justify="between" margin={{ top: "medium" }}>
-                <Anchor onClick={() => alert("Legen Sie einen neuen Account an.")}>Passwort vergessen?</Anchor>
+              <Anchor
+                onClick={() => alert("Legen Sie einen neuen Account an.")}
+              >
+                Passwort vergessen?
+              </Anchor>
             </Box>
           </Form>
         </Box>
