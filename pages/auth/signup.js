@@ -33,7 +33,7 @@ export default function SignIn({ avatars }) {
         <Box width="medium">
           <Form
             value={value}
-            validate="submit"
+            validate="blur"
             onChange={(nextValue) => {
               setNameError(undefined);
               setValue(nextValue);
@@ -78,7 +78,17 @@ export default function SignIn({ avatars }) {
               <TextInput name="name" type="name" />
             </FormField>
 
-            <FormField label="Passwort" name="password" required>
+            <FormField
+              label="Passwort"
+              name="password"
+              validate={(name) => {
+                if (name.length < 8) {
+                  return "Das Passwort sollte min. 8 Zeichen lang sein.";
+                }
+                return undefined;
+              }}
+              required
+            >
               <TextInput name="password" type="password" />
             </FormField>
 
