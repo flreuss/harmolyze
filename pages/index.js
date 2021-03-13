@@ -1,43 +1,99 @@
-import { Box, Grid, Card, CardBody, CardFooter, Text } from "grommet";
-import { getSession } from "next-auth/client";
+import {
+  Box,
+  Grid,
+  Card,
+  CardBody,
+  CardFooter,
+  Text,
+  Stack,
+  Button,
+} from "grommet";
+import { getSession, useSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
+import { Add, Trash } from "grommet-icons";
+import Link from "next/link";
 
 export default function Home({ tunebooks }) {
   const router = useRouter();
+  const [session, loading] = useSession();
 
   return (
     <Layout>
-      <Box
-        pad="large"
-        background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
-        height="100%"
-      >
-        {tunebooks.map((tunebook) => (
-          <Box>
-            <Text>{tunebook.name}</Text>
-            {tunebook.tunes_docs.map((tune) => (
-              <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
-                <AnimatedCard
-                  key={tune._id}
-                  onClick={() => router.push(`/tune/${tune._id}`)}
-                  background="white"
-                >
-                  <CardBody pad="small">
-                    <Text size="medium">{tune.title}</Text>
-                  </CardBody>
+      <Stack anchor="bottom-right" fill>
+        <Box
+          pad="large"
+          background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
+          height="100%"
+        >
+          {tunebooks.map((tunebook) => (
+            <Box>
+              <Text>{tunebook.name}</Text>
+              {tunebook.tunes_docs.map((tune) => (
+                <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
+                  <Stack anchor="top-right" fill>
+                    <AnimatedCard
+                      key={tune._id}
+                      onClick={() => router.push(`/tune/${tune._id}`)}
+                      background="white"
+                    >
+                      <CardBody pad="small">
+                        <Text size="medium">{tune.title}</Text>
+                      </CardBody>
 
-                  <CardFooter pad={{ horizontal: "medium", vertical: "small" }}>
-                    <Text size="xsmall">Exercise {tune._id}</Text>
-                  </CardFooter>
-                </AnimatedCard>
-              </Grid>
-            ))}
-          </Box>
-        ))}
-      </Box>
+                      <CardFooter
+                        pad={{ horizontal: "medium", vertical: "small" }}
+                      >
+                        <Text size="xsmall">Exercise {tune._id}</Text>
+                      </CardFooter>
+                    </AnimatedCard>
+                    {!loading && session && session.user.isAdmin && (
+                      <Button
+                        hoverIndicator
+                        icon={<Trash />}
+                        onClick={() => {
+                          fetch("/api/admin/tune", {
+                            method: "DELETE",
+                            body: JSON.stringify(tune),
+                            headers: {
+                              "Content-type": "application/json",
+                            },
+                          }).then((res) => {
+                            if (res.status % 200 <= 26) {
+                              //TODO: add state for tunebooks and update state on succesful deletion of a tune
+                              alert(
+                                "Übungsaufgabe wurde erfolgreich gelöscht."
+                              );
+                            } else {
+                              alert(
+                                "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                              );
+                            }
+                          });
+                        }}
+                      />
+                    )}
+                  </Stack>
+                </Grid>
+              ))}
+            </Box>
+          ))}
+        </Box>
+        {!loading && session && session.user.isAdmin && (
+          <Link href="/admin/createTune" passHref>
+            <Box
+              round="full"
+              overflow="hidden"
+              background="brand"
+              margin="medium"
+            >
+              <Button icon={<Add />} hoverIndicator onClick={() => {}} />
+            </Box>
+          </Link>
+        )}
+      </Stack>
     </Layout>
   );
 }
@@ -85,18 +141,18 @@ export async function getServerSideProps(context) {
             as: "tunes_docs",
           },
         },
-      //TODO: sort tunes ascending by difficulty
-      //   {
-      //     $lookup: {
-      //       from: "tunes",
-      //       let: { tunes: "$tunes" },
-      //       pipeline: [
-      //         { $match: { $expr: { $eq: ["$$tunes", "$_id"] } } },
-      //         { $sort: { difficulty: -1 } },
-      //       ],
-      //       as: "tunes_docs",
-      //     },
-      //   },
+        //TODO: sort tunes ascending by difficulty
+        //   {
+        //     $lookup: {
+        //       from: "tunes",
+        //       let: { tunes: "$tunes" },
+        //       pipeline: [
+        //         { $match: { $expr: { $eq: ["$$tunes", "$_id"] } } },
+        //         { $sort: { difficulty: -1 } },
+        //       ],
+        //       as: "tunes_docs",
+        //     },
+        //   },
       ])
       .project({
         name: 1,

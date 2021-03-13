@@ -47,7 +47,7 @@ export default function SignIn({ avatars }) {
                 },
               })
                 .then((res) => {
-                  if (res.status === 201) {
+                  if (res.status % 200 <= 26) {
                     signIn("credentials", {
                       name: value.name,
                       password: value.password,
