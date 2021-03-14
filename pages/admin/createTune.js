@@ -17,14 +17,16 @@ import { useRouter } from "next/router";
 import { connectToDatabase } from "../../lib/mongodb";
 
 export default function CreateTune({ tunebooks, session }) {
-  const router = useRouter();
-  const [notification, setNotification] = useState(undefined);
-  const [value, setValue] = useState({
+  const defaultValue = {
     abc: "",
     title: "",
     difficulty: 0,
     tunebook_id: tunebooks[0]._id,
-  });
+  };
+
+  const router = useRouter();
+  const [notification, setNotification] = useState(undefined);
+  const [value, setValue] = useState(defaultValue);
 
   return session && session.user.isAdmin ? (
     <Layout>
@@ -51,6 +53,7 @@ export default function CreateTune({ tunebooks, session }) {
                     text: "Übungsaufgabe wurde erfolgreich angelegt",
                     color: "status-ok",
                   });
+                  setValue(defaultValue);
                 } else {
                   setNotification({
                     text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
