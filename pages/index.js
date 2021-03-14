@@ -52,7 +52,7 @@ export default function Home({ tunebooks }) {
                     {!loading && session && session.user.isAdmin && (
                       <Button
                         hoverIndicator
-                        icon={<Trash />}
+                        icon={<Trash color="status-critical"/>}
                         onClick={() => {
                           fetch("/api/admin/tune", {
                             method: "DELETE",

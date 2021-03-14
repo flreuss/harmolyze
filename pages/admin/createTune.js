@@ -70,6 +70,7 @@ export default function CreateTune({ tunebooks, session }) {
                 name="difficulty"
                 min={0}
                 max={100}
+                step={5}
                 onChange={(event) => {
                   const newValue = value;
                   newValue.difficulty = +event.target.value;
