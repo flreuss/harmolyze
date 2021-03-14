@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
 import SelectionDialog from "./riemannFunc/selectionDialog";
-import Notification from "../components/notification";
 
 import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
@@ -28,7 +27,6 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   }, [initialAbcString, size, solutionAbcString, abcString]);
 
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
-  const [notification, setNotification] = useState(undefined);
 
   //Methods
   function validateSolution() {
@@ -66,7 +64,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
       });
     });
 
-    if (success) setNotification("Geschafft!");
+    if (success) alert("Geschafft!");
   }
 
   /**
@@ -310,14 +308,6 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
           defaultValue={openSelectionDialog.defaultValue}
           mode={openSelectionDialog.mode}
           target={ref.current}
-        />
-      )}
-      {notification && (
-        <Notification
-          color="status-ok"
-          onClose={() => setNotification(undefined)}
-          text={notification}
-          timeout={3000}
         />
       )}
     </Box>
