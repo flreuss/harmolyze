@@ -11,16 +11,22 @@ import {
 import { getSession, useSession } from "next-auth/client";
 import Notification from "../components/notification";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
 import { Add, Trash } from "grommet-icons";
 import Link from "next/link";
+import {synth} from "abcjs";
 
 export default function Home({ tunebooks }) {
   const router = useRouter();
   const [session, loading] = useSession();
   const [notification, setNotification] = useState(undefined);
+
+  useEffect(() => {
+    const ctx = synth.activeAudioContext();
+    if (ctx && ctx.state === "running") ctx.close();
+  });
 
   return (
     <Layout>

@@ -1,4 +1,4 @@
-import abc from "abcjs";
+import {renderAbc, synth} from "abcjs";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
@@ -28,7 +28,7 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
   }, [initialAbcString, solutionAbcString, abcString]);
   useLayoutEffect(() => {
     renderVisualObjs();
-  }, [size, device])
+  }, [size, device]);
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
   //Methods
@@ -36,7 +36,7 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
     renderVisualObjs();
 
     const solutionVoicesArray = makeVoicesArray(
-      abc.renderAbc("*", solutionAbcString)
+      renderAbc("*", solutionAbcString)
     );
 
     let success = true;
@@ -49,7 +49,7 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
         if (
           note.elem.type === "note" &&
           solutionChord &&
-          !chordOf(note.elem.abcelem, abc.renderAbc("*", initialAbcString))
+          !chordOf(note.elem.abcelem, renderAbc("*", initialAbcString))
         ) {
           const solutionChords = solutionChord[0].name.split("\n");
 
@@ -135,6 +135,8 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
   //Event handlers
   function handleSelectionDialogClose(abcelem, riemannFunc) {
     if (riemannFunc) {
+      synthControl.pause();
+
       if (!abcelem.chord) {
         setAbcString(insert(abcString, `"_${riemannFunc}"`, abcelem.startChar));
       } else if (riemannFunc.toString() !== abcelem.chord[0].name) {
@@ -166,8 +168,8 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
     const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
 
     if (
-      chordOf(abcelem, abc.renderAbc("*", initialAbcString)) ||
-      !chordOf(abcelem, abc.renderAbc("*", solutionAbcString))
+      chordOf(abcelem, renderAbc("*", initialAbcString)) ||
+      !chordOf(abcelem, renderAbc("*", solutionAbcString))
     ) {
       highlightAdjacentNotesOf(
         abcelem,
@@ -210,12 +212,12 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
         config.staffwidth = size.width / 2.5;
     }
 
-    visualObjs = abc.renderAbc("scoreContainer", abcString, config);
+    visualObjs = renderAbc("scoreContainer", abcString, config);
     voicesArray = makeVoicesArray(visualObjs);
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
 
-    const solutionVisualObjs = abc.renderAbc("*", solutionAbcString);
-    const initialVisualObjs = abc.renderAbc("*", initialAbcString);
+    const solutionVisualObjs = renderAbc("*", solutionAbcString);
+    const initialVisualObjs = renderAbc("*", initialAbcString);
 
     for (let voice of voicesArray) {
       for (let note of voice) {
@@ -238,8 +240,8 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
   }
 
   function loadAudio(visualObjs) {
-    if (abc.synth.supportsAudio()) {
-      synthControl = new abc.synth.SynthController();
+    if (synth.supportsAudio()) {
+      synthControl = new synth.SynthController();
       synthControl.load(
         "#audioContainer",
         new CursorControl("#scoreContainer"),
@@ -258,16 +260,19 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
     synthControl.disable(true);
     const visualObj = visualObjs[0];
 
-    let midiBuffer = new abc.synth.CreateSynth();
+    const activeAudioContext = synth.activeAudioContext();
+    const audioContext = activeAudioContext && activeAudioContext.state !== "closed" ?  activeAudioContext : new AudioContext();
+    let midiBuffer = new synth.CreateSynth();
     midiBuffer
       .init({
         visualObj,
+        audioContext,
       })
       .then((response) => {
         console.log(response);
         if (synthControl) {
           synthControl
-            .setTune(visualObj, false)
+            .setTune(visualObj, false, { audioContext })
             .then((response) => {
               console.log("Audio successfully loaded.");
             })
@@ -301,7 +306,10 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
             <strong>Überprüfen</strong>
           </Text>
         }
-        onClick={() => validateSolution(voicesArray, solutionAbcString)}
+        onClick={() => {
+          synthControl.pause();
+          validateSolution(voicesArray, solutionAbcString);
+        }}
         primary
       />
       {openSelectionDialog && (
