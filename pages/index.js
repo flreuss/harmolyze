@@ -151,18 +151,17 @@ export async function getServerSideProps(context) {
             as: "tunes_docs",
           },
         },
-        //TODO: sort tunes ascending by difficulty
-        //   {
-        //     $lookup: {
-        //       from: "tunes",
-        //       let: { tunes: "$tunes" },
-        //       pipeline: [
-        //         { $match: { $expr: { $eq: ["$$tunes", "$_id"] } } },
-        //         { $sort: { difficulty: -1 } },
-        //       ],
-        //       as: "tunes_docs",
-        //     },
-        //   },
+        //If you want empty tunebooks to get returned as well, set preserveNullAndEmptyArrays: true
+        { $unwind: { path: "$tunes_docs", preserveNullAndEmptyArrays: false } },
+        { $sort: { "tunes_docs.difficulty": 1 } },
+        {
+          $group: {
+            _id: "$_id",
+            name: { $first: "$name" },
+            tunes_docs: { $push: "$tunes_docs" },
+          },
+        },
+        { $sort: { _id: 1 } },
       ])
       .project({
         name: 1,
@@ -172,6 +171,7 @@ export async function getServerSideProps(context) {
       })
       .toArray();
 
+    //TODO: Do this in pipeline instead
     for (let tunebook of tunebooks) {
       for (let tune of tunebook.tunes_docs) {
         tune._id = tune._id.toString();
