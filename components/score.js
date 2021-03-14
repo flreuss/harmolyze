@@ -28,7 +28,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   }, [initialAbcString, size, solutionAbcString, abcString]);
 
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
-  const [openNotification, setOpenNotification] = useState(undefined);
+  const [notification, setNotification] = useState(undefined);
 
   //Methods
   function validateSolution() {
@@ -66,7 +66,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
       });
     });
 
-    if (success) alert("Geschafft!");
+    if (success) setNotification("Geschafft!");
   }
 
   /**
@@ -289,21 +289,6 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         fill="horizontal"
         id="audioContainer"
       />
-      {openSelectionDialog && (
-        <SelectionDialog
-          onClose={openSelectionDialog.onClose}
-          defaultValue={openSelectionDialog.defaultValue}
-          mode={openSelectionDialog.mode}
-          target={ref.current}
-        />
-      )}
-      {openNotification && (
-        <Notification
-          onClose={() => setOpenNotification(undefined)}
-          text="Diese Funktion ist Teil der vorgegebenen Lösung."
-          timeout={3000}
-        />
-      )}
       <Button
         pad="medium"
         type="submit"
@@ -315,6 +300,22 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
         onClick={() => validateSolution(voicesArray, solutionAbcString)}
         primary
       />
+      {openSelectionDialog && (
+        <SelectionDialog
+          onClose={openSelectionDialog.onClose}
+          defaultValue={openSelectionDialog.defaultValue}
+          mode={openSelectionDialog.mode}
+          target={ref.current}
+        />
+      )}
+      {notification && (
+        <Notification
+          color="status-ok"
+          onClose={() => setNotification(undefined)}
+          text={notification}
+          timeout={3000}
+        />
+      )}
     </Box>
   );
 }

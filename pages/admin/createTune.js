@@ -1,6 +1,7 @@
 import { getSession, signIn } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
+import Notification from "../../components/notification";
 import {
   Box,
   Button,
@@ -17,6 +18,7 @@ import { connectToDatabase } from "../../lib/mongodb";
 
 export default function CreateTune({ tunebooks, session }) {
   const router = useRouter();
+  const [notification, setNotification] = useState(undefined);
   const [value, setValue] = useState({
     abc: "",
     title: "",
@@ -45,9 +47,15 @@ export default function CreateTune({ tunebooks, session }) {
                 },
               }).then((res) => {
                 if (res.status === 201) {
-                  alert("Übungsaufgabe wurde erfolgreich angelegt");
+                  setNotification({
+                    text: "Übungsaufgabe wurde erfolgreich angelegt",
+                    color: "status-ok",
+                  });
                 } else {
-                  alert("Bei der Datenbankanfrage ist ein Fehler aufgetreten");
+                  setNotification({
+                    text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                    color: "status-error",
+                  });
                 }
               });
             }}
@@ -104,6 +112,14 @@ export default function CreateTune({ tunebooks, session }) {
           </Form>
         </Box>
       </Box>
+      {notification && (
+        <Notification
+          color={notification.color}
+          onClose={() => setNotification(undefined)}
+          text={notification.text}
+          timeout={3000}
+        />
+      )}
     </Layout>
   ) : (
     <p>Access Denied</p>

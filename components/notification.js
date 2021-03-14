@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { FormClose } from "grommet-icons";
 import { Box, Button, Layer, Text } from "grommet";
 
-export default function Notification({ onClose, timeout, text }) {
+export default function Notification({ onClose, timeout, text, color }) {
   useEffect(() => {
     setTimeout(onClose, timeout);
   });
@@ -24,7 +24,7 @@ export default function Notification({ onClose, timeout, text }) {
         round="medium"
         elevation="medium"
         pad={{ vertical: "xsmall", horizontal: "small" }}
-        background={{color: "brand", opacity: "medium"}}
+        background={{ color: color, opacity: "medium" }}
       >
         <Box align="center" direction="row" gap="xsmall">
           <Text>{text}</Text>

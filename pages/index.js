@@ -9,6 +9,7 @@ import {
   Button,
 } from "grommet";
 import { getSession, useSession } from "next-auth/client";
+import Notification from "../components/notification";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Layout from "../components/layout";
@@ -19,6 +20,7 @@ import Link from "next/link";
 export default function Home({ tunebooks }) {
   const router = useRouter();
   const [session, loading] = useSession();
+  const [notification, setNotification] = useState(undefined);
 
   return (
     <Layout>
@@ -65,12 +67,9 @@ export default function Home({ tunebooks }) {
                             },
                           }).then((res) => {
                             if (res.status % 200 <= 26) {
-                              //TODO: add state for tunebooks and update state on succesful deletion of a tune
-                              alert(
-                                "Übungsaufgabe wurde erfolgreich gelöscht."
-                              );
+                              router.push("/");
                             } else {
-                              alert(
+                              setNotification(
                                 "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
                               );
                             }
@@ -97,6 +96,14 @@ export default function Home({ tunebooks }) {
           </Link>
         )}
       </Stack>
+      {notification && (
+        <Notification
+          color="status-error"
+          onClose={() => setNotification(undefined)}
+          text={notification}
+          timeout={3000}
+        />
+      )}
     </Layout>
   );
 }
