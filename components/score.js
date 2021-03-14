@@ -34,9 +34,9 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   function validateSolution() {
     renderVisualObjs();
 
-    const solutionVoicesArray = abc
-      .renderAbc("*", solutionAbcString)[0]
-      .makeVoicesArray();
+    const solutionVoicesArray = makeVoicesArray(
+      abc.renderAbc("*", solutionAbcString)
+    );
 
     let success = true;
     voicesArray.forEach((voice, voiceIndex) => {
@@ -79,7 +79,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     );
     const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
 
-    const compareToVoicesArray = visualObjs[0].makeVoicesArray();
+    const compareToVoicesArray = makeVoicesArray(visualObjs);
 
     return compareToVoicesArray[lowestAdjacentNotePos.voice][
       lowestAdjacentNotePos.noteTotal
@@ -185,6 +185,12 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     }
   }
 
+  function makeVoicesArray(visualObjs) {
+    return visualObjs[0].makeVoicesArray().map((voice) => {
+      return voice.filter((val) => val.elem.type === "note");
+    });
+  }
+
   //Rendering
   function renderVisualObjs() {
     let config = configFromFile;
@@ -205,7 +211,7 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     }
 
     visualObjs = abc.renderAbc("scoreContainer", abcString, config);
-    voicesArray = visualObjs[0].makeVoicesArray();
+    voicesArray = makeVoicesArray(visualObjs);
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
 
     const solutionVisualObjs = abc.renderAbc("*", solutionAbcString);
@@ -214,13 +220,11 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
     for (let voice of voicesArray) {
       for (let note of voice) {
         if (
-          note.elem.type === "note" &&
-          (!chordOf(note.elem.abcelem, solutionVisualObjs) ||
-            chordOf(note.elem.abcelem, initialVisualObjs))
+          !chordOf(note.elem.abcelem, solutionVisualObjs) ||
+          chordOf(note.elem.abcelem, initialVisualObjs)
         ) {
-          note.elem.elemset[note.elem.elemset.length - 1].classList.add(
-            "abcjs-given"
-          );
+          const last = note.elem.elemset.length - 1;
+          note.elem.elemset[last].classList.add("abcjs-given");
           if (note.elem.abcelem.chord) {
             note.elem.children[
               note.elem.children.length - 1
@@ -359,14 +363,6 @@ function makeSimultaneousNotesArray(voicesArray) {
     let adjacentVoicesArrayIndices = [];
 
     for (let i = 0; i < voicesArray.length; i++) {
-      while (
-        voicesArray[i][current[i].noteIndex] &&
-        voicesArray[i][current[i].noteIndex].elem.type !== "note" &&
-        voicesArray[i][current[i].noteIndex].elem.type !== "rest"
-      ) {
-        current[i].noteIndex++;
-      }
-
       if (
         voicesArray[i][current[i].noteIndex] &&
         current[i].countTotal === countTotal
@@ -397,11 +393,8 @@ function makeSimultaneousNotesArray(voicesArray) {
 }
 
 function existsUnclassifiedNote(voicesArray, current) {
-  let result = true;
-
   for (let i = 0; i < voicesArray.length; i++) {
-    result = result && current[i].noteIndex < voicesArray[i].length;
+    if (current[i].noteIndex < voicesArray[i].length) return true;
   }
-
-  return result;
+  return false;
 }
