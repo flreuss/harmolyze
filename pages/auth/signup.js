@@ -27,7 +27,7 @@ export default function SignIn({ avatars }) {
 
   return (
     <Layout>
-      <Box fill align="center" justify="center" gap="large">
+      <Box fill pad="medium" align="center" justify="center" gap="large">
         <Heading margin="none">Benutzerkonto anlegen</Heading>
 
         <Box width="medium">
@@ -137,7 +137,7 @@ export default function SignIn({ avatars }) {
               </RadioButtonGroup>
             </FormField>
 
-            <Box direction="row" justify="between" margin={{ top: "medium" }}>
+            <Box direction="row" justify="between" margin={{ top: "medium", bottom: "medium" }}>
               <Link
                 href={`/auth/signin?name=${value.name ? value.name : ""}`}
                 passHref

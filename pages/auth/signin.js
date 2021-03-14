@@ -23,7 +23,7 @@ export default function SignIn() {
 
   return (
     <Layout>
-      <Box fill align="center" justify="center" gap="large">
+      <Box fill pad="medium" align="center" justify="center" gap="large">
         <Heading margin="none">Einloggen</Heading>
         <Box width="medium">
           <Form
@@ -89,7 +89,7 @@ export default function SignIn() {
                 primary
               />
             </Box>
-            <Box direction="row" justify="between" margin={{ top: "medium" }}>
+            <Box direction="row" justify="between" margin={{ top: "medium", bottom: "medium" }}>
               <Anchor
                 onClick={() => alert("Legen Sie einen neuen Account an.")}
               >
