@@ -31,15 +31,11 @@ export default function Home({ tunebooks }) {
           height="100%"
         >
           {tunebooks.map((tunebook) => (
-            <Box key={tunebook._id}>
+            <Box key={tunebook._id} gap="small">
               <Text>{tunebook.name}</Text>
-              {tunebook.tunes_docs.map((tune) => (
-                <Grid
-                  gap="medium"
-                  columns={{ count: "fit", size: "small" }}
-                  key={tune._id}
-                >
-                  <Stack anchor="top-right" fill>
+              <Grid gap="small" columns="small" margin={{ left: "medium" }}>
+                {tunebook.tunes_docs.map((tune) => (
+                  <Stack anchor="bottom-right" key={tune._id}>
                     <AnimatedCard
                       onClick={() => router.push(`/tune/${tune._id}`)}
                       background="white"
@@ -78,8 +74,8 @@ export default function Home({ tunebooks }) {
                       />
                     )}
                   </Stack>
-                </Grid>
-              ))}
+                ))}
+              </Grid>
             </Box>
           ))}
         </Box>

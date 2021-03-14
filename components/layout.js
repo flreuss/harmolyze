@@ -37,7 +37,7 @@ export default function Layout({ children }) {
               <Button size="small" hoverIndicator icon={<Home />} />
             </Link>
           </Nav>
-          {session && (
+          {!loading && session && (
             <Box direction="row" align="center" gap="small">
               <Avatar src={session.user.image} />
               <Anchor color="white" label={session.user.name} />
