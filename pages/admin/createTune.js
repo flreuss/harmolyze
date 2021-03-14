@@ -41,7 +41,7 @@ export default function CreateTune({ tunebooks, session }) {
                 method: "POST",
                 body: JSON.stringify(value),
                 headers: {
-                  "Content-type": "application/json",
+                  "Content-type": "application/json;charset=utf-8",
                 },
               }).then((res) => {
                 if (res.status === 201) {

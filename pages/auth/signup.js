@@ -43,7 +43,7 @@ export default function SignIn({ avatars }) {
                 method: "POST",
                 body: JSON.stringify(value),
                 headers: {
-                  "Content-type": "application/json",
+                  "Content-type": "application/json;charset=utf-8",
                 },
               })
                 .then((res) => {

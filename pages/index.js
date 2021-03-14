@@ -29,13 +29,16 @@ export default function Home({ tunebooks }) {
           height="100%"
         >
           {tunebooks.map((tunebook) => (
-            <Box>
+            <Box key={tunebook._id}>
               <Text>{tunebook.name}</Text>
               {tunebook.tunes_docs.map((tune) => (
-                <Grid gap="medium" columns={{ count: "fit", size: "small" }}>
+                <Grid
+                  gap="medium"
+                  columns={{ count: "fit", size: "small" }}
+                  key={tune._id}
+                >
                   <Stack anchor="top-right" fill>
                     <AnimatedCard
-                      key={tune._id}
                       onClick={() => router.push(`/tune/${tune._id}`)}
                       background="white"
                     >
@@ -52,13 +55,13 @@ export default function Home({ tunebooks }) {
                     {!loading && session && session.user.isAdmin && (
                       <Button
                         hoverIndicator
-                        icon={<Trash color="status-critical"/>}
+                        icon={<Trash color="status-critical" />}
                         onClick={() => {
                           fetch("/api/admin/tune", {
                             method: "DELETE",
                             body: JSON.stringify(tune),
                             headers: {
-                              "Content-type": "application/json",
+                              "Content-type": "application/json;charset=utf-8",
                             },
                           }).then((res) => {
                             if (res.status % 200 <= 26) {
