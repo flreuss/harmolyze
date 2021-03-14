@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { Box, Text } from "grommet";
+import {
+  colorToRgbObj,
+  convertObjToString,
+  produceRgbShade,
+} from "../lib/tinycolorUtils";
 
 export default function NumberMultiSelector({
   options,
@@ -23,7 +28,13 @@ export default function NumberMultiSelector({
   }
 
   return (
-    <Box direction="row" pad="xsmall" gap="none" justify="stretch" fill="horizontal">
+    <Box
+      direction="row"
+      pad="xsmall"
+      gap="none"
+      justify="stretch"
+      fill="horizontal"
+    >
       {options.map((el) => (
         <Field
           value={el}
@@ -43,8 +54,8 @@ function Field({ value, onClick, selected }) {
       hoverIndicator={
         selected
           ? {
-              color: "brand",
-              opacity: true,
+              //TODO: Replace by fetching rgb values from "brand"
+              color: convertObjToString(produceRgbShade(125, 76, 219, 0.7)),
             }
           : "light-4"
       }
