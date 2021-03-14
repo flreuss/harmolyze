@@ -1,15 +1,15 @@
 import abc from "abcjs";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
 import SelectionDialog from "./riemannFunc/selectionDialog";
-
 import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import VoiceArrayPosition from "../lib/voiceArrayPosition";
 import CursorControl from "../lib/cursorControl";
+import useWindowSize from "../lib/useWindowSize";
 
-export default function Score({ initialAbcString, solutionAbcString, size }) {
+export default function Score({ initialAbcString, solutionAbcString, device }) {
   //Attributes
   const ref = React.useRef();
 
@@ -21,11 +21,14 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   var synthControl;
 
   //State
+  const size = useWindowSize();
   const [abcString, setAbcString] = useState(initialAbcString);
   useEffect(() => {
     renderVisualObjs();
-  }, [initialAbcString, size, solutionAbcString, abcString]);
-
+  }, [initialAbcString, solutionAbcString, abcString]);
+  useLayoutEffect(() => {
+    renderVisualObjs();
+  }, [size, device])
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
   //Methods
@@ -193,19 +196,18 @@ export default function Score({ initialAbcString, solutionAbcString, size }) {
   function renderVisualObjs() {
     let config = configFromFile;
     config.clickListener = handleClick;
-    //TODO: #32 Problem: config.staffwidth wird an den Breakpoints des ResizeContext auf window.innerWidth gesetzt. Verhindert stufenloses resizen am PC
-    switch (size) {
+    switch (device) {
       case "small":
-        config.staffwidth = window.innerWidth;
+        config.staffwidth = size.width;
         break;
       case "medium":
-        config.staffwidth = window.innerWidth / 1.5;
+        config.staffwidth = size.width / 1.5;
         break;
       case "large":
-        config.staffwidth = window.innerWidth / 2;
+        config.staffwidth = size.width / 2;
         break;
       default:
-        config.staffwidth = window.innerWidth / 2.5;
+        config.staffwidth = size.width / 2.5;
     }
 
     visualObjs = abc.renderAbc("scoreContainer", abcString, config);

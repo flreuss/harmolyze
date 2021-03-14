@@ -19,10 +19,10 @@ export default function Exercise({ initialAbcString, solutionAbcString }) {
         justify="center"
       >
         <ResponsiveContext.Consumer>
-          {(size) => (
+          {(device) => (
             <Score
               initialAbcString={initialAbcString}
-              size={size}
+              device={device}
               solutionAbcString={solutionAbcString}
             />
           )}
