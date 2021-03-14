@@ -26,12 +26,12 @@ export default function RiemannFuncSelectionDialog({
     onClose(
       baseFunc
         ? new RiemannFunc(
-          baseFunc,
-          addTones,
-          base,
-          isSecondaryDominant,
-          missingFundamental
-        )
+            baseFunc,
+            addTones,
+            base,
+            isSecondaryDominant,
+            missingFundamental
+          )
         : undefined
     );
   }
@@ -44,7 +44,7 @@ export default function RiemannFuncSelectionDialog({
       target={target}
       background={{ color: "white", opacity: "strong" }}
     >
-      <Box pad="medium" gap="medium">
+      <Box pad="large" gap="medium">
         <Heading level={3} margin="none">
           Riemann Function
         </Heading>
