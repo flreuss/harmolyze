@@ -210,7 +210,6 @@ class ColorWheel extends Component {
       this.centerCircleBounds.inside(evt.fromCenter) &&
       this.state.centerCircleOpen
     ) {
-      // TODO: Have it clear on click?
       this.canvasEl.style.cursor = "pointer";
     } else {
       this.canvasEl.style.cursor = "auto";
@@ -333,7 +332,6 @@ class ColorWheel extends Component {
 
   // MARK - Drawing:
   drawOuterWheel() {
-    // TODO: Draw outline; separate method.
     const { radius, options, lineWidth } = this.props;
     const height = radius * 2;
     const width = radius * 2;
@@ -523,7 +521,6 @@ class ColorWheel extends Component {
         );
       });
 
-      // TODO: Make this animation speed dynamic.
       animationPercentage += 1 / 10; // i.e. 1 / x frames
 
       // Essentially re-draws rgbShades.forEach until the animationPercentage reaches 1, i.e. 100%
@@ -536,7 +533,6 @@ class ColorWheel extends Component {
     if (animated) {
       animateShades();
     } else {
-      // TODO: Refactor into its own func.
       drawShades();
     }
   }
