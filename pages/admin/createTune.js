@@ -1,4 +1,4 @@
-import { getSession, signIn } from "next-auth/client";
+import { getSession } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
 import Notification from "../../components/notification";

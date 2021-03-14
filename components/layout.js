@@ -12,7 +12,7 @@ import {
 import { Home, Logout } from "grommet-icons";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
-import { signIn, useSession, signOut } from "next-auth/client";
+import { useSession, signOut } from "next-auth/client";
 
 export default function Layout({ children }) {
   const [session, loading] = useSession();
