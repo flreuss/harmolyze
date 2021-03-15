@@ -15,7 +15,7 @@ export default async (req, res) => {
             { $push: { tunes: ObjectId(tunes.insertedId) } }
           );
           //201 Created
-          res.status(201).json(tunes.insertedId);
+          res.status(201).json(tunes.ops[0]);
         } catch (err) {
           //500 Internal Server Error
           console.error(err);
@@ -30,10 +30,10 @@ export default async (req, res) => {
             .findOneAndDelete({ _id: ObjectId(req.body._id) });
           db.collection("tunebooks").updateOne(
             { _id: tune.value.tunebook_id },
-            { $pull: { "tunes": ObjectId(req.body._id) } }
+            { $pull: { tunes: ObjectId(req.body._id) } }
           );
           //200 OK
-          res.status(200).json(tune);
+          res.status(200).json(tune.value);
         } catch (err) {
           //500 Internal Server Error
           console.error(err);

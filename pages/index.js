@@ -8,7 +8,7 @@ import {
   Stack,
   Button,
 } from "grommet";
-import { getSession, useSession } from "next-auth/client";
+import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -18,9 +18,8 @@ import { Add, Trash } from "grommet-icons";
 import Link from "next/link";
 import {synth} from "abcjs";
 
-export default function Home({ tunebooks }) {
+export default function Home({ tunebooks, session }) {
   const router = useRouter();
-  const [session, loading] = useSession();
   const [notification, setNotification] = useState(undefined);
 
   useEffect(() => {
@@ -56,7 +55,7 @@ export default function Home({ tunebooks }) {
                         <Text size="xsmall">Exercise {tune._id}</Text>
                       </CardFooter>
                     </AnimatedCard>
-                    {!loading && session && session.user.isAdmin && (
+                    { session && session.user.isAdmin && (
                       <Button
                         hoverIndicator
                         icon={<Trash color="status-critical" />}
@@ -85,7 +84,7 @@ export default function Home({ tunebooks }) {
             </Box>
           ))}
         </Box>
-        {!loading && session && session.user.isAdmin && (
+        {session && session.user.isAdmin && (
           <Link href="/admin/createTune" passHref>
             <Box
               round="full"
@@ -183,6 +182,7 @@ export async function getServerSideProps(context) {
     return {
       props: {
         tunebooks,
+        session
       },
     };
   }

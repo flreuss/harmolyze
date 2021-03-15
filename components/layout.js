@@ -40,7 +40,7 @@ export default function Layout({ children }) {
           {!loading && session && (
             <Box direction="row" align="center" gap="small">
               <Avatar src={session.user.image} />
-              <Anchor color="white" label={session.user.name} />
+              <Anchor color="white" label={session.user._id} />
               <Button
                 size="small"
                 hoverIndicator

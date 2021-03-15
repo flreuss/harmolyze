@@ -1,4 +1,4 @@
-import {renderAbc, synth} from "abcjs";
+import { renderAbc, synth } from "abcjs";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
@@ -9,7 +9,12 @@ import VoiceArrayPosition from "../lib/voiceArrayPosition";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
 
-export default function Score({ initialAbcString, solutionAbcString, device }) {
+export default function Score({
+  initialAbcString,
+  solutionAbcString,
+  device,
+  onValidate,
+}) {
   //Attributes
   const ref = React.useRef();
 
@@ -32,14 +37,14 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
   //Methods
-  function validateSolution() {
+  function findMistakes(voicesArray, solutionAbcString) {
     renderVisualObjs();
 
     const solutionVoicesArray = makeVoicesArray(
       renderAbc("*", solutionAbcString)
     );
 
-    let success = true;
+    let mistakeCount = 0;
     voicesArray.forEach((voice, voiceIndex) => {
       voice.forEach((note, noteIndex) => {
         const filledInChord = note.elem.abcelem.chord;
@@ -59,7 +64,7 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
             !solutionChords.includes(filledInChord[0].name)
           ) {
             selectionColor = "rgb(200,0,0)";
-            success = false;
+            mistakeCount += 1;
           }
 
           highlightAdjacentNotesOf(note.elem.abcelem, selectionColor, true);
@@ -67,7 +72,7 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
       });
     });
 
-    if (success) alert("Geschafft!");
+    onValidate(mistakeCount);
   }
 
   /**
@@ -135,7 +140,7 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
   //Event handlers
   function handleSelectionDialogClose(abcelem, riemannFunc) {
     if (riemannFunc) {
-      synthControl.pause();
+      if (synthControl) synthControl.pause();
 
       if (!abcelem.chord) {
         setAbcString(insert(abcString, `"_${riemannFunc}"`, abcelem.startChar));
@@ -261,7 +266,10 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
     const visualObj = visualObjs[0];
 
     const activeAudioContext = synth.activeAudioContext();
-    const audioContext = activeAudioContext && activeAudioContext.state !== "closed" ?  activeAudioContext : new AudioContext();
+    const audioContext =
+      activeAudioContext && activeAudioContext.state !== "closed"
+        ? activeAudioContext
+        : new AudioContext();
     let midiBuffer = new synth.CreateSynth();
     midiBuffer
       .init({
@@ -307,8 +315,8 @@ export default function Score({ initialAbcString, solutionAbcString, device }) {
           </Text>
         }
         onClick={() => {
-          synthControl.pause();
-          validateSolution(voicesArray, solutionAbcString);
+          if (synthControl) synthControl.pause();
+          findMistakes(voicesArray, solutionAbcString);
         }}
         primary
       />
