@@ -61,7 +61,7 @@ export default function Home({ tunebooks }) {
                         hoverIndicator
                         icon={<Trash color="status-critical" />}
                         onClick={() => {
-                          fetch("/api/admin/tune", {
+                          fetch("/api/secured/tune", {
                             method: "DELETE",
                             body: JSON.stringify(tune),
                             headers: {

@@ -41,7 +41,7 @@ export default function CreateTune({ tunebooks, session }) {
               setValue(nextValue);
             }}
             onSubmit={({ value }) => {
-              fetch("/api/admin/tune", {
+              fetch("/api/secured/tune", {
                 method: "POST",
                 body: JSON.stringify(value),
                 headers: {
