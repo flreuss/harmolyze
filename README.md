@@ -1,5 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Eine neue Aufgabe anlegen
 
+Installation (einmalig):
+1. Überprüfen Sie zunächst, ob Sie die nötige Administrator-Berechtigung für die Riemann-App besitzen. Hierfür muss in der Datenbank (MongoDB) für Ihren Benutzer das isAdmin-Flag auf true gesetzt sein.
+2. Installieren Sie [MuseScore](https://musescore.org/de/download) auf Ihrem PC.
+3. Installieren Sie das MuseScore-Plugin [ABC_ImpEx](https://github.com/mist13/ABC_ImpEx). _Hinweis: Damit das Plugin in MuseScore ausgeführt werden kann, müssen Sie (in Windows) weiterhin die Dateien [xml2abc.exe](https://wim.vree.org/svgParse/xml2abc.html) und [abc2xml.exe](https://wim.vree.org/svgParse/abc2xml.html) herunterladen und in den Plugin-Ordner (standardmäßig C:\Program Files (x86)\MuseScore 3\plugins\ABC_ImpEx) kopieren.
+
+Neue Aufgabe anlegen:
+5. Erstellen Sie in MuseScore eine neue Partitur und fügen Sie alle Noten ein.
+6. Fügen Sie Funktionssymbole hinzu:
+- Klicken sie auf die tiefste Note einer Harmonie und drücken Sie STRG+E. _Hinweis: Funktionssymbole werden als Ausdruckstext hinzugefügt, damit alle Sonderzeichen korrekt verarbeitet werden.
+- Abweichende Basstöne werden durch vorangestellten Unterstrich gekennzeichnet; also beispielsweise \_3D für eine Dominante mit Terzbass. Es werden Grund-, Terz- und Quintbässe unterstützt.
+- Harmoniefremde Töne werden durch nachfolgenden Bindestrich gekennzeichnet; also beispielsweise D-46 für einen Dominantquartsextakkord. Pro Funktion können maximal zwei harmoniefremde Töne angegeben werden. Die möglichen harmoniefremden Töne reichen von 2 bis 9.
+- Für verkürzte Dominanten wird /D notiert.
+- Für Zwischendominanten wird (D) notiert. Doppeldominanten sind als Zwischendominanten zu notieren.
+- Funktionen, die durch App-Benutzende zu lösen sind, werden in geschweifte Klammern gesetzt. Diese Funktionen werden App-Benutzenden demzufolge nicht angezeigt. Kommen mehrere Lösungen für eine Funktion in Betracht, so werden diese durch einen Querstrich getrennt. Bsp.: {...|...}.
+Überprüfen Sie, ob der Modus (Dur/Moll) in der ABC-Datei richtig gesetzt ist und passen sie ihn gegebenenfalls von Hand an (z. B. Em statt G)
+Kopieren Sie die Zeichenkette in die Zwischenablage (STRG+C) und fügen Sie sie im Formular in das entsprechende Feld ein.
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 ## Getting Started
 
 First, run the development server:
