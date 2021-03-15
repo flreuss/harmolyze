@@ -14,6 +14,13 @@ Neue Aufgabe anlegen:
 - Für verkürzte Dominanten wird /D notiert.
 - Für Zwischendominanten wird (D) notiert. Doppeldominanten sind als Zwischendominanten zu notieren.
 - Funktionen, die durch App-Benutzende zu lösen sind, werden in geschweifte Klammern gesetzt. Diese Funktionen werden App-Benutzenden demzufolge nicht angezeigt. Kommen mehrere Lösungen für eine Funktion in Betracht, so werden diese durch einen Querstrich getrennt. Bsp.: {...|...}.
+
+Hinweis: Folgende Funktionen werden aktuell nicht von Riemann-App unterstützt:
+- Alterationen
+- Modulationen
+- Doppelsubdominanten
+- Rückbezügliche Zwischendominanten
+- Ellipsen
 Überprüfen Sie, ob der Modus (Dur/Moll) in der ABC-Datei richtig gesetzt ist und passen sie ihn gegebenenfalls von Hand an (z. B. Em statt G)
 Kopieren Sie die Zeichenkette in die Zwischenablage (STRG+C) und fügen Sie sie im Formular in das entsprechende Feld ein.
 
