@@ -14,9 +14,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
-import { Add, Trash } from "grommet-icons";
+import { Add, Clock, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
-import {synth} from "abcjs";
+import { synth } from "abcjs";
 
 export default function Home({ tunebooks, session }) {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function Home({ tunebooks, session }) {
               <Text>{tunebook.name}</Text>
               <Grid gap="small" columns="small" margin={{ left: "medium" }}>
                 {tunebook.tunes_docs.map((tune) => (
-                  <Stack anchor="bottom-right" key={tune._id}>
+                  <Stack anchor="top-right" key={tune._id}>
                     <AnimatedCard
                       onClick={() => router.push(`/tune/${tune._id}`)}
                       background="white"
@@ -51,11 +51,20 @@ export default function Home({ tunebooks, session }) {
 
                       <CardFooter
                         pad={{ horizontal: "medium", vertical: "small" }}
+                        justify="end"
                       >
-                        <Text size="xsmall">Exercise {tune._id}</Text>
+                        <Box direction="row" gap="xsmall">
+                          <StatusCritical />
+                          <Text>19</Text>
+                        </Box>
+                        <Box direction="row" gap="xsmall">
+                          <Clock />
+                          <Text>4:30</Text>
+                        </Box>
+                        {/* TODO: Display index with Success counts (attempts) */}
                       </CardFooter>
                     </AnimatedCard>
-                    { session && session.user.isAdmin && (
+                    {session && session.user.isAdmin && (
                       <Button
                         hoverIndicator
                         icon={<Trash color="status-critical" />}
@@ -154,6 +163,16 @@ export async function getServerSideProps(context) {
         },
         //If you want empty tunebooks to get returned as well, set preserveNullAndEmptyArrays: true
         { $unwind: { path: "$tunes_docs", preserveNullAndEmptyArrays: false } },
+        {
+          $project: {
+            tunes_docs: {
+              title: 1,
+              difficulty: 1,
+              _id: { $toString: "$tunes_docs._id" },
+            },
+            name: 1,
+          },
+        },
         { $sort: { "tunes_docs.difficulty": 1 } },
         {
           $group: {
@@ -164,25 +183,12 @@ export async function getServerSideProps(context) {
         },
         { $sort: { _id: 1 } },
       ])
-      .project({
-        name: 1,
-        "tunes_docs.title": 1,
-        "tunes_docs.difficulty": 1,
-        "tunes_docs._id": 1,
-      })
       .toArray();
-
-    //TODO: Do this in pipeline instead
-    for (let tunebook of tunebooks) {
-      for (let tune of tunebook.tunes_docs) {
-        tune._id = tune._id.toString();
-      }
-    }
 
     return {
       props: {
         tunebooks,
-        session
+        session,
       },
     };
   }
