@@ -13,7 +13,7 @@ Neue Aufgabe anlegen:
 - Harmoniefremde Töne werden durch nachfolgenden Bindestrich gekennzeichnet; also beispielsweise D-46 für einen Dominantquartsextakkord. Pro Funktion können maximal zwei harmoniefremde Töne angegeben werden. Die möglichen harmoniefremden Töne reichen von 2 bis 9.
 - Für verkürzte Dominanten wird /D notiert. Für den verkürzten Dominantseptnonakkord mit Terzbass wird also \_3/D-79 notiert.
 - Für Zwischendominanten wird (D) notiert. Doppeldominanten sind als Zwischendominanten zu notieren.
-- Funktionen, die durch App-Benutzende zu lösen sind, werden in geschweifte Klammern gesetzt. Diese Funktionen werden App-Benutzenden demzufolge nicht angezeigt. Kommen mehrere Lösungen für eine Funktion in Betracht, so werden diese durch einen Querstrich getrennt. Bsp.: {...|...}.
+- Funktionen, die durch App-Benutzende zu lösen sind, werden in geschweifte Klammern gesetzt. Diese Funktionen werden App-Benutzenden demzufolge nicht angezeigt. Kommen mehrere Lösungen für eine Funktion in Betracht, klicken Sie für jede Möglichkeit erneut auf die tiefste Note und drücken Sie STRG+E.
 
 Hinweis: Folgende Funktionen werden aktuell nicht von Riemann-App unterstützt:
 - Alterationen
