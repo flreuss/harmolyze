@@ -17,7 +17,7 @@ export default function SignIn() {
   const [unauthorized, setUnauthorized] = useState();
   const router = useRouter();
   const [value, setValue] = useState({
-    name: router.query.name ? router.query.name : "",
+    name: router.query.name || "",
     password: "",
   });
 

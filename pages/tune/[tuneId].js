@@ -26,7 +26,7 @@ export default function Tune({
   const router = useRouter();
 
   return (
-    <Layout>
+    <Layout session={session} points={router.query.currentPoints || ""}>
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -98,7 +98,7 @@ export async function getServerSideProps(context) {
         initialAbcString: getInitial(tune.abc),
         solutionAbcString: getSolution(tune.abc),
         tuneId: context.params.tuneId,
-        session: session,
+        session,
       },
     };
   }

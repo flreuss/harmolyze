@@ -14,11 +14,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
-import { Add, Clock, StatusCritical, Trash } from "grommet-icons";
+import { Add, Clock, Money, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
 import { synth } from "abcjs";
 
-export default function Home({ tunebooks, session }) {
+export default function Home({ tunebooks, session, points }) {
   const router = useRouter();
   const [notification, setNotification] = useState(undefined);
 
@@ -28,7 +28,7 @@ export default function Home({ tunebooks, session }) {
   });
 
   return (
-    <Layout>
+    <Layout session={session} points={points}>
       <Stack anchor="bottom-right" fill>
         <Box
           pad="large"
@@ -38,11 +38,15 @@ export default function Home({ tunebooks, session }) {
           {tunebooks.map((tunebook) => (
             <Box key={tunebook._id} gap="small">
               <Text>{tunebook.name}</Text>
-              <Grid gap="small" columns="small" margin={{ left: "medium" }}>
+              <Grid
+                gap="small"
+                columns="small"
+                margin={{ left: "small", bottom: "medium" }}
+              >
                 {tunebook.tunes.map((tune) => (
                   <Stack anchor="top-right" key={tune._id}>
                     <AnimatedCard
-                      onClick={() => router.push(`/tune/${tune._id}`)}
+                      onClick={() => router.push(`/tune/${tune._id}?currentPoints=${points}`)}
                       background="white"
                     >
                       <CardBody pad="small">
@@ -53,6 +57,12 @@ export default function Home({ tunebooks, session }) {
                         pad={{ horizontal: "medium", vertical: "small" }}
                         justify="end"
                       >
+                        {!tune.highscore && (
+                          <Box direction="row" gap="xsmall">
+                            <Money />
+                            <Text>{tune.points}</Text>
+                          </Box>
+                        )}
                         {tune.highscore && (
                           <Box direction="row" gap="xsmall">
                             <StatusCritical />
@@ -62,7 +72,9 @@ export default function Home({ tunebooks, session }) {
                         {tune.highscore && (
                           <Box direction="row" gap="xsmall">
                             <Clock />
-                            <Text>{millisToMinutesAndSeconds(tune.highscore.time)}</Text>
+                            <Text>
+                              {millisToMinutesAndSeconds(tune.highscore.time)}
+                            </Text>
                           </Box>
                         )}
                       </CardFooter>
@@ -201,14 +213,14 @@ export async function getServerSideProps(context) {
           $project: {
             tunes_docs: {
               title: 1,
-              difficulty: 1,
+              points: 1,
               _id: { $toString: "$tunes_docs._id" },
               highscore: { $first: "$highscore" },
             },
             name: 1,
           },
         },
-        { $sort: { "tunes_docs.difficulty": 1 } },
+        { $sort: { "tunes_docs.points": 1 } },
         {
           $group: {
             _id: "$_id",
@@ -220,10 +232,35 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
+    const attempts = await db.collection("attempts").aggregate([
+      { $match: { user_id: session.user._id } },
+      {
+        $group: {
+          _id: "$tune_id",
+        },
+      },
+      {
+        $lookup: {
+          from: "tunes",
+          localField: "_id",
+          foreignField: "_id",
+          as: "tune",
+        },
+      },
+      { $unwind: { path: "$tune", preserveNullAndEmptyArrays: false } },
+      {
+        $group: {
+          _id: null,
+          totalPoints: { $sum: "$tune.points" },
+        },
+      },
+    ]).toArray();
+
     return {
       props: {
         tunebooks,
         session,
+        points: attempts[0].totalPoints,
       },
     };
   }

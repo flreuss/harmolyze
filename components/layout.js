@@ -8,18 +8,17 @@ import {
   Nav,
   Avatar,
   Anchor,
+  Text,
 } from "grommet";
-import { Home, Logout } from "grommet-icons";
+import { Home, Logout, Money } from "grommet-icons";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
-import { useSession, signOut } from "next-auth/client";
+import { signOut } from "next-auth/client";
 
 const customTheme = deepMerge(grommet, {});
 
-export default function Layout({ children }) {
-  const [session, loading] = useSession();
-
+export default function Layout({ children, session, points }) {
   return (
     <Grommet full theme={customTheme}>
       <Grid
@@ -37,8 +36,12 @@ export default function Layout({ children }) {
               <Button size="small" hoverIndicator icon={<Home />} />
             </Link>
           </Nav>
-          {!loading && session && (
+          {session && (
             <Box direction="row" align="center" gap="small">
+              <Box direction="row" gap="xsmall">
+                <Money />
+                <Text>{points}</Text>
+              </Box>
               <Avatar src={session.user.image} />
               <Anchor color="white" label={session.user._id} />
               <Button

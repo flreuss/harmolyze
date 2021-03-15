@@ -20,7 +20,7 @@ export default function CreateTune({ tunebooks, session }) {
   const defaultValue = {
     abc: "",
     title: "",
-    difficulty: 0,
+    points: 0,
     tunebook_id: tunebooks[0]._id,
   };
 
@@ -76,15 +76,15 @@ export default function CreateTune({ tunebooks, session }) {
               />
             </FormField>
 
-            <FormField label="Schwierigkeitsgrad" name="difficulty" required>
+            <FormField label="Schwierigkeitsgrad" name="points" required>
               <RangeInput
-                name="difficulty"
+                name="points"
                 min={0}
                 max={100}
                 step={5}
                 onChange={(event) => {
                   const newValue = value;
-                  newValue.difficulty = +event.target.value;
+                  newValue.points = +event.target.value;
                   setValue(newValue);
                 }}
               />

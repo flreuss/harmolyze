@@ -139,7 +139,7 @@ export default function SignIn({ avatars }) {
 
             <Box direction="row" justify="between" margin={{ top: "medium", bottom: "medium" }}>
               <Link
-                href={`/auth/signin?name=${value.name ? value.name : ""}`}
+                href={`/auth/signin?name=${value.name || ""}`}
                 passHref
               >
                 <Button label="Einloggen" secondary />
