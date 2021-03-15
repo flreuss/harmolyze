@@ -7,6 +7,8 @@ import {
   Text,
   Stack,
   Button,
+  Accordion,
+  AccordionPanel,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -21,6 +23,8 @@ import { synth } from "abcjs";
 export default function Home({ tunebooks, session, points }) {
   const router = useRouter();
   const [notification, setNotification] = useState(undefined);
+  //TODO: So setzen, dass initial das erste tunebook geöffnet ist, bei dem sich noch ein ungelöster Tune befindet. Wenn es keines gibt, wird der default Wert auf undefined gesetzt
+  const [activeIndex, setActiveIndex] = useState([0]);
 
   useEffect(() => {
     const ctx = synth.activeAudioContext();
@@ -35,78 +39,87 @@ export default function Home({ tunebooks, session, points }) {
           background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
           height="100%"
         >
-          {tunebooks.map((tunebook) => (
-            <Box key={tunebook._id} gap="small">
-              <Text>{tunebook.name}</Text>
-              <Grid
+          <Accordion
+            activeIndex={activeIndex}
+            onActive={(newActiveIndex) => setActiveIndex(newActiveIndex)}
+          >
+            {tunebooks.map((tunebook) => (
+              <AccordionPanel
+                key={tunebook._id}
                 gap="small"
-                columns="small"
-                margin={{ left: "small", bottom: "medium" }}
+                label={tunebook.name}
               >
-                {tunebook.tunes.map((tune) => (
-                  <Stack anchor="top-right" key={tune._id}>
-                    <AnimatedCard
-                      onClick={() => router.push(`/tune/${tune._id}?currentPoints=${points}`)}
-                      background="white"
-                    >
-                      <CardBody pad="small">
-                        <Text size="medium">{tune.title}</Text>
-                      </CardBody>
-
-                      <CardFooter
-                        pad={{ horizontal: "medium", vertical: "small" }}
-                        justify="end"
+                <Grid gap="small" columns="small" margin="medium">
+                  {tunebook.tunes.map((tune) => (
+                    <Stack anchor="top-right" key={tune._id}>
+                      <AnimatedCard
+                        onClick={() =>
+                          router.push(
+                            `/tune/${tune._id}?currentPoints=${points}`
+                          )
+                        }
+                        background="white"
                       >
-                        {!tune.highscore && (
-                          <Box direction="row" gap="xsmall">
-                            <Money />
-                            <Text>{tune.points}</Text>
-                          </Box>
-                        )}
-                        {tune.highscore && (
-                          <Box direction="row" gap="xsmall">
-                            <StatusCritical />
-                            <Text>{tune.highscore.mistakeCount}</Text>
-                          </Box>
-                        )}
-                        {tune.highscore && (
-                          <Box direction="row" gap="xsmall">
-                            <Clock />
-                            <Text>
-                              {millisToMinutesAndSeconds(tune.highscore.time)}
-                            </Text>
-                          </Box>
-                        )}
-                      </CardFooter>
-                    </AnimatedCard>
-                    {session && session.user.isAdmin && (
-                      <Button
-                        hoverIndicator
-                        icon={<Trash color="status-critical" />}
-                        onClick={() => {
-                          fetch("/api/secured/tune", {
-                            method: "DELETE",
-                            body: JSON.stringify(tune),
-                            headers: {
-                              "Content-type": "application/json;charset=utf-8",
-                            },
-                          }).then((res) => {
-                            if (res.status % 200 <= 26) {
-                              router.push("/");
-                            } else {
-                              setNotification(
-                                "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                              );
-                            }
-                          });
-                        }}
-                      />
-                    )}
-                  </Stack>
-                ))}
-              </Grid>
-            </Box>
-          ))}
+                        <CardBody pad="small">
+                          <Text size="medium">{tune.title}</Text>
+                        </CardBody>
+
+                        <CardFooter
+                          pad={{ horizontal: "medium", vertical: "small" }}
+                          justify="end"
+                        >
+                          {!tune.highscore && (
+                            <Box direction="row" gap="xsmall">
+                              <Money />
+                              <Text>{tune.points}</Text>
+                            </Box>
+                          )}
+                          {tune.highscore && (
+                            <Box direction="row" gap="xsmall">
+                              <StatusCritical />
+                              <Text>{tune.highscore.mistakeCount}</Text>
+                            </Box>
+                          )}
+                          {tune.highscore && (
+                            <Box direction="row" gap="xsmall">
+                              <Clock />
+                              <Text>
+                                {millisToMinutesAndSeconds(tune.highscore.time)}
+                              </Text>
+                            </Box>
+                          )}
+                        </CardFooter>
+                      </AnimatedCard>
+                      {session && session.user.isAdmin && (
+                        <Button
+                          hoverIndicator
+                          icon={<Trash color="status-critical" />}
+                          onClick={() => {
+                            fetch("/api/secured/tune", {
+                              method: "DELETE",
+                              body: JSON.stringify(tune),
+                              headers: {
+                                "Content-type":
+                                  "application/json;charset=utf-8",
+                              },
+                            }).then((res) => {
+                              if (res.status % 200 <= 26) {
+                                router.push("/");
+                              } else {
+                                setNotification(
+                                  "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                                );
+                              }
+                            });
+                          }}
+                        />
+                      )}
+                    </Stack>
+                  ))}
+                </Grid>
+              </AccordionPanel>
+            ))}
+          </Accordion>
         </Box>
         {session && session.user.isAdmin && (
           <Link href="/admin/createTune" passHref>
@@ -232,29 +245,32 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
-    const attempts = await db.collection("attempts").aggregate([
-      { $match: { user_id: session.user._id } },
-      {
-        $group: {
-          _id: "$tune_id",
+    const attempts = await db
+      .collection("attempts")
+      .aggregate([
+        { $match: { user_id: session.user._id } },
+        {
+          $group: {
+            _id: "$tune_id",
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "tunes",
-          localField: "_id",
-          foreignField: "_id",
-          as: "tune",
+        {
+          $lookup: {
+            from: "tunes",
+            localField: "_id",
+            foreignField: "_id",
+            as: "tune",
+          },
         },
-      },
-      { $unwind: { path: "$tune", preserveNullAndEmptyArrays: false } },
-      {
-        $group: {
-          _id: null,
-          totalPoints: { $sum: "$tune.points" },
+        { $unwind: { path: "$tune", preserveNullAndEmptyArrays: false } },
+        {
+          $group: {
+            _id: null,
+            totalPoints: { $sum: "$tune.points" },
+          },
         },
-      },
-    ]).toArray();
+      ])
+      .toArray();
 
     return {
       props: {
