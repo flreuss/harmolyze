@@ -11,7 +11,7 @@ Neue Aufgabe anlegen:
 - Klicken sie auf die tiefste Note einer Harmonie und drücken Sie STRG+E. _Hinweis: Funktionssymbole werden als Ausdruckstext hinzugefügt, damit alle Sonderzeichen korrekt verarbeitet werden.
 - Abweichende Basstöne werden durch vorangestellten Unterstrich gekennzeichnet; also beispielsweise \_3D für eine Dominante mit Terzbass. Es werden Grund-, Terz- und Quintbässe unterstützt.
 - Harmoniefremde Töne werden durch nachfolgenden Bindestrich gekennzeichnet; also beispielsweise D-46 für einen Dominantquartsextakkord. Pro Funktion können maximal zwei harmoniefremde Töne angegeben werden. Die möglichen harmoniefremden Töne reichen von 2 bis 9.
-- Für verkürzte Dominanten wird /D notiert.
+- Für verkürzte Dominanten wird /D notiert. Für den verkürzten Dominantseptnonakkord mit Terzbass wird also \_3/D-79 notiert.
 - Für Zwischendominanten wird (D) notiert. Doppeldominanten sind als Zwischendominanten zu notieren.
 - Funktionen, die durch App-Benutzende zu lösen sind, werden in geschweifte Klammern gesetzt. Diese Funktionen werden App-Benutzenden demzufolge nicht angezeigt. Kommen mehrere Lösungen für eine Funktion in Betracht, so werden diese durch einen Querstrich getrennt. Bsp.: {...|...}.
 
