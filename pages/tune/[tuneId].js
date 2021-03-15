@@ -17,9 +17,9 @@ export default function Tune({
   session,
 }) {
   const [attempt, setAttempt] = useState({
-    startDate: new Date(),
-    endDate: undefined,
-    mistakeCount: 0,
+    startedAt: new Date(),
+    completedAt: undefined,
+    mistakes: 0,
     user_id: session.user._id,
     tune_id: tuneId,
   });
@@ -39,13 +39,13 @@ export default function Tune({
               initialAbcString={initialAbcString}
               device={device}
               solutionAbcString={solutionAbcString}
-              onValidate={(mistakeCount) => {
+              onValidate={(mistakes) => {
                 let nextAttempt = attempt;
-                if (mistakeCount > 0) {
-                  nextAttempt.mistakeCount += mistakeCount;
+                if (mistakes > 0) {
+                  nextAttempt.mistakes += mistakes;
                   setAttempt(nextAttempt);
                 } else {
-                  nextAttempt.endDate = new Date();
+                  nextAttempt.completedAt = new Date();
                   createAttempt(nextAttempt, 
                     //TODO: Show attemptResume page
                     () => router.push("/"));

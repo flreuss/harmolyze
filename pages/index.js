@@ -77,7 +77,7 @@ export default function Home({ tunebooks, session, points }) {
                           {tune.highscore && (
                             <Box direction="row" gap="xsmall">
                               <StatusCritical />
-                              <Text>{tune.highscore.mistakeCount}</Text>
+                              <Text>{tune.highscore.mistakes}</Text>
                             </Box>
                           )}
                           {tune.highscore && (
@@ -214,8 +214,8 @@ export async function getServerSideProps(context) {
               {
                 $group: {
                   _id: null,
-                  mistakeCount: { $min: "$mistakeCount" },
-                  time: { $min: { $subtract: ["$endDate", "$startDate"] } },
+                  mistakes: { $min: "$mistakes" },
+                  time: { $min: { $subtract: ["$completedAt", "$startedAt"] } },
                 },
               },
             ],
@@ -272,11 +272,13 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
+    const points = attempts.length > 0 ? attempts[0].totalPoints : 0;
+
     return {
       props: {
         tunebooks,
         session,
-        points: attempts[0].totalPoints,
+        points,
       },
     };
   }

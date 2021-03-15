@@ -5,9 +5,9 @@ import { ObjectId } from "mongodb";
 export default async (req, res) => {
   const session = await getSession({ req });
   const newAttempt = {
-    startDate: new Date(req.body.startDate),
-    endDate: new Date(req.body.endDate),
-    mistakeCount: +req.body.mistakeCount,
+    startedAt: new Date(req.body.startedAt),
+    completedAt: new Date(req.body.completedAt),
+    mistakes: +req.body.mistakes,
     user_id: req.body.user_id,
     tune_id: ObjectId(req.body.tune_id),
   };

@@ -44,7 +44,7 @@ export default function Score({
       renderAbc("*", solutionAbcString)
     );
 
-    let mistakeCount = 0;
+    let mistakes = 0;
     voicesArray.forEach((voice, voiceIndex) => {
       voice.forEach((note, noteIndex) => {
         const filledInChord = note.elem.abcelem.chord;
@@ -64,7 +64,7 @@ export default function Score({
             !solutionChords.includes(filledInChord[0].name)
           ) {
             selectionColor = "rgb(200,0,0)";
-            mistakeCount += 1;
+            mistakes += 1;
           }
 
           highlightAdjacentNotesOf(note.elem.abcelem, selectionColor, true);
@@ -72,7 +72,7 @@ export default function Score({
       });
     });
 
-    onValidate(mistakeCount);
+    onValidate(mistakes);
   }
 
   /**
