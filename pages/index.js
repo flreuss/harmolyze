@@ -39,7 +39,7 @@ export default function Home({ tunebooks, session }) {
             <Box key={tunebook._id} gap="small">
               <Text>{tunebook.name}</Text>
               <Grid gap="small" columns="small" margin={{ left: "medium" }}>
-                {tunebook.tunes_docs.map((tune) => (
+                {tunebook.tunes.map((tune) => (
                   <Stack anchor="top-right" key={tune._id}>
                     <AnimatedCard
                       onClick={() => router.push(`/tune/${tune._id}`)}
@@ -53,15 +53,18 @@ export default function Home({ tunebooks, session }) {
                         pad={{ horizontal: "medium", vertical: "small" }}
                         justify="end"
                       >
-                        <Box direction="row" gap="xsmall">
-                          <StatusCritical />
-                          <Text>19</Text>
-                        </Box>
-                        <Box direction="row" gap="xsmall">
-                          <Clock />
-                          <Text>4:30</Text>
-                        </Box>
-                        {/* TODO: Display index with Success counts (attempts) */}
+                        {tune.highscore && (
+                          <Box direction="row" gap="xsmall">
+                            <StatusCritical />
+                            <Text>{tune.highscore.mistakeCount}</Text>
+                          </Box>
+                        )}
+                        {tune.highscore && (
+                          <Box direction="row" gap="xsmall">
+                            <Clock />
+                            <Text>{millisToMinutesAndSeconds(tune.highscore.time)}</Text>
+                          </Box>
+                        )}
                       </CardFooter>
                     </AnimatedCard>
                     {session && session.user.isAdmin && (
@@ -138,6 +141,12 @@ function AnimatedCard(props) {
   );
 }
 
+function millisToMinutesAndSeconds(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+}
+
 export async function getServerSideProps(context) {
   const session = await getSession(context);
   if (!session) {
@@ -161,14 +170,40 @@ export async function getServerSideProps(context) {
             as: "tunes_docs",
           },
         },
-        //If you want empty tunebooks to get returned as well, set preserveNullAndEmptyArrays: true
         { $unwind: { path: "$tunes_docs", preserveNullAndEmptyArrays: false } },
+        {
+          $lookup: {
+            from: "attempts",
+            let: { tune_id: "$tunes_docs._id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$user_id", session.user._id] },
+                      { $eq: ["$tune_id", "$$tune_id"] },
+                    ],
+                  },
+                },
+              },
+              {
+                $group: {
+                  _id: null,
+                  mistakeCount: { $min: "$mistakeCount" },
+                  time: { $min: { $subtract: ["$endDate", "$startDate"] } },
+                },
+              },
+            ],
+            as: "highscore",
+          },
+        },
         {
           $project: {
             tunes_docs: {
               title: 1,
               difficulty: 1,
               _id: { $toString: "$tunes_docs._id" },
+              highscore: { $first: "$highscore" },
             },
             name: 1,
           },
@@ -178,7 +213,7 @@ export async function getServerSideProps(context) {
           $group: {
             _id: "$_id",
             name: { $first: "$name" },
-            tunes_docs: { $push: "$tunes_docs" },
+            tunes: { $push: "$tunes_docs" },
           },
         },
         { $sort: { _id: 1 } },

@@ -4,12 +4,17 @@ import { ObjectId } from "mongodb";
 
 export default async (req, res) => {
   const session = await getSession({ req });
-  let newAttempt = req.body;
+  const newAttempt = {
+    startDate: new Date(req.body.startDate),
+    endDate: new Date(req.body.endDate),
+    mistakeCount: +req.body.mistakeCount,
+    user_id: req.body.user_id,
+    tune_id: ObjectId(req.body.tune_id),
+  };
   if (session && newAttempt.user_id === session.user._id) {
     switch (req.method) {
       case "POST":
         try {
-          newAttempt.tune_id = ObjectId(newAttempt.tune_id);
           const { db } = await connectToDatabase();
           const attempts = await db
             .collection("attempts")
