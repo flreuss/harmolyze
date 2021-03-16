@@ -9,7 +9,7 @@ import { ObjectId } from "mongodb";
 import Layout from "../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
-import {millisToMinutesAndSeconds} from "../../lib/stringUtils"
+import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
 
 export default function Tune({
   initialAbcString,
@@ -44,7 +44,9 @@ export default function Tune({
         size="full"
         thickness="small"
       />
-      <Box pad="medium" direction="row" justify="end"><Text>{millisToMinutesAndSeconds(time)}</Text></Box>
+      <Box pad="medium" direction="row" justify="end">
+        <Text>{millisToMinutesAndSeconds(time)}</Text>
+      </Box>
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -57,10 +59,13 @@ export default function Tune({
               initialAbcString={initialAbcString}
               device={device}
               solutionAbcString={solutionAbcString}
-              onValidate={(mistakes, progress) => {
-                if (mistakes > 0) {
-                  const nextMistakes = attempt.mistakes + mistakes;
-                  setAttempt({ mistakes: nextMistakes, progress });
+              onValidate={(newMistakes, progress) => {
+                if (newMistakes > 0) {
+                  setAttempt((attempt) => ({
+                    ...attempt,
+                    mistakes: attempt.mistakes + newMistakes,
+                    progress,
+                  }));
                 } else {
                   let newAttempt = attempt;
                   newAttempt.completedAt = new Date();

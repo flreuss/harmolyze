@@ -12,25 +12,20 @@ export default function RiemannFuncSelectionDialog({
   target,
   mode,
 }) {
-  const [baseFunc, setBaseFunc] = useState(
-    defaultValue.baseFunc ? defaultValue.baseFunc.short : undefined
-  );
-  const [addTones, setAddTones] = useState(defaultValue.addTones);
-  const [base, setBase] = useState(defaultValue.base);
-  const [isSecondaryDominant, setIsSecondaryDominant] = useState(
-    defaultValue.isSecondaryDominant
-  );
-  const [incomplete, setIncomplete] = useState(defaultValue.incomplete);
+  const [riemannFunc, setRiemannFunc] = useState({
+    ...defaultValue,
+    baseFuncString: defaultValue.baseFunc ? defaultValue.baseFunc.short : undefined,
+  });
 
   function handleClose() {
     onClose(
-      baseFunc
+      riemannFunc.baseFuncString
         ? new RiemannFunc(
-            baseFunc,
-            addTones,
-            base,
-            isSecondaryDominant,
-            incomplete,
+            riemannFunc.baseFuncString,
+            riemannFunc.addTones,
+            riemannFunc.base,
+            riemannFunc.isSecondaryDominant,
+            riemannFunc.incomplete,
             mode
           )
         : undefined
@@ -52,29 +47,35 @@ export default function RiemannFuncSelectionDialog({
 
         <NumberMultiSelector
           options={RiemannFunc.validAddTones}
-          selected={addTones}
-          onChange={(values) => setAddTones(values.sort())}
+          selected={riemannFunc.addTones}
+          onChange={(values) =>
+            setRiemannFunc((riemannFunc) => ({
+              ...riemannFunc,
+              addTones: values.sort(),
+            }))
+          }
           max={2}
         />
 
         <SelectionWheel
           value={
-            isSecondaryDominant
-              ? `(${baseFunc})`
-              : incomplete
-              ? `/${baseFunc}`
-              : baseFunc
+            riemannFunc.isSecondaryDominant
+              ? `(${riemannFunc.baseFuncString})`
+              : riemannFunc.incomplete
+              ? `/${riemannFunc.baseFuncString}`
+              : riemannFunc.baseFuncString
           }
           onChange={(val) => {
-            setBaseFunc(
-              val.startsWith("(")
+            setRiemannFunc((riemannFunc) => ({
+              ...riemannFunc,
+              baseFuncString: val.startsWith("(")
                 ? val.slice(1, -1)
                 : val.startsWith("/")
                 ? val.slice(1)
-                : val
-            );
-            setIsSecondaryDominant(val.startsWith("("));
-            setIncomplete(val.startsWith("/"));
+                : val,
+              isSecondaryDominant: val.startsWith("("),
+              incomplete: val.startsWith("/"),
+            }));
           }}
           radius={175}
           mode={mode}
@@ -83,8 +84,13 @@ export default function RiemannFuncSelectionDialog({
         <NumberSelector
           name="baseSelector"
           options={RiemannFunc.validBaseNotes}
-          value={base}
-          onChange={(val) => setBase(val)}
+          value={riemannFunc.base}
+          onChange={(val) =>
+            setRiemannFunc((riemannFunc) => ({
+              ...riemannFunc,
+              base: val,
+            }))
+          }
         />
 
         <Box
