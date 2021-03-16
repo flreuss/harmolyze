@@ -15,6 +15,10 @@ import {
 } from "grommet";
 import { useRouter } from "next/router";
 import { connectToDatabase } from "../../lib/mongodb";
+import { renderAbc } from "abcjs";
+import { getSolution, getInitial } from "../../lib/solutions";
+import { NotesVoicesArray } from "../../lib/abcjsUtils";
+import RiemannFunc from "../../lib/riemannFunc";
 
 export default function CreateTune({ tunebooks, session }) {
   const defaultValue = {
@@ -41,6 +45,8 @@ export default function CreateTune({ tunebooks, session }) {
               setValue(nextValue);
             }}
             onSubmit={({ value }) => {
+              value.points = calculatePoints(value);
+
               fetch("/api/secured/tune", {
                 method: "POST",
                 body: JSON.stringify(value),
@@ -73,20 +79,6 @@ export default function CreateTune({ tunebooks, session }) {
                 options={tunebooks}
                 labelKey="name"
                 valueKey={{ key: "_id", reduce: true }}
-              />
-            </FormField>
-
-            <FormField label="Schwierigkeitsgrad" name="points" required>
-              <RangeInput
-                name="points"
-                min={0}
-                max={100}
-                step={5}
-                onChange={(event) => {
-                  const newValue = value;
-                  newValue.points = +event.target.value;
-                  setValue(newValue);
-                }}
               />
             </FormField>
 
@@ -127,6 +119,40 @@ export default function CreateTune({ tunebooks, session }) {
   ) : (
     <p>Access Denied</p>
   );
+}
+
+function calculatePoints(tune) {
+  const solutionVisualObjs = renderAbc("*", getSolution(tune.abc));
+  const solutionVoicesArray = new NotesVoicesArray(solutionVisualObjs[0]);
+  const keySignature = solutionVisualObjs[0].getKeySignature();
+
+  const initialVisualObjs = renderAbc("*", getInitial(tune.abc));
+  const initialVoicesArray = new NotesVoicesArray(initialVisualObjs[0]);
+
+  let points = 0;
+  solutionVoicesArray.foreachElem((elem, elemPos) => {
+    const initialElem = initialVoicesArray.getElem(elemPos);
+    if (elem.abcelem.chord && !initialElem.abcelem.chord) {
+      const riemannFunc = RiemannFunc.fromString(
+        //TODO: ignoriert wenn es mehrere Lösungsmöglichkeiten gibt --> dann soll die leichteste genommen werden
+        elem.abcelem.chord[0].name,
+        keySignature.mode
+      );
+      points += riemannFunc.baseFunc.type.points;
+    }
+  });
+
+  // Multipliziere mit Bonus für erschwerende Faktoren
+  //	Wie viele Vorzeichen hat der Tune?
+  points *= 1 + 0.2 * keySignature.accidentals.length;
+  // Steht der Tune in Dur oder Moll?
+  // Moll ist 1.3, weil bei einem Drittel der Grundfunktionen Töne auftreten, die nicht leitereigen sind
+  points *= ["m", "min", "minor"].includes(keySignature.mode) ? 1.3 : 1;
+
+  // 	Wie viele verschiedene Stimmen hat der Tune?
+  points *= 1 + 0.1 * (solutionVoicesArray.length - 1);
+
+  return Math.round(points / 5) * 5;
 }
 
 export async function getServerSideProps(context) {
