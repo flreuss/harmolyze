@@ -49,10 +49,10 @@ export default function Score({
     );
 
     let mistakes = 0;
+    let total = 0;
     voicesArray.forEachElem((elem, pos) => {
       const filledInChord = elem.abcelem.chord;
-      const solutionChord =
-        solutionVoicesArray.getElem(pos).abcelem.chord;
+      const solutionChord = solutionVoicesArray.getElem(pos).abcelem.chord;
 
       if (
         solutionChord &&
@@ -61,6 +61,7 @@ export default function Score({
           new NotesVoicesArray(renderAbc("*", initialAbcString)[0])
         ).abcelem.chord
       ) {
+        total += 1;
         const solutionChords = solutionChord[0].name.split("\n");
 
         let selectionColor = "rgb(0,200,0)";
@@ -73,7 +74,7 @@ export default function Score({
       }
     });
 
-    onValidate(mistakes);
+    onValidate(mistakes, (total - mistakes) / total);
   }
 
   function adjacentElemsOf(abcelem, voicesArray) {
@@ -180,6 +181,7 @@ export default function Score({
 
   //Rendering
   function renderVisualObjs() {
+    console.log("Rendering VisualObjs...")
     let config = configFromFile;
     config.clickListener = handleClick;
     switch (device) {
@@ -211,15 +213,14 @@ export default function Score({
       if (
         !lowestAdjacentElemOf(elem.abcelem, solutionVoicesArray).abcelem
           .chord ||
-        lowestAdjacentElemOf(elem.abcelem, initialVoicesArray).abcelem
-          .chord
+        lowestAdjacentElemOf(elem.abcelem, initialVoicesArray).abcelem.chord
       ) {
         const last = elem.elemset.length - 1;
         elem.elemset[last].classList.add("abcjs-given");
         if (elem.abcelem.chord) {
-          elem.children[
-            elem.children.length - 1
-          ].graphelem.classList.add("abcjs-given");
+          elem.children[elem.children.length - 1].graphelem.classList.add(
+            "abcjs-given"
+          );
         }
       }
     });

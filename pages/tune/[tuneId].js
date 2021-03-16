@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, ResponsiveContext } from "grommet";
+import React, { useEffect, useState } from "react";
+import { Box, Meter, ResponsiveContext, Text } from "grommet";
 
 import Score from "../../components/score";
 
@@ -9,6 +9,7 @@ import { ObjectId } from "mongodb";
 import Layout from "../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
+import {millisToMinutesAndSeconds} from "../../lib/stringUtils"
 
 export default function Tune({
   initialAbcString,
@@ -16,17 +17,34 @@ export default function Tune({
   tuneId,
   session,
 }) {
+  const [time, setTime] = useState(0);
   const [attempt, setAttempt] = useState({
     startedAt: new Date(),
     completedAt: undefined,
+    progress: 0,
     mistakes: 0,
     user_id: session.user._id,
     tune_id: tuneId,
   });
   const router = useRouter();
 
+  useEffect(() => {
+    let interval = null;
+    interval = setInterval(() => {
+      setTime((millis) => millis + 1000);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [time]);
+
   return (
     <Layout session={session} score={router.query.score || ""}>
+      <Meter
+        value={Math.floor(attempt.progress * 100)}
+        max={100}
+        size="full"
+        thickness="small"
+      />
+      <Box pad="medium" direction="row" justify="end"><Text>{millisToMinutesAndSeconds(time)}</Text></Box>
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -39,16 +57,19 @@ export default function Tune({
               initialAbcString={initialAbcString}
               device={device}
               solutionAbcString={solutionAbcString}
-              onValidate={(mistakes) => {
-                let nextAttempt = attempt;
+              onValidate={(mistakes, progress) => {
                 if (mistakes > 0) {
-                  nextAttempt.mistakes += mistakes;
-                  setAttempt(nextAttempt);
+                  const nextMistakes = attempt.mistakes + mistakes;
+                  setAttempt({ mistakes: nextMistakes, progress });
                 } else {
-                  nextAttempt.completedAt = new Date();
-                  createAttempt(nextAttempt, 
+                  let newAttempt = attempt;
+                  newAttempt.completedAt = new Date();
+                  newAttempt.progress = 1;
+                  createAttempt(
+                    newAttempt,
                     //TODO: Show attemptResume page
-                    () => router.push("/"));
+                    () => router.push("/")
+                  );
                 }
               }}
             />

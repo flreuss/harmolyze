@@ -21,6 +21,7 @@ import { Add, Clock, Money, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
 import { synth } from "abcjs";
 import ConfirmationDialog from "../components/confirmationDialog";
+import {millisToMinutesAndSeconds} from "../lib/stringUtils"
 
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
@@ -189,12 +190,6 @@ function AnimatedCard(props) {
       {props.children}
     </Card>
   );
-}
-
-function millisToMinutesAndSeconds(millis) {
-  var minutes = Math.floor(millis / 60000);
-  var seconds = ((millis % 60000) / 1000).toFixed(0);
-  return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 }
 
 export async function getServerSideProps(context) {

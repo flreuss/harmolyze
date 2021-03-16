@@ -10,6 +10,7 @@ export default async (req, res) => {
     mistakes: +req.body.mistakes,
     user_id: req.body.user_id,
     tune_id: ObjectId(req.body.tune_id),
+    progress: +req.body.progress,
   };
   if (session && newAttempt.user_id === session.user._id) {
     switch (req.method) {
