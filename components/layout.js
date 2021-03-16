@@ -18,7 +18,7 @@ import { signOut } from "next-auth/client";
 
 const customTheme = deepMerge(grommet, {});
 
-export default function Layout({ children, session, points }) {
+export default function Layout({ children, session, score }) {
   return (
     <Grommet full theme={customTheme}>
       <Grid
@@ -40,7 +40,7 @@ export default function Layout({ children, session, points }) {
             <Box direction="row" align="center" gap="small">
               <Box direction="row" gap="xsmall">
                 <Money />
-                <Text>{points}</Text>
+                <Text>{score}</Text>
               </Box>
               <Avatar src={session.user.image} />
               <Anchor color="white" label={session.user._id} />

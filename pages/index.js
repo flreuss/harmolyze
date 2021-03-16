@@ -22,7 +22,7 @@ import Link from "next/link";
 import { synth } from "abcjs";
 import ConfirmationDialog from "../components/confirmationDialog";
 
-export default function Home({ tunebooks, session, points }) {
+export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
   const [notification, setNotification] = useState(undefined);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
@@ -35,7 +35,7 @@ export default function Home({ tunebooks, session, points }) {
   });
 
   return (
-    <Layout session={session} points={points}>
+    <Layout session={session} score={score}>
       <Meter
         value={
           tunebooks
@@ -68,7 +68,7 @@ export default function Home({ tunebooks, session, points }) {
                       <AnimatedCard
                         onClick={() =>
                           router.push(
-                            `/tune/${tune._id}?currentPoints=${points}`
+                            `/tune/${tune._id}?score=${score}`
                           )
                         }
                         background="white"
@@ -294,19 +294,19 @@ export async function getServerSideProps(context) {
         {
           $group: {
             _id: null,
-            totalPoints: { $sum: "$tune.points" },
+            score: { $sum: "$tune.points" },
           },
         },
       ])
       .toArray();
 
-    const points = attempts.length > 0 ? attempts[0].totalPoints : 0;
+    const score = attempts.length > 0 ? attempts[0].score : 0;
 
     return {
       props: {
         tunebooks,
         session,
-        points,
+        score,
       },
     };
   }

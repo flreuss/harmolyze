@@ -26,7 +26,7 @@ export default function Tune({
   const router = useRouter();
 
   return (
-    <Layout session={session} points={router.query.currentPoints || ""}>
+    <Layout session={session} score={router.query.score || ""}>
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
