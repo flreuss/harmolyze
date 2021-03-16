@@ -67,9 +67,7 @@ export default function Home({ tunebooks, session, score }) {
                     <Stack anchor="top-right" key={tune._id}>
                       <AnimatedCard
                         onClick={() =>
-                          router.push(
-                            `/tune/${tune._id}?score=${score}`
-                          )
+                          router.push(`/tune/${tune._id}?score=${score}`)
                         }
                         background="white"
                       >
@@ -103,15 +101,16 @@ export default function Home({ tunebooks, session, score }) {
                           )}
                         </CardFooter>
                       </AnimatedCard>
-                      {session && session.user.isAdmin && (
-                        <Button
-                          hoverIndicator
-                          icon={<Trash color="status-critical" />}
-                          onClick={() => {
-                            setOpenDeleteDialog({ tune });
-                          }}
-                        />
-                      )}
+                      {((tune.createdBy === session.user._id ||
+                        session.user.isAdmin) && (
+                          <Button
+                            hoverIndicator
+                            icon={<Trash color="status-critical" />}
+                            onClick={() => {
+                              setOpenDeleteDialog({ tune });
+                            }}
+                          />
+                        ))}
                     </Stack>
                   ))}
                 </Grid>
@@ -119,18 +118,16 @@ export default function Home({ tunebooks, session, score }) {
             ))}
           </Accordion>
         </Box>
-        {session && session.user.isAdmin && (
-          <Link href="/admin/createTune" passHref>
-            <Box
-              round="full"
-              overflow="hidden"
-              background="brand"
-              margin="medium"
-            >
-              <Button icon={<Add />} hoverIndicator onClick={() => {}} />
-            </Box>
-          </Link>
-        )}
+        <Link href="/tune/new" passHref>
+          <Box
+            round="full"
+            overflow="hidden"
+            background="brand"
+            margin="medium"
+          >
+            <Button icon={<Add />} hoverIndicator onClick={() => {}} />
+          </Box>
+        </Link>
       </Stack>
       {notification && (
         <Notification
@@ -255,6 +252,7 @@ export async function getServerSideProps(context) {
             tunes_docs: {
               title: 1,
               points: 1,
+              createdBy: 1,
               _id: { $toString: "$tunes_docs._id" },
               highscore: { $first: "$highscore" },
             },

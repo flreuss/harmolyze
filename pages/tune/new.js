@@ -8,12 +8,10 @@ import {
   Form,
   FormField,
   Heading,
-  RangeInput,
   TextInput,
   TextArea,
   Select,
 } from "grommet";
-import { useRouter } from "next/router";
 import { connectToDatabase } from "../../lib/mongodb";
 import { renderAbc } from "abcjs";
 import { getSolution, getInitial } from "../../lib/solutions";
@@ -28,11 +26,10 @@ export default function CreateTune({ tunebooks, session }) {
     tunebook_id: tunebooks[0]._id,
   };
 
-  const router = useRouter();
   const [notification, setNotification] = useState(undefined);
   const [value, setValue] = useState(defaultValue);
 
-  return session && session.user.isAdmin ? (
+  return (
     <Layout>
       <Box fill align="center" justify="center" gap="large">
         <Heading margin="none">Neue Übungsaufgabe anlegen</Heading>
@@ -116,8 +113,6 @@ export default function CreateTune({ tunebooks, session }) {
         />
       )}
     </Layout>
-  ) : (
-    <p>Access Denied</p>
   );
 }
 
@@ -169,7 +164,7 @@ export async function getServerSideProps(context) {
 
     const tunebooks = await db
       .collection("tunebooks")
-      .find()
+      .find({ $or: [{ public: !session.user.isAdmin }, { public: true }] })
       .project({
         tunes: 0,
       })
