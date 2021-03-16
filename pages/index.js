@@ -9,6 +9,7 @@ import {
   Button,
   Accordion,
   AccordionPanel,
+  Meter,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -33,6 +34,16 @@ export default function Home({ tunebooks, session, points }) {
 
   return (
     <Layout session={session} points={points}>
+      <Meter
+        value={
+          tunebooks
+            .flatMap((tunebook) => tunebook.tunes)
+            .filter((tune) => tune.highscore).length
+        }
+        max={tunebooks.flatMap((tunebook) => tunebook.tunes).length}
+        size="full"
+        thickness="small"
+      />
       <Stack anchor="bottom-right" fill>
         <Box
           pad="large"
