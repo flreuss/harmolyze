@@ -7,8 +7,8 @@ import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import {
   makeSimultaneousNotesArray,
-  makeNotesVoicesArray,
-} from "../lib/abcjsExtension";
+  NotesVoicesArray,
+} from "../lib/abcjsUtils";
 import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
@@ -44,39 +44,33 @@ export default function Score({
   function findMistakes(voicesArray, solutionAbcString) {
     renderVisualObjs();
 
-    const solutionVoicesArray = makeNotesVoicesArray(
+    const solutionVoicesArray = new NotesVoicesArray(
       renderAbc("*", solutionAbcString)[0]
     );
 
     let mistakes = 0;
-    voicesArray.forEach((voice, voiceIndex) => {
-      voice.forEach((note, noteIndex) => {
-        const filledInChord = note.elem.abcelem.chord;
-        const solutionChord =
-          solutionVoicesArray[voiceIndex][noteIndex].elem.abcelem.chord;
+    voicesArray.forEachElem((elem, pos) => {
+      const filledInChord = elem.abcelem.chord;
+      const solutionChord =
+        solutionVoicesArray[pos.voice][pos.noteTotal].elem.abcelem.chord;
 
-        if (
-          note.elem.type === "note" &&
-          solutionChord &&
-          !lowestAdjacentElemOf(
-            note.elem.abcelem,
-            makeNotesVoicesArray(renderAbc("*", initialAbcString)[0])
-          ).abcelem.chord
-        ) {
-          const solutionChords = solutionChord[0].name.split("\n");
+      if (
+        solutionChord &&
+        !lowestAdjacentElemOf(
+          elem.abcelem,
+          new NotesVoicesArray(renderAbc("*", initialAbcString)[0])
+        ).abcelem.chord
+      ) {
+        const solutionChords = solutionChord[0].name.split("\n");
 
-          let selectionColor = "rgb(0,200,0)";
-          if (
-            !filledInChord ||
-            !solutionChords.includes(filledInChord[0].name)
-          ) {
-            selectionColor = "rgb(200,0,0)";
-            mistakes += 1;
-          }
-
-          highlightAdjacentNotesOf(note.elem.abcelem, selectionColor, true);
+        let selectionColor = "rgb(0,200,0)";
+        if (!filledInChord || !solutionChords.includes(filledInChord[0].name)) {
+          selectionColor = "rgb(200,0,0)";
+          mistakes += 1;
         }
-      });
+
+        highlightAdjacentNotesOf(elem.abcelem, selectionColor, true);
+      }
     });
 
     onValidate(mistakes);
@@ -86,7 +80,7 @@ export default function Score({
     const adjacent = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
     );
-    return adjacent.map((pos) => voicesArray[pos.voice][pos.noteTotal].elem);
+    return adjacent.map((pos) => voicesArray.getElem(pos));
   }
 
   function lowestAdjacentElemOf(abcelem, voicesArray) {
@@ -151,17 +145,17 @@ export default function Score({
   ) {
     const lowestAdjacentNote = lowestAdjacentElemOf(
       abcelem,
-      makeNotesVoicesArray(visualObjs[0])
+      new NotesVoicesArray(visualObjs[0])
     ).abcelem;
 
     if (
       lowestAdjacentElemOf(
         abcelem,
-        makeNotesVoicesArray(renderAbc("*", initialAbcString)[0])
+        new NotesVoicesArray(renderAbc("*", initialAbcString)[0])
       ).abcelem.chord ||
       !lowestAdjacentElemOf(
         abcelem,
-        makeNotesVoicesArray(renderAbc("*", solutionAbcString)[0])
+        new NotesVoicesArray(renderAbc("*", solutionAbcString)[0])
       ).abcelem.chord
     ) {
       highlightAdjacentNotesOf(
@@ -203,34 +197,32 @@ export default function Score({
     }
 
     visualObjs = renderAbc("scoreContainer", abcString, config);
-    voicesArray = makeNotesVoicesArray(visualObjs[0]);
+    voicesArray = new NotesVoicesArray(visualObjs[0]);
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
 
-    const solutionVoicesArray = makeNotesVoicesArray(
+    const solutionVoicesArray = new NotesVoicesArray(
       renderAbc("*", solutionAbcString)[0]
     );
-    const initialVoicesArray = makeNotesVoicesArray(
+    const initialVoicesArray = new NotesVoicesArray(
       renderAbc("*", initialAbcString)[0]
     );
 
-    for (let voice of voicesArray) {
-      for (let note of voice) {
-        if (
-          !lowestAdjacentElemOf(note.elem.abcelem, solutionVoicesArray).abcelem
-            .chord ||
-          lowestAdjacentElemOf(note.elem.abcelem, initialVoicesArray).abcelem
-            .chord
-        ) {
-          const last = note.elem.elemset.length - 1;
-          note.elem.elemset[last].classList.add("abcjs-given");
-          if (note.elem.abcelem.chord) {
-            note.elem.children[
-              note.elem.children.length - 1
-            ].graphelem.classList.add("abcjs-given");
-          }
+    voicesArray.foreachElem((elem) => {
+      if (
+        !lowestAdjacentElemOf(elem.abcelem, solutionVoicesArray).abcelem
+          .chord ||
+        lowestAdjacentElemOf(elem.abcelem, initialVoicesArray).abcelem
+          .chord
+      ) {
+        const last = elem.elemset.length - 1;
+        elem.elemset[last].classList.add("abcjs-given");
+        if (elem.abcelem.chord) {
+          elem.children[
+            elem.children.length - 1
+          ].graphelem.classList.add("abcjs-given");
         }
       }
-    }
+    });
 
     loadAudio(visualObjs);
   }
