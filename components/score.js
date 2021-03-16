@@ -41,7 +41,7 @@ export default function Score({
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
   //Methods
-  function findMistakes(voicesArray, solutionAbcString) {
+  function findMistakes(solutionAbcString) {
     renderVisualObjs();
 
     const solutionVoicesArray = new NotesVoicesArray(
@@ -300,7 +300,7 @@ export default function Score({
         }
         onClick={() => {
           if (synthControl) synthControl.pause();
-          findMistakes(voicesArray, solutionAbcString);
+          findMistakes(solutionAbcString);
         }}
         primary
       />
