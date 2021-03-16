@@ -10,6 +10,8 @@ import {
   Accordion,
   AccordionPanel,
   Meter,
+  Layer,
+  Heading,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -24,6 +26,7 @@ import { synth } from "abcjs";
 export default function Home({ tunebooks, session, points }) {
   const router = useRouter();
   const [notification, setNotification] = useState(undefined);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
   //TODO: So setzen, dass initial das erste tunebook geöffnet ist, bei dem sich noch ein ungelöster Tune befindet. Wenn es keines gibt, wird der default Wert auf undefined gesetzt
   const [activeIndex, setActiveIndex] = useState([0]);
 
@@ -106,22 +109,7 @@ export default function Home({ tunebooks, session, points }) {
                           hoverIndicator
                           icon={<Trash color="status-critical" />}
                           onClick={() => {
-                            fetch("/api/secured/tune", {
-                              method: "DELETE",
-                              body: JSON.stringify(tune),
-                              headers: {
-                                "Content-type":
-                                  "application/json;charset=utf-8",
-                              },
-                            }).then((res) => {
-                              if (res.status % 200 <= 26) {
-                                router.push("/");
-                              } else {
-                                setNotification(
-                                  "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                                );
-                              }
-                            });
+                            setOpenDeleteDialog({ tune });
                           }}
                         />
                       )}
@@ -152,6 +140,65 @@ export default function Home({ tunebooks, session, points }) {
           text={notification}
           timeout={3000}
         />
+      )}
+      {openDeleteDialog && (
+        <Layer
+          position="center"
+          onClickOutside={() => setOpenDeleteDialog(undefined)}
+          onEsc={() => setOpenDeleteDialog(undefined)}
+        >
+          <Box pad="medium" gap="small" width="medium">
+            <Heading level={3} margin="none">
+              Löschen
+            </Heading>
+            <Text>
+              Sind Sie sicher, dass Sie "{openDeleteDialog.tune.title}" löschen wollen?
+            </Text>
+            <Box
+              as="footer"
+              gap="small"
+              direction="row"
+              align="center"
+              justify="end"
+              pad={{ top: "medium", bottom: "small" }}
+            >
+              <Button
+                label="Abbrechen"
+                onClick={() => {
+                  setOpenDeleteDialog(undefined);
+                }}
+                color="dark-3"
+              />
+              <Button
+                label={
+                  <Text color="white">
+                    <strong>Löschen</strong>
+                  </Text>
+                }
+                onClick={() => {
+                  fetch("/api/secured/tune", {
+                    method: "DELETE",
+                    body: JSON.stringify(openDeleteDialog.tune),
+                    headers: {
+                      "Content-type": "application/json;charset=utf-8",
+                    },
+                  }).then((res) => {
+                    if (res.status % 200 <= 26) {
+                      router.push("/");
+                    } else {
+                      setNotification(
+                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                      );
+                    }
+                  });
+                  setOpenDeleteDialog(undefined);
+                }}
+                primary
+                color="status-critical"
+              />
+            </Box>
+          </Box>
+        </Layer>
       )}
     </Layout>
   );
