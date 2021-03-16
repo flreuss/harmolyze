@@ -5,7 +5,11 @@ import { Box, Button, Text } from "grommet";
 import SelectionDialog from "./riemannFunc/selectionDialog";
 import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
-import VoiceArrayPosition from "../lib/voiceArrayPosition";
+import {
+  makeSimultaneousNotesArray,
+  makeNotesVoicesArray,
+} from "../lib/abcjsExtension";
+import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
 
@@ -40,8 +44,8 @@ export default function Score({
   function findMistakes(voicesArray, solutionAbcString) {
     renderVisualObjs();
 
-    const solutionVoicesArray = makeVoicesArray(
-      renderAbc("*", solutionAbcString)
+    const solutionVoicesArray = makeNotesVoicesArray(
+      renderAbc("*", solutionAbcString)[0]
     );
 
     let mistakes = 0;
@@ -54,7 +58,10 @@ export default function Score({
         if (
           note.elem.type === "note" &&
           solutionChord &&
-          !chordOf(note.elem.abcelem, renderAbc("*", initialAbcString))
+          !lowestAdjacentElemOf(
+            note.elem.abcelem,
+            makeNotesVoicesArray(renderAbc("*", initialAbcString)[0])
+          ).abcelem.chord
         ) {
           const solutionChords = solutionChord[0].name.split("\n");
 
@@ -75,42 +82,21 @@ export default function Score({
     onValidate(mistakes);
   }
 
-  /**
-   *
-   * @returns {string} chord of the element corresponding to abcelem in visualObjs
-   */
-  function chordOf(abcelem, visualObjs) {
-    const adjacentNotes = simultaneousNotesArray.get(
+  function adjacentElemsOf(abcelem, voicesArray) {
+    const adjacent = simultaneousNotesArray.get(
       JSON.stringify(abcelem.abselem.counters)
     );
-    const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
-
-    const compareToVoicesArray = makeVoicesArray(visualObjs);
-
-    return compareToVoicesArray[lowestAdjacentNotePos.voice][
-      lowestAdjacentNotePos.noteTotal
-    ].elem.abcelem.chord;
+    return adjacent.map((pos) => voicesArray[pos.voice][pos.noteTotal].elem);
   }
 
-  function lowestAdjacentNoteOf(abcelem) {
-    var adjacentNotes = simultaneousNotesArray.get(
-      JSON.stringify(abcelem.abselem.counters)
-    );
-
-    const lowestAdjacentNotePos = adjacentNotes[adjacentNotes.length - 1];
-
-    return voicesArray[lowestAdjacentNotePos.voice][
-      lowestAdjacentNotePos.noteTotal
-    ].elem;
+  function lowestAdjacentElemOf(abcelem, voicesArray) {
+    const adjacentElems = adjacentElemsOf(abcelem, voicesArray);
+    return adjacentElems[adjacentElems.length - 1];
   }
 
-  function unHighlightAllNotes() {
-    if (notesHighlighted.length > 0) {
-      notesHighlighted.forEach((el) =>
-        el.unhighlight(undefined, "currentColor")
-      );
-      notesHighlighted = [];
-    }
+  function unhighlightAllNotes() {
+    notesHighlighted.forEach((el) => el.unhighlight(undefined, "currentColor"));
+    notesHighlighted = [];
   }
 
   function highlightAdjacentNotesOf(
@@ -119,7 +105,7 @@ export default function Score({
     multiselect = false
   ) {
     if (!multiselect) {
-      unHighlightAllNotes();
+      unhighlightAllNotes();
     }
 
     const adjacentNotes = simultaneousNotesArray.get(
@@ -154,10 +140,10 @@ export default function Score({
           )
         );
       } else {
-        unHighlightAllNotes();
+        unhighlightAllNotes();
       }
     } else {
-      unHighlightAllNotes();
+      unhighlightAllNotes();
     }
     setOpenSelectionDialog(undefined);
   }
@@ -170,11 +156,20 @@ export default function Score({
     _drag,
     _mouseEvent
   ) {
-    const lowestAdjacentNote = lowestAdjacentNoteOf(abcelem).abcelem;
+    const lowestAdjacentNote = lowestAdjacentElemOf(
+      abcelem,
+      makeNotesVoicesArray(visualObjs[0])
+    ).abcelem;
 
     if (
-      chordOf(abcelem, renderAbc("*", initialAbcString)) ||
-      !chordOf(abcelem, renderAbc("*", solutionAbcString))
+      lowestAdjacentElemOf(
+        abcelem,
+        makeNotesVoicesArray(renderAbc("*", initialAbcString)[0])
+      ).abcelem.chord ||
+      !lowestAdjacentElemOf(
+        abcelem,
+        makeNotesVoicesArray(renderAbc("*", solutionAbcString)[0])
+      ).abcelem.chord
     ) {
       highlightAdjacentNotesOf(
         abcelem,
@@ -191,12 +186,6 @@ export default function Score({
         mode: visualObjs[0].getKeySignature().mode,
       });
     }
-  }
-
-  function makeVoicesArray(visualObjs) {
-    return visualObjs[0].makeVoicesArray().map((voice) => {
-      return voice.filter((val) => val.elem.type === "note");
-    });
   }
 
   //Rendering
@@ -218,17 +207,23 @@ export default function Score({
     }
 
     visualObjs = renderAbc("scoreContainer", abcString, config);
-    voicesArray = makeVoicesArray(visualObjs);
+    voicesArray = makeNotesVoicesArray(visualObjs[0]);
     simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
 
-    const solutionVisualObjs = renderAbc("*", solutionAbcString);
-    const initialVisualObjs = renderAbc("*", initialAbcString);
+    const solutionVoicesArray = makeNotesVoicesArray(
+      renderAbc("*", solutionAbcString)[0]
+    );
+    const initialVoicesArray = makeNotesVoicesArray(
+      renderAbc("*", initialAbcString)[0]
+    );
 
     for (let voice of voicesArray) {
       for (let note of voice) {
         if (
-          !chordOf(note.elem.abcelem, solutionVisualObjs) ||
-          chordOf(note.elem.abcelem, initialVisualObjs)
+          !lowestAdjacentElemOf(note.elem.abcelem, solutionVoicesArray).abcelem
+            .chord ||
+          lowestAdjacentElemOf(note.elem.abcelem, initialVoicesArray).abcelem
+            .chord
         ) {
           const last = note.elem.elemset.length - 1;
           note.elem.elemset[last].classList.add("abcjs-given");
@@ -330,79 +325,4 @@ export default function Score({
       )}
     </Box>
   );
-}
-
-//===========================================================
-
-//Helper functions
-function insert(mainString, insString = "", pos = 0) {
-  while (mainString[pos] === " ") {
-    pos += 1;
-  }
-  return mainString.slice(0, pos) + insString + mainString.slice(pos);
-}
-
-function replace(mainString, replString = "", pos = 0, len = 0) {
-  //workaround for chords
-  if (mainString[pos] === "[") {
-    pos -= len;
-  }
-  while (mainString[pos] === " ") {
-    pos += 1;
-  }
-  return mainString.slice(0, pos) + replString + mainString.slice(pos + len);
-}
-
-function makeSimultaneousNotesArray(voicesArray) {
-  let countTotal = 0;
-  let result = new Map();
-
-  let current = Array.from(
-    {
-      length: voicesArray.length,
-    },
-    (_) => ({
-      noteIndex: 0,
-      countTotal: 0,
-    })
-  );
-
-  while (existsUnclassifiedNote(voicesArray, current)) {
-    let adjacentVoicesArrayIndices = [];
-
-    for (let i = 0; i < voicesArray.length; i++) {
-      if (
-        voicesArray[i][current[i].noteIndex] &&
-        current[i].countTotal === countTotal
-      ) {
-        let pos = new VoiceArrayPosition(i, current[i].noteIndex);
-        adjacentVoicesArrayIndices.push(pos);
-
-        current[i].countTotal +=
-          voicesArray[i][current[i].noteIndex].elem.duration;
-        current[i].noteIndex++;
-      }
-    }
-
-    for (let voiceArrayPosition of adjacentVoicesArrayIndices) {
-      const currentNoteElem =
-        voicesArray[voiceArrayPosition.voice][voiceArrayPosition.noteTotal]
-          .elem;
-      result.set(
-        JSON.stringify(currentNoteElem.counters),
-        adjacentVoicesArrayIndices
-      );
-    }
-
-    countTotal = Math.min(...current.map((voice) => voice.countTotal));
-  }
-
-  return result;
-}
-
-function existsUnclassifiedNote(voicesArray, current) {
-  for (let i = 0; i < voicesArray.length; i++) {
-    if (current[i].noteIndex < voicesArray[i].length) return true;
-  }
-  return false;
 }
