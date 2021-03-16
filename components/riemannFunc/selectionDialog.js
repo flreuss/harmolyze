@@ -12,15 +12,15 @@ export default function RiemannFuncSelectionDialog({
   target,
   mode,
 }) {
-  const [baseFunc, setBaseFunc] = useState(defaultValue.baseFunc);
+  const [baseFunc, setBaseFunc] = useState(
+    defaultValue.baseFunc ? defaultValue.baseFunc.short : undefined
+  );
   const [addTones, setAddTones] = useState(defaultValue.addTones);
   const [base, setBase] = useState(defaultValue.base);
   const [isSecondaryDominant, setIsSecondaryDominant] = useState(
     defaultValue.isSecondaryDominant
   );
-  const [missingFundamental, setMissingFundamental] = useState(
-    defaultValue.missingFundamental
-  );
+  const [incomplete, setIncomplete] = useState(defaultValue.incomplete);
 
   function handleClose() {
     onClose(
@@ -30,7 +30,8 @@ export default function RiemannFuncSelectionDialog({
             addTones,
             base,
             isSecondaryDominant,
-            missingFundamental
+            incomplete,
+            mode
           )
         : undefined
     );
@@ -60,7 +61,7 @@ export default function RiemannFuncSelectionDialog({
           value={
             isSecondaryDominant
               ? `(${baseFunc})`
-              : missingFundamental
+              : incomplete
               ? `/${baseFunc}`
               : baseFunc
           }
@@ -73,7 +74,7 @@ export default function RiemannFuncSelectionDialog({
                 : val
             );
             setIsSecondaryDominant(val.startsWith("("));
-            setMissingFundamental(val.startsWith("/"));
+            setIncomplete(val.startsWith("/"));
           }}
           radius={175}
           mode={mode}

@@ -174,7 +174,10 @@ export default function Score({
         onClose: (riemannFunc) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFunc),
         defaultValue: lowestAdjacentNote.chord
-          ? RiemannFunc.fromString(lowestAdjacentNote.chord[0].name)
+          ? RiemannFunc.fromString(
+              lowestAdjacentNote.chord[0].name,
+              visualObjs[0].getKeySignature().mode
+            )
           : new RiemannFunc(),
         mode: visualObjs[0].getKeySignature().mode,
       });
