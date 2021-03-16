@@ -52,7 +52,7 @@ export default function Score({
     voicesArray.forEachElem((elem, pos) => {
       const filledInChord = elem.abcelem.chord;
       const solutionChord =
-        solutionVoicesArray[pos.voice][pos.noteTotal].elem.abcelem.chord;
+        solutionVoicesArray.getElem(pos).abcelem.chord;
 
       if (
         solutionChord &&
@@ -207,7 +207,7 @@ export default function Score({
       renderAbc("*", initialAbcString)[0]
     );
 
-    voicesArray.foreachElem((elem) => {
+    voicesArray.forEachElem((elem) => {
       if (
         !lowestAdjacentElemOf(elem.abcelem, solutionVoicesArray).abcelem
           .chord ||

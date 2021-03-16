@@ -130,7 +130,7 @@ function calculatePoints(tune) {
   const initialVoicesArray = new NotesVoicesArray(initialVisualObjs[0]);
 
   let points = 0;
-  solutionVoicesArray.foreachElem((elem, elemPos) => {
+  solutionVoicesArray.forEachElem((elem, elemPos) => {
     const initialElem = initialVoicesArray.getElem(elemPos);
     if (elem.abcelem.chord && !initialElem.abcelem.chord) {
       const riemannFunc = RiemannFunc.fromString(
