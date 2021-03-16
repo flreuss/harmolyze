@@ -108,18 +108,11 @@ export default function Score({
       unhighlightAllNotes();
     }
 
-    const adjacentNotes = simultaneousNotesArray.get(
-      JSON.stringify(abcelem.abselem.counters)
-    );
+    const adjacentElems = adjacentElemsOf(abcelem, voicesArray);
 
-    for (let adjacentNote of adjacentNotes) {
-      voicesArray[adjacentNote.voice][adjacentNote.noteTotal].elem.highlight(
-        undefined,
-        selectionColor
-      );
-      notesHighlighted.push(
-        voicesArray[adjacentNote.voice][adjacentNote.noteTotal].elem
-      );
+    for (let elem of adjacentElems) {
+      elem.highlight(undefined, selectionColor);
+      notesHighlighted.push(elem);
     }
   }
 
