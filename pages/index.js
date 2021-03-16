@@ -10,8 +10,6 @@ import {
   Accordion,
   AccordionPanel,
   Meter,
-  Layer,
-  Heading,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -22,6 +20,7 @@ import { connectToDatabase } from "../lib/mongodb";
 import { Add, Clock, Money, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
 import { synth } from "abcjs";
+import ConfirmationDialog from "../components/confirmationDialog";
 
 export default function Home({ tunebooks, session, points }) {
   const router = useRouter();
@@ -142,63 +141,34 @@ export default function Home({ tunebooks, session, points }) {
         />
       )}
       {openDeleteDialog && (
-        <Layer
-          position="center"
-          onClickOutside={() => setOpenDeleteDialog(undefined)}
-          onEsc={() => setOpenDeleteDialog(undefined)}
+        <ConfirmationDialog
+          heading="Löschen"
+          confirmLabel="Löschen"
+          onCancel={() => setOpenDeleteDialog(undefined)}
+          onConfirm={() => {
+            fetch("/api/secured/tune", {
+              method: "DELETE",
+              body: JSON.stringify(openDeleteDialog.tune),
+              headers: {
+                "Content-type": "application/json;charset=utf-8",
+              },
+            }).then((res) => {
+              if (res.status % 200 <= 26) {
+                router.push("/");
+              } else {
+                setNotification(
+                  "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                );
+              }
+            });
+            setOpenDeleteDialog(undefined);
+          }}
         >
-          <Box pad="medium" gap="small" width="medium">
-            <Heading level={3} margin="none">
-              Löschen
-            </Heading>
-            <Text>
-              Sind Sie sicher, dass Sie "{openDeleteDialog.tune.title}" löschen wollen?
-            </Text>
-            <Box
-              as="footer"
-              gap="small"
-              direction="row"
-              align="center"
-              justify="end"
-              pad={{ top: "medium", bottom: "small" }}
-            >
-              <Button
-                label="Abbrechen"
-                onClick={() => {
-                  setOpenDeleteDialog(undefined);
-                }}
-                color="dark-3"
-              />
-              <Button
-                label={
-                  <Text color="white">
-                    <strong>Löschen</strong>
-                  </Text>
-                }
-                onClick={() => {
-                  fetch("/api/secured/tune", {
-                    method: "DELETE",
-                    body: JSON.stringify(openDeleteDialog.tune),
-                    headers: {
-                      "Content-type": "application/json;charset=utf-8",
-                    },
-                  }).then((res) => {
-                    if (res.status % 200 <= 26) {
-                      router.push("/");
-                    } else {
-                      setNotification(
-                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                      );
-                    }
-                  });
-                  setOpenDeleteDialog(undefined);
-                }}
-                primary
-                color="status-critical"
-              />
-            </Box>
-          </Box>
-        </Layer>
+          <Text>
+            Sind Sie sicher, dass Sie "{openDeleteDialog.tune.title}" löschen
+            wollen?
+          </Text>
+        </ConfirmationDialog>
       )}
     </Layout>
   );
