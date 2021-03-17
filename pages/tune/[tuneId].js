@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Meter, ResponsiveContext, Text } from "grommet";
 
-import Score from "../../components/score";
+import Score from "../../components/exercise";
 
 import { connectToDatabase } from "../../lib/mongodb";
 import { ObjectId } from "mongodb";

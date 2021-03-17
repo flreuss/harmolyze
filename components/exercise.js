@@ -3,7 +3,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
 import SelectionDialog from "./riemannFunc/selectionDialog";
-import configFromFile from "./score.config.json";
+import configFromFile from "./exercise.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import {
   addClasses,
@@ -20,7 +20,7 @@ import useWindowSize from "../lib/useWindowSize";
 import createPersistedState from "use-persisted-state";
 import { getInitial, getSolution } from "../lib/solutions";
 
-export default function Score({ tune, device, onValidate }) {
+export default function Exercise({ tune, device, onValidate }) {
   //Attributes
   const ref = React.useRef();
   const defaultExercise = {
