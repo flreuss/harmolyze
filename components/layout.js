@@ -26,8 +26,8 @@ export default function Layout({ children, session, score }) {
         rows={["auto", "flex"]}
         columns={["auto", "flex"]}
         areas={[
-          { name: "header", start: [0, 0], end: [1, 0] },
-          { name: "main", start: [1, 1], end: [1, 1] },
+          ["header", "header"],
+          ["main", "main"],
         ]}
       >
         <Header gridArea="header" background="brand" pad="small">
@@ -42,7 +42,7 @@ export default function Layout({ children, session, score }) {
                 <Money />
                 <Text>{score}</Text>
               </Box>
-              <Avatar src={session.user.image} />
+              <Avatar src={session.user.image} size="medium" />
               <Anchor color="white" label={session.user._id} />
               <Button
                 size="small"
