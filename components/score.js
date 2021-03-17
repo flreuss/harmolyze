@@ -6,8 +6,10 @@ import SelectionDialog from "./riemannFunc/selectionDialog";
 import configFromFile from "./score.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import {
-  makeSimultaneousNotesArray,
+  addClasses,
+  hasClass,
   NotesVoicesArray,
+  SimultaneousNotesArray,
 } from "../lib/abcjsUtils";
 import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
@@ -25,13 +27,16 @@ export default function Score({
   //Global
   var visualObjs;
   var voicesArray;
-  //TODO: Memoized (useMemo)
+  //TODO: Memoized (useMemo), muss nur bei resize neu berechnet werden
   var simultaneousNotesArray;
   var notesHighlighted = [];
   var synthControl;
 
   //State
   const size = useWindowSize();
+  const [alreadySolved, setAlreadySolved] = useState([]);
+  const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
+
   const [abcString, setAbcString] = useState(initialAbcString);
   useEffect(() => {
     renderVisualObjs();
@@ -39,14 +44,17 @@ export default function Score({
   useLayoutEffect(() => {
     renderVisualObjs();
   }, [size, device]);
-  const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
   //Methods
   function findMistakes(solutionAbcString) {
+    //TODO: Check why this render call is necessary...
     renderVisualObjs();
-
     const solutionVoicesArray = new NotesVoicesArray(
       renderAbc("*", solutionAbcString)[0]
+    );
+
+    const initialVoicesArray = new NotesVoicesArray(
+      renderAbc("*", initialAbcString)[0]
     );
 
     let mistakes = 0;
@@ -57,31 +65,31 @@ export default function Score({
 
       if (
         solutionChord &&
-        !lowestAdjacentElemOf(
-          elem.abcelem,
-          new NotesVoicesArray(renderAbc("*", initialAbcString)[0])
-        ).abcelem.chord
+        !lowestAdjacentElemOf(elem.abcelem, initialVoicesArray).abcelem.chord
       ) {
         total += 1;
         const solutionChords = solutionChord[0].name.split("\n");
 
-        let selectionColor = "rgb(0,200,0)";
         if (!filledInChord || !solutionChords.includes(filledInChord[0].name)) {
-          selectionColor = "rgb(200,0,0)";
           mistakes += 1;
+          highlightAdjacentNotesOf(elem.abcelem, "rgb(200,0,0)", true);
+        } else if (!hasClass(elem, "abcjs-solved")) {
+          setAlreadySolved((alreadySolvedPos) =>
+            alreadySolvedPos.concat(simultaneousNotesArray.get(elem.counters))
+          );
+          adjacentElemsOf(elem.abcelem, voicesArray).forEach((elem) => {
+            addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+          });
         }
-
-        highlightAdjacentNotesOf(elem.abcelem, selectionColor, true);
       }
     });
 
     onValidate(mistakes, (total - mistakes) / total);
+    console.log(alreadySolved);
   }
 
   function adjacentElemsOf(abcelem, voicesArray) {
-    const adjacent = simultaneousNotesArray.get(
-      JSON.stringify(abcelem.abselem.counters)
-    );
+    const adjacent = simultaneousNotesArray.get(abcelem.abselem.counters);
     return adjacent.map((pos) => voicesArray.getElem(pos));
   }
 
@@ -150,21 +158,7 @@ export default function Score({
       new NotesVoicesArray(visualObjs[0])
     ).abcelem;
 
-    if (
-      lowestAdjacentElemOf(
-        abcelem,
-        new NotesVoicesArray(renderAbc("*", initialAbcString)[0])
-      ).abcelem.chord ||
-      !lowestAdjacentElemOf(
-        abcelem,
-        new NotesVoicesArray(renderAbc("*", solutionAbcString)[0])
-      ).abcelem.chord
-    ) {
-      highlightAdjacentNotesOf(
-        abcelem,
-        getComputedStyle(document.querySelector(".abcjs-given")).fill
-      );
-    } else if (!abcelem.rest) {
+    if (!abcelem.rest && !hasClass(abcelem.abselem, "abcjs-disabled")) {
       highlightAdjacentNotesOf(abcelem, configFromFile.selectionColor);
       setOpenSelectionDialog({
         onClose: (riemannFunc) =>
@@ -201,7 +195,7 @@ export default function Score({
 
     visualObjs = renderAbc("scoreContainer", abcString, config);
     voicesArray = new NotesVoicesArray(visualObjs[0]);
-    simultaneousNotesArray = makeSimultaneousNotesArray(voicesArray);
+    simultaneousNotesArray = new SimultaneousNotesArray(voicesArray);
 
     const solutionVoicesArray = new NotesVoicesArray(
       renderAbc("*", solutionAbcString)[0]
@@ -210,19 +204,15 @@ export default function Score({
       renderAbc("*", initialAbcString)[0]
     );
 
-    voicesArray.forEachElem((elem) => {
+    voicesArray.forEachElem((elem, pos) => {
       if (
         !lowestAdjacentElemOf(elem.abcelem, solutionVoicesArray).abcelem
           .chord ||
         lowestAdjacentElemOf(elem.abcelem, initialVoicesArray).abcelem.chord
       ) {
-        const last = elem.elemset.length - 1;
-        elem.elemset[last].classList.add("abcjs-given");
-        if (elem.abcelem.chord) {
-          elem.children[elem.children.length - 1].graphelem.classList.add(
-            "abcjs-given"
-          );
-        }
+        addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
+      } else if (alreadySolved.some((solvedPos) => solvedPos.equals(pos))) {
+        addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
       }
     });
 
