@@ -3,7 +3,6 @@ import { Box, Meter, ResponsiveContext, Text } from "grommet";
 
 import Score from "../../components/score";
 
-import { getInitial, getSolution } from "../../lib/solutions";
 import { connectToDatabase } from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import Layout from "../../components/layout";
@@ -35,7 +34,11 @@ export default function Tune({ tune, session }) {
   return (
     <Layout
       status={
-        <Box direction="row" gap="medium" pad={{ horizontal: "medium", vertical: "small" }}>
+        <Box
+          direction="row"
+          gap="medium"
+          pad={{ horizontal: "medium", vertical: "small" }}
+        >
           <Box direction="row" gap="xsmall">
             <StatusCritical />
             <Text>{attempt.mistakes}</Text>
@@ -63,9 +66,8 @@ export default function Tune({ tune, session }) {
         <ResponsiveContext.Consumer>
           {(device) => (
             <Score
-              initialAbcString={getInitial(tune.abc)}
+              tune={tune}
               device={device}
-              solutionAbcString={getSolution(tune.abc)}
               onValidate={(newMistakes, progress) => {
                 if (newMistakes > 0) {
                   setAttempt((attempt) => ({

@@ -20,6 +20,7 @@
     "react-dom": "17.0.1",
     "styled-components": "^5.2.1",
     "tinycolor2": "^1.4.2",
+    "use-persisted-state": "^0.3.3",
     "xml2abc": "https://wim.vree.org/js/xml2abc.tgz"
   },
   "devDependencies": {

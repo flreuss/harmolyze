@@ -17,15 +17,16 @@ import {
 import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
+import createPersistedState from "use-persisted-state";
+import { getInitial, getSolution } from "../lib/solutions";
 
-export default function Score({
-  initialAbcString,
-  solutionAbcString,
-  device,
-  onValidate,
-}) {
+export default function Score({ tune, device, onValidate }) {
   //Attributes
   const ref = React.useRef();
+  const defaultExercise = {
+    abc: getInitial(tune.abc),
+    alreadySolved: [],
+  };
 
   //Global
   var visualObjs;
@@ -37,13 +38,14 @@ export default function Score({
 
   //State
   const size = useWindowSize();
-  const [alreadySolved, setAlreadySolved] = useState([]);
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
-  const [abcString, setAbcString] = useState(initialAbcString);
+  const useExercise = createPersistedState(tune._id.toString());
+  const [exercise, setExercise] = useExercise(defaultExercise);
+
   useEffect(() => {
     renderVisualObjs();
-  }, [initialAbcString, solutionAbcString, abcString]);
+  }, [tune, exercise.abc]);
   useLayoutEffect(() => {
     renderVisualObjs();
   }, [size, device]);
@@ -57,7 +59,7 @@ export default function Score({
     );
 
     const initialVoicesArray = new NotesVoicesArray(
-      renderAbc("*", initialAbcString)[0]
+      renderAbc("*", getInitial(tune.abc))[0]
     );
 
     let mistakes = 0;
@@ -81,9 +83,12 @@ export default function Score({
             }
           );
         } else if (!hasClass(elem, "abcjs-solved")) {
-          setAlreadySolved((alreadySolvedPos) =>
-            alreadySolvedPos.concat(simultaneousNotesArray.get(elem.counters))
-          );
+          setExercise((exercise) => ({
+            ...exercise,
+            alreadySolved: exercise.alreadySolved.concat(
+              simultaneousNotesArray.get(elem.counters)
+            ),
+          }));
           adjacentElemsOf(elem, voicesArray, simultaneousNotesArray).forEach(
             (elem) => {
               addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
@@ -94,7 +99,10 @@ export default function Score({
     });
 
     onValidate(mistakes, (total - mistakes) / total);
-    console.log(alreadySolved);
+
+    if (mistakes === 0) {
+      setExercise(defaultExercise);
+    }
   }
 
   //Event handlers
@@ -103,16 +111,20 @@ export default function Score({
       if (synthControl) synthControl.pause();
 
       if (!abcelem.chord) {
-        setAbcString(insert(abcString, `"_${riemannFunc}"`, abcelem.startChar));
+        setExercise((exercise) => ({
+          ...exercise,
+          abc: insert(exercise.abc, `"_${riemannFunc}"`, abcelem.startChar),
+        }));
       } else if (riemannFunc.toString() !== abcelem.chord[0].name) {
-        setAbcString(
-          replace(
-            abcString,
+        setExercise((exercise) => ({
+          ...exercise,
+          abc: replace(
+            exercise.abc,
             `"_${riemannFunc}"`,
             abcelem.startChar,
             abcelem.chord[0].name.length + 3
-          )
-        );
+          ),
+        }));
       } else {
         unhighlight(notesHighlighted);
       }
@@ -177,15 +189,15 @@ export default function Score({
         config.staffwidth = size.width / 2.5;
     }
 
-    visualObjs = renderAbc("scoreContainer", abcString, config);
+    visualObjs = renderAbc("scoreContainer", exercise.abc, config);
     voicesArray = new NotesVoicesArray(visualObjs[0]);
     simultaneousNotesArray = new SimultaneousNotesArray(voicesArray);
 
     const solutionVoicesArray = new NotesVoicesArray(
-      renderAbc("*", solutionAbcString)[0]
+      renderAbc("*", getSolution(tune.abc))[0]
     );
     const initialVoicesArray = new NotesVoicesArray(
-      renderAbc("*", initialAbcString)[0]
+      renderAbc("*", getInitial(tune.abc))[0]
     );
 
     voicesArray.forEachElem((elem, pos) => {
@@ -194,7 +206,9 @@ export default function Score({
         chordOf(elem, initialVoicesArray, simultaneousNotesArray)
       ) {
         addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
-      } else if (alreadySolved.some((solvedPos) => solvedPos.equals(pos))) {
+      } else if (
+        exercise.alreadySolved.some((solvedPos) => pos.equals(solvedPos))
+      ) {
         addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
       }
     });
@@ -275,7 +289,7 @@ export default function Score({
         }
         onClick={() => {
           if (synthControl) synthControl.pause();
-          findMistakes(solutionAbcString);
+          findMistakes(getSolution(tune.abc));
         }}
         primary
       />
