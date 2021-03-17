@@ -7,18 +7,17 @@ import {
   Main,
   Nav,
   Avatar,
-  Anchor,
-  Text,
+  Menu,
 } from "grommet";
-import { Home, Logout, Money } from "grommet-icons";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
 import { signOut } from "next-auth/client";
+import { Home } from "grommet-icons";
 
 const customTheme = deepMerge(grommet, {});
 
-export default function Layout({ children, session, score }) {
+export default function Layout({ children, user, status, homeIcon }) {
   return (
     <Grommet full theme={customTheme}>
       <Grid
@@ -33,25 +32,29 @@ export default function Layout({ children, session, score }) {
         <Header gridArea="header" background="brand" pad="small">
           <Nav gap="small" direction="row">
             <Link href="/" passHref>
-              <Button size="small" hoverIndicator icon={<Home />} />
+              <Button size="small" hoverIndicator icon={homeIcon || <Home />} />
             </Link>
           </Nav>
-          {session && (
-            <Box direction="row" align="center" gap="small">
-              <Box direction="row" gap="xsmall">
-                <Money />
-                <Text>{score}</Text>
-              </Box>
-              <Avatar src={session.user.image} size="medium" />
-              <Anchor color="white" label={session.user._id} />
-              <Button
-                size="small"
-                hoverIndicator
-                icon={<Logout />}
-                onClick={() => signOut()}
+
+          <Box direction="row" align="center" gap="medium">
+            {status}
+            {user && (
+              <Menu
+                label={<Avatar src={user.image} size="small" />}
+                dropProps={{
+                  align: { top: "bottom", right: "right" },
+                }}
+                items={[
+                  {
+                    label: "Ausloggen",
+                    onClick: () => {
+                      signOut();
+                    },
+                  },
+                ]}
               />
-            </Box>
-          )}
+            )}
+          </Box>
         </Header>
         <Main gridArea="main">{children}</Main>
       </Grid>

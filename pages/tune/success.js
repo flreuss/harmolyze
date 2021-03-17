@@ -1,5 +1,5 @@
-import { Box, Button, Text } from "grommet";
-import { Home } from "grommet-icons";
+import { Box, Button, Heading, Text } from "grommet";
+import { Clock, Home, StatusCritical } from "grommet-icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Layout from "../../components/layout";
@@ -17,13 +17,29 @@ export default function Success(props) {
         justify="center"
         gap="medium"
       >
-        <Text size="xlarge">Name: {router.query.tune_title}</Text>
-        <Text size="large">Mistakes: {router.query.mistakes}</Text>
-        <Text size="large">
-          Time: {millisToMinutesAndSeconds(router.query.time)}
-        </Text>
+        <Heading textAlign="center">GESCHAFFT!</Heading>
+        <Heading textAlign="center">{router.query.tune_title}</Heading>
+        <Box
+          direction="row"
+          gap="medium"
+          pad={{ horizontal: "medium", vertical: "small" }}
+        >
+          <Box direction="row" gap="xsmall">
+            <StatusCritical />
+            <Text>{router.query.mistakes}</Text>
+          </Box>
+          <Box direction="row" gap="xsmall">
+            <Clock />
+            <Text>{millisToMinutesAndSeconds(router.query.time)}</Text>
+          </Box>
+        </Box>
         <Link href="/" passHref>
-          <Button size="small" hoverIndicator label="Zurück zum Start" icon={<Home />} />
+          <Button
+            size="small"
+            hoverIndicator
+            label="Zurück zum Start"
+            icon={<Home />}
+          />
         </Link>
       </Box>
     </Layout>

@@ -30,9 +30,9 @@ export default function CreateTune({ tunebooks, session }) {
   const [value, setValue] = useState(defaultValue);
 
   return (
-    <Layout>
-      <Box fill align="center" justify="center" gap="large">
-        <Heading margin="none">Neue Übungsaufgabe anlegen</Heading>
+    <Layout session={session}>
+      <Box fill align="center" justify="center" gap="large" pad="medium">
+        <Heading textAlign="center" margin="none">Neue Übungsaufgabe anlegen</Heading>
 
         <Box width="medium">
           <Form

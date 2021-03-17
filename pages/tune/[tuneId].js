@@ -10,6 +10,7 @@ import Layout from "../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
+import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
 
 export default function Tune({ tune, session }) {
   const [time, setTime] = useState(0);
@@ -32,16 +33,27 @@ export default function Tune({ tune, session }) {
   }, [time]);
 
   return (
-    <Layout session={session} score={router.query.score || ""}>
+    <Layout
+      status={
+        <Box direction="row" gap="medium" pad={{ horizontal: "medium", vertical: "small" }}>
+          <Box direction="row" gap="xsmall">
+            <StatusCritical />
+            <Text>{attempt.mistakes}</Text>
+          </Box>
+          <Box direction="row" gap="xsmall">
+            <Clock />
+            <Text>{millisToMinutesAndSeconds(time)}</Text>
+          </Box>
+        </Box>
+      }
+      homeIcon={<LinkPrevious />}
+    >
       <Meter
         value={Math.floor(attempt.progress * 100)}
         max={100}
         size="full"
         thickness="small"
       />
-      <Box pad="medium" direction="row" justify="end">
-        <Text>{millisToMinutesAndSeconds(time)}</Text>
-      </Box>
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill

@@ -39,7 +39,15 @@ export default function Home({ tunebooks, session, score }) {
   });
 
   return (
-    <Layout session={session} score={score}>
+    <Layout
+      user={session.user}
+      status={
+        <Box direction="row" gap="xsmall">
+          <Money />
+          <Text>{score}</Text>
+        </Box>
+      }
+    >
       <Meter
         value={
           tunebooks
@@ -108,6 +116,7 @@ export default function Home({ tunebooks, session, score }) {
                       {(tune.createdBy === session.user._id ||
                         session.user.isAdmin) && (
                         <Button
+                          size="small"
                           hoverIndicator
                           icon={<Trash color="status-critical" />}
                           onClick={() => {

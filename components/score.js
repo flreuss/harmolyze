@@ -25,6 +25,7 @@ export default function Score({
   //Global
   var visualObjs;
   var voicesArray;
+  //TODO: Memoized (useMemo)
   var simultaneousNotesArray;
   var notesHighlighted = [];
   var synthControl;
@@ -280,7 +281,7 @@ export default function Score({
 
   return (
     <Box fill align="center" justify="center" gap="none" ref={ref}>
-      <div id="scoreContainer" />
+      <Box id="scoreContainer" />
       <Box
         pad={{
           horizontal: "large",
@@ -293,6 +294,7 @@ export default function Score({
       <Button
         pad="medium"
         type="submit"
+        margin="medium"
         label={
           <Text color="white">
             <strong>Überprüfen</strong>
