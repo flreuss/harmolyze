@@ -30,6 +30,10 @@ body {
   fill: gray;
 }
 
+.abcjs-mistake {
+  fill: red;
+}
+
 .abcjs-disabled:hover {
   cursor: default;
 }

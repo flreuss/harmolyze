@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Box, Text } from "grommet";
 import {
-  colorToRgbObj,
   convertObjToString,
   produceRgbShade,
 } from "../lib/tinycolorUtils";
