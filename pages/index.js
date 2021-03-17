@@ -21,14 +21,17 @@ import { Add, Clock, Money, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
 import { synth } from "abcjs";
 import ConfirmationDialog from "../components/confirmationDialog";
-import {millisToMinutesAndSeconds} from "../lib/stringUtils"
+import { millisToMinutesAndSeconds } from "../lib/stringUtils";
 
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
   const [notification, setNotification] = useState(undefined);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
-  //TODO: So setzen, dass initial das erste tunebook geöffnet ist, bei dem sich noch ein ungelöster Tune befindet. Wenn es keines gibt, wird der default Wert auf undefined gesetzt
-  const [activeIndex, setActiveIndex] = useState([0]);
+  const [activeIndex, setActiveIndex] = useState([
+    tunebooks.findIndex((tunebook) =>
+      tunebook.tunes.some((tune) => !tune.highscore)
+    ),
+  ]);
 
   useEffect(() => {
     const ctx = synth.activeAudioContext();
@@ -102,16 +105,16 @@ export default function Home({ tunebooks, session, score }) {
                           )}
                         </CardFooter>
                       </AnimatedCard>
-                      {((tune.createdBy === session.user._id ||
+                      {(tune.createdBy === session.user._id ||
                         session.user.isAdmin) && (
-                          <Button
-                            hoverIndicator
-                            icon={<Trash color="status-critical" />}
-                            onClick={() => {
-                              setOpenDeleteDialog({ tune });
-                            }}
-                          />
-                        ))}
+                        <Button
+                          hoverIndicator
+                          icon={<Trash color="status-critical" />}
+                          onClick={() => {
+                            setOpenDeleteDialog({ tune });
+                          }}
+                        />
+                      )}
                     </Stack>
                   ))}
                 </Grid>
