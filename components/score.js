@@ -11,7 +11,7 @@ import {
   NotesVoicesArray,
   SimultaneousNotesArray,
   adjacentElemsOf,
-  lowestAdjacentElemOf,
+  chordOf,
   unhighlight,
 } from "../lib/abcjsUtils";
 import { insert, replace } from "../lib/stringUtils";
@@ -68,35 +68,27 @@ export default function Score({
 
       if (
         solutionChord &&
-        !lowestAdjacentElemOf(
-          elem.abcelem,
-          initialVoicesArray,
-          simultaneousNotesArray
-        ).abcelem.chord
+        !chordOf(elem, initialVoicesArray, simultaneousNotesArray)
       ) {
         total += 1;
         const solutionChords = solutionChord[0].name.split("\n");
 
         if (!filledInChord || !solutionChords.includes(filledInChord[0].name)) {
           mistakes += 1;
-          adjacentElemsOf(
-            elem.abcelem,
-            voicesArray,
-            simultaneousNotesArray
-          ).forEach((elem) => {
-            addClasses(elem, ["abcjs-mistake"]);
-          });
+          adjacentElemsOf(elem, voicesArray, simultaneousNotesArray).forEach(
+            (elem) => {
+              addClasses(elem, ["abcjs-mistake"]);
+            }
+          );
         } else if (!hasClass(elem, "abcjs-solved")) {
           setAlreadySolved((alreadySolvedPos) =>
             alreadySolvedPos.concat(simultaneousNotesArray.get(elem.counters))
           );
-          adjacentElemsOf(
-            elem.abcelem,
-            voicesArray,
-            simultaneousNotesArray
-          ).forEach((elem) => {
-            addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
-          });
+          adjacentElemsOf(elem, voicesArray, simultaneousNotesArray).forEach(
+            (elem) => {
+              addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+            }
+          );
         }
       }
     });
@@ -138,20 +130,20 @@ export default function Score({
     _drag,
     _mouseEvent
   ) {
-    const lowestAdjacentNote = lowestAdjacentElemOf(
-      abcelem,
-      new NotesVoicesArray(visualObjs[0]),
-      simultaneousNotesArray
-    ).abcelem;
-
     if (!abcelem.rest && !hasClass(abcelem.abselem, "abcjs-disabled")) {
-      unhighlight(notesHighlighted);
-      adjacentElemsOf(abcelem, voicesArray, simultaneousNotesArray).forEach(
-        (elem) => {
-          elem.highlight(undefined, configFromFile.selectionColor);
-          notesHighlighted.push(elem);
-        }
+      const adjacentElems = adjacentElemsOf(
+        abcelem.abselem,
+        voicesArray,
+        simultaneousNotesArray
       );
+      const lowestAdjacentNote =
+        adjacentElems[adjacentElems.length - 1].abcelem;
+
+      unhighlight(notesHighlighted);
+      adjacentElems.forEach((elem) => {
+        elem.highlight(undefined, configFromFile.selectionColor);
+        notesHighlighted.push(elem);
+      });
       setOpenSelectionDialog({
         onClose: (riemannFunc) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFunc),
@@ -198,16 +190,8 @@ export default function Score({
 
     voicesArray.forEachElem((elem, pos) => {
       if (
-        !lowestAdjacentElemOf(
-          elem.abcelem,
-          solutionVoicesArray,
-          simultaneousNotesArray
-        ).abcelem.chord ||
-        lowestAdjacentElemOf(
-          elem.abcelem,
-          initialVoicesArray,
-          simultaneousNotesArray
-        ).abcelem.chord
+        !chordOf(elem, solutionVoicesArray, simultaneousNotesArray) ||
+        chordOf(elem, initialVoicesArray, simultaneousNotesArray)
       ) {
         addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
       } else if (alreadySolved.some((solvedPos) => solvedPos.equals(pos))) {

@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text } from "grommet";
+import { Box, Button, Heading, Image, Text, Tip } from "grommet";
 import { Clock, Home, StatusCritical } from "grommet-icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,22 +16,36 @@ export default function Success(props) {
         align="center"
         justify="center"
         gap="medium"
+        pad="medium"
       >
-        <Heading textAlign="center">GESCHAFFT!</Heading>
-        <Heading textAlign="center">{router.query.tune_title}</Heading>
+        <Heading textAlign="center" level={1}>
+          GLÜCKWUNSCH!
+        </Heading>
+        <Image
+          src="https://media.giphy.com/media/Q81NcsY6YxK7jxnr4v/giphy.gif"
+          fit="cover"
+          pad="medium"
+        />
+        <Heading textAlign="center" level={2}>
+          Du hast "{router.query.tune_title}" gelöst.
+        </Heading>
         <Box
           direction="row"
           gap="medium"
           pad={{ horizontal: "medium", vertical: "small" }}
         >
-          <Box direction="row" gap="xsmall">
-            <StatusCritical />
-            <Text>{router.query.mistakes}</Text>
-          </Box>
-          <Box direction="row" gap="xsmall">
-            <Clock />
-            <Text>{millisToMinutesAndSeconds(router.query.time)}</Text>
-          </Box>
+          <Tip content="Fehler">
+            <Box direction="row" gap="xsmall">
+              <StatusCritical />
+              <Text>{router.query.mistakes}</Text>
+            </Box>
+          </Tip>
+          <Tip content="Benötigte Zeit">
+            <Box direction="row" gap="xsmall">
+              <Clock />
+              <Text>{millisToMinutesAndSeconds(router.query.time)}</Text>
+            </Box>
+          </Tip>
         </Box>
         <Link href="/" passHref>
           <Button
