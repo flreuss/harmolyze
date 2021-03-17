@@ -128,12 +128,15 @@ function calculatePoints(tune) {
   solutionVoicesArray.forEachElem((elem, elemPos) => {
     const initialElem = initialVoicesArray.getElem(elemPos);
     if (elem.abcelem.chord && !initialElem.abcelem.chord) {
-      const riemannFunc = RiemannFunc.fromString(
-        //TODO: ignoriert wenn es mehrere Lösungsmöglichkeiten gibt --> dann soll die leichteste genommen werden
-        elem.abcelem.chord[0].name,
-        keySignature.mode
+      points += Math.min(
+        elem.abcelem.chord.map((chord) => {
+          const riemannFunc = RiemannFunc.fromString(
+            chord.name,
+            keySignature.mode
+          );
+          return riemannFunc.baseFunc.type.points;
+        })
       );
-      points += riemannFunc.baseFunc.type.points;
     }
   });
 
