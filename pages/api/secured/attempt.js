@@ -17,15 +17,15 @@ export default async (req, res) => {
       case "POST":
         try {
           const { db } = await connectToDatabase();
-          const attempts = await db
-            .collection("attempts")
+          const successfulAttempts = await db
+            .collection("successfulAttempts")
             .insertOne(newAttempt);
           db.collection("users").updateOne(
             { _id: newAttempt.user_id },
-            { $push: { attempts: ObjectId(attempts.insertedId) } }
+            { $push: { successfulAttempts: ObjectId(successfulAttempts.insertedId) } }
           );
           //201 Created
-          res.status(201).json(attempts.ops[0]);
+          res.status(201).json(successfulAttempts.ops[0]);
         } catch (err) {
           //500 Internal Server Error
           console.error(err);
