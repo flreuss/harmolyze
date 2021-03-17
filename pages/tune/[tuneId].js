@@ -11,10 +11,7 @@ import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
 
-export default function Tune({
-  tune,
-  session,
-}) {
+export default function Tune({ tune, session }) {
   const [time, setTime] = useState(0);
   const [attempt, setAttempt] = useState({
     startedAt: new Date(),
@@ -114,7 +111,7 @@ export async function getServerSideProps(context) {
       {
         _id: ObjectId(context.params.tuneId),
       },
-      { projection: {_id: { $toString: "$tune._id" }, abc: 1, title: 1 } }
+      { projection: { _id: { $toString: "$_id" }, abc: 1, title: 1 } }
     );
 
     return {
