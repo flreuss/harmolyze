@@ -17,6 +17,7 @@ import { renderAbc } from "abcjs";
 import { getSolution, getInitial } from "../../lib/solutions";
 import { NotesVoicesArray } from "../../lib/abcjsUtils";
 import RiemannFunc from "../../lib/riemannFunc";
+import { LinkPrevious } from "grommet-icons";
 
 export default function CreateTune({ tunebooks, session }) {
   const defaultValue = {
@@ -30,7 +31,7 @@ export default function CreateTune({ tunebooks, session }) {
   const [value, setValue] = useState(defaultValue);
 
   return (
-    <Layout session={session}>
+    <Layout user={session.user}>
       <Box fill align="center" justify="center" gap="large" pad="medium">
         <Heading textAlign="center" margin="none">Neue Übungsaufgabe anlegen</Heading>
 

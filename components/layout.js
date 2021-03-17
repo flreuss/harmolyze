@@ -46,7 +46,7 @@ export default function Layout({ children, user, status, homeIcon }) {
                 }}
                 items={[
                   {
-                    label: "Ausloggen",
+                    label: "Abmelden",
                     onClick: () => {
                       signOut();
                     },

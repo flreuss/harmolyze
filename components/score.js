@@ -12,6 +12,7 @@ import {
 import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
+import styles from "../styles/Score.module.css";
 
 export default function Score({
   initialAbcString,
@@ -182,7 +183,7 @@ export default function Score({
 
   //Rendering
   function renderVisualObjs() {
-    console.log("Rendering VisualObjs...")
+    console.log("Rendering VisualObjs...");
     let config = configFromFile;
     config.clickListener = handleClick;
     switch (device) {
