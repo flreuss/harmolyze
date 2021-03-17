@@ -12,9 +12,7 @@ import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
 
 export default function Tune({
-  initialAbcString,
-  solutionAbcString,
-  tuneId,
+  tune,
   session,
 }) {
   const [time, setTime] = useState(0);
@@ -24,7 +22,7 @@ export default function Tune({
     progress: 0,
     mistakes: 0,
     user_id: session.user._id,
-    tune_id: tuneId,
+    tune_id: tune._id,
   });
   const router = useRouter();
 
@@ -56,9 +54,9 @@ export default function Tune({
         <ResponsiveContext.Consumer>
           {(device) => (
             <Score
-              initialAbcString={initialAbcString}
+              initialAbcString={getInitial(tune.abc)}
               device={device}
-              solutionAbcString={solutionAbcString}
+              solutionAbcString={getSolution(tune.abc)}
               onValidate={(newMistakes, progress) => {
                 if (newMistakes > 0) {
                   setAttempt((attempt) => ({
@@ -70,10 +68,10 @@ export default function Tune({
                   let newAttempt = attempt;
                   newAttempt.completedAt = new Date();
                   newAttempt.progress = 1;
-                  createAttempt(
-                    newAttempt,
-                    //TODO: Show attemptResume page
-                    () => router.push("/")
+                  createAttempt(newAttempt, () =>
+                    router.push(
+                      `/tune/success?tune_title=${tune.title}&mistakes=${attempt.mistakes}&time=${time}`
+                    )
                   );
                 }
               }}
@@ -116,14 +114,12 @@ export async function getServerSideProps(context) {
       {
         _id: ObjectId(context.params.tuneId),
       },
-      { projection: { abc: 1 } }
+      { projection: {_id: { $toString: "$tune._id" }, abc: 1, title: 1 } }
     );
 
     return {
       props: {
-        initialAbcString: getInitial(tune.abc),
-        solutionAbcString: getSolution(tune.abc),
-        tuneId: context.params.tuneId,
+        tune,
         session,
       },
     };
