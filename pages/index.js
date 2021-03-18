@@ -34,11 +34,6 @@ export default function Home({ tunebooks, session, score }) {
     ),
   ]);
 
-  useEffect(() => {
-    const ctx = synth.activeAudioContext();
-    if (ctx && ctx.state === "running") ctx.close();
-  });
-
   return (
     <Layout
       loading={loading}
@@ -250,7 +245,7 @@ export async function getServerSideProps(context) {
                 $group: {
                   _id: null,
                   mistakes: { $min: "$mistakes" },
-                  time: { $min: { $subtract: ["$completedAt", "$startedAt"] } },
+                  time: { $min: "$time" },
                 },
               },
             ],

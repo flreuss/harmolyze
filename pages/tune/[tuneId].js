@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Meter, ResponsiveContext, Text } from "grommet";
 
-import Score from "../../components/exercise";
+import Exercise from "../../components/exercise";
 
 import { connectToDatabase } from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -10,24 +10,40 @@ import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
 import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
+import createPersistedState from "use-persisted-state";
+import { getInitial, getSolution } from "../../lib/solutions";
 
 export default function Tune({ tune, session }) {
-  const [time, setTime] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [attempt, setAttempt] = useState({
-    startedAt: new Date(),
-    completedAt: undefined,
+  const defaultAttempt = {
     progress: 0,
     mistakes: 0,
     user_id: session.user._id,
     tune_id: tune._id,
-  });
+    abc: getInitial(tune.abc),
+    solved: [],
+    showMistakes: false,
+  };
+
+  const useTime = createPersistedState(
+    `user_${session.user._id}_tune_${tune._id}_time`
+  );
+  const [time, setTime] = useTime(0);
+  const resetTime = () => setTime(0);
+
+  const [loading, setLoading] = useState(false);
+
+  const useAttempt = createPersistedState(
+    `user_${session.user._id}_tune_${tune._id}_attempt`
+  );
+  const [attempt, setAttempt] = useAttempt(defaultAttempt);
+  const resetAttempt = () => setAttempt(defaultAttempt);
+
   const router = useRouter();
 
   useEffect(() => {
     let interval = null;
     interval = setInterval(() => {
-      setTime((millis) => millis + 1000);
+      setTime(time + 1000);
     }, 1000);
     return () => clearInterval(interval);
   }, [time]);
@@ -67,24 +83,41 @@ export default function Tune({ tune, session }) {
       >
         <ResponsiveContext.Consumer>
           {(device) => (
-            <Score
-              tune={tune}
+            <Exercise
+              abc={attempt.abc}
+              initial={getInitial(tune.abc)}
+              solution={getSolution(tune.abc)}
+              showMistakes={attempt.showMistakes}
+              solved={attempt.solved}
               device={device}
-              onValidate={(newMistakes, progress) => {
-                if (newMistakes > 0) {
+              onChange={(newAbc) => {
+                setAttempt((attempt) => ({
+                  ...attempt,
+                  abc: newAbc,
+                  showMistakes: false,
+                }));
+              }}
+              onValidate={(nextMistakes, nextSolved, nextSolvedArray) => {
+                if (nextMistakes > 0) {
                   setAttempt((attempt) => ({
                     ...attempt,
-                    mistakes: attempt.mistakes + newMistakes,
-                    progress,
+                    showMistakes: true,
+                    mistakes: attempt.mistakes + nextMistakes,
+                    progress: nextSolved / (nextMistakes + nextSolved),
+                    solved: attempt.solved.concat(nextSolvedArray),
                   }));
                 } else {
-                  let newAttempt = attempt;
-                  newAttempt.completedAt = new Date();
-                  newAttempt.progress = 1;
                   setLoading(true);
-                  createAttempt(newAttempt, () =>
+                  const successfulAttempt = {
+                    ...attempt,
+                    progress: 1,
+                    time: time,
+                  };
+                  resetAttempt();
+                  resetTime();
+                  createAttempt(successfulAttempt, () =>
                     router.push(
-                      `/tune/success?tune_title=${tune.title}&mistakes=${attempt.mistakes}&time=${time}`
+                      `/tune/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
                     )
                   );
                 }
@@ -98,7 +131,7 @@ export default function Tune({ tune, session }) {
 }
 
 function createAttempt(attempt, onSuccess) {
-  fetch("/api/secured/attempt", {
+  fetch("/api/secured/successfulAttempt", {
     method: "POST",
     body: JSON.stringify(attempt),
     headers: {

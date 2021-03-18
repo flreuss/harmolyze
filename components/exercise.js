@@ -17,16 +17,20 @@ import {
 import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
-import createPersistedState from "use-persisted-state";
 import { getInitial, getSolution } from "../lib/solutions";
 
-export default function Exercise({ tune, device, onValidate }) {
+export default function Exercise({
+  abc,
+  initial,
+  solution,
+  solved,
+  showMistakes,
+  device,
+  onValidate,
+  onChange,
+}) {
   //Attributes
   const ref = React.useRef();
-  const defaultExercise = {
-    abc: getInitial(tune.abc),
-    alreadySolved: [],
-  };
 
   //Global
   var visualObjs;
@@ -40,12 +44,13 @@ export default function Exercise({ tune, device, onValidate }) {
   const size = useWindowSize();
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
-  const useExercise = createPersistedState(tune._id.toString());
-  const [exercise, setExercise] = useExercise(defaultExercise);
-
   useEffect(() => {
     renderVisualObjs();
-  }, [tune, exercise.abc]);
+    return () => {
+      if (synthControl) synthControl.pause();
+      synth.activeAudioContext().close();
+    };
+  }, [abc, solved]);
   useLayoutEffect(() => {
     renderVisualObjs();
   }, [size, device]);
@@ -58,12 +63,11 @@ export default function Exercise({ tune, device, onValidate }) {
       renderAbc("*", solutionAbcString)[0]
     );
 
-    const initialVoicesArray = new NotesVoicesArray(
-      renderAbc("*", getInitial(tune.abc))[0]
-    );
+    const initialVoicesArray = new NotesVoicesArray(renderAbc("*", initial)[0]);
 
     let mistakes = 0;
-    let total = 0;
+    let solvedCount = 0;
+    let solvedArray = [];
     voicesArray.forEachElem((elem, pos) => {
       const filledInChord = elem.abcelem.chord;
       const solutionChord = solutionVoicesArray.getElem(pos).abcelem.chord;
@@ -72,7 +76,6 @@ export default function Exercise({ tune, device, onValidate }) {
         solutionChord &&
         !chordOf(elem, initialVoicesArray, simultaneousNotesArray)
       ) {
-        total += 1;
         const solutionChords = solutionChord[0].name.split("\n");
 
         if (!filledInChord || !solutionChords.includes(filledInChord[0].name)) {
@@ -83,48 +86,31 @@ export default function Exercise({ tune, device, onValidate }) {
             }
           );
         } else if (!hasClass(elem, "abcjs-solved")) {
-          setExercise((exercise) => ({
-            ...exercise,
-            alreadySolved: exercise.alreadySolved.concat(
-              simultaneousNotesArray.get(elem.counters)
-            ),
-          }));
-          adjacentElemsOf(elem, voicesArray, simultaneousNotesArray).forEach(
-            (elem) => {
-              addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
-            }
+          solvedCount += 1;
+          solvedArray = solvedArray.concat(
+            simultaneousNotesArray.get(elem.counters)
           );
         }
       }
     });
 
-    onValidate(mistakes, (total - mistakes) / total);
-
-    if (mistakes === 0) {
-      setExercise(defaultExercise);
-    }
+    onValidate(mistakes, solvedCount, solvedArray);
   }
 
   //Event handlers
   function handleSelectionDialogClose(abcelem, riemannFunc) {
     if (riemannFunc) {
-      if (synthControl) synthControl.pause();
-
       if (!abcelem.chord) {
-        setExercise((exercise) => ({
-          ...exercise,
-          abc: insert(exercise.abc, `"_${riemannFunc}"`, abcelem.startChar),
-        }));
+        onChange(insert(abc, `"_${riemannFunc}"`, abcelem.startChar));
       } else if (riemannFunc.toString() !== abcelem.chord[0].name) {
-        setExercise((exercise) => ({
-          ...exercise,
-          abc: replace(
-            exercise.abc,
+        onChange(
+          replace(
+            abc,
             `"_${riemannFunc}"`,
             abcelem.startChar,
             abcelem.chord[0].name.length + 3
-          ),
-        }));
+          )
+        );
       } else {
         unhighlight(notesHighlighted);
       }
@@ -189,16 +175,14 @@ export default function Exercise({ tune, device, onValidate }) {
         config.staffwidth = size.width / 2.5;
     }
 
-    visualObjs = renderAbc("scoreContainer", exercise.abc, config);
+    visualObjs = renderAbc("scoreContainer", abc, config);
     voicesArray = new NotesVoicesArray(visualObjs[0]);
     simultaneousNotesArray = new SimultaneousNotesArray(voicesArray);
 
     const solutionVoicesArray = new NotesVoicesArray(
-      renderAbc("*", getSolution(tune.abc))[0]
+      renderAbc("*", solution)[0]
     );
-    const initialVoicesArray = new NotesVoicesArray(
-      renderAbc("*", getInitial(tune.abc))[0]
-    );
+    const initialVoicesArray = new NotesVoicesArray(renderAbc("*", initial)[0]);
 
     voicesArray.forEachElem((elem, pos) => {
       if (
@@ -206,10 +190,11 @@ export default function Exercise({ tune, device, onValidate }) {
         chordOf(elem, initialVoicesArray, simultaneousNotesArray)
       ) {
         addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
-      } else if (
-        exercise.alreadySolved.some((solvedPos) => pos.equals(solvedPos))
-      ) {
+      } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
         addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+      } else if (showMistakes) {
+        elem.highlight(undefined, "red");
+        notesHighlighted.push(elem);
       }
     });
 
@@ -288,8 +273,7 @@ export default function Exercise({ tune, device, onValidate }) {
           </Text>
         }
         onClick={() => {
-          if (synthControl) synthControl.pause();
-          findMistakes(getSolution(tune.abc));
+          findMistakes(solution);
         }}
         primary
       />

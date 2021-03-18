@@ -5,12 +5,10 @@ import { ObjectId } from "mongodb";
 export default async (req, res) => {
   const session = await getSession({ req });
   const newAttempt = {
-    startedAt: new Date(req.body.startedAt),
-    completedAt: new Date(req.body.completedAt),
+    time: +req.body.time,
     mistakes: +req.body.mistakes,
     user_id: req.body.user_id,
     tune_id: ObjectId(req.body.tune_id),
-    progress: +req.body.progress,
   };
   if (session && newAttempt.user_id === session.user._id) {
     switch (req.method) {
@@ -22,7 +20,11 @@ export default async (req, res) => {
             .insertOne(newAttempt);
           db.collection("users").updateOne(
             { _id: newAttempt.user_id },
-            { $push: { successfulAttempts: ObjectId(successfulAttempts.insertedId) } }
+            {
+              $push: {
+                successfulAttempts: ObjectId(successfulAttempts.insertedId),
+              },
+            }
           );
           //201 Created
           res.status(201).json(successfulAttempts.ops[0]);
