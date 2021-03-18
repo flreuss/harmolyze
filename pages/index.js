@@ -10,6 +10,7 @@ import {
   Accordion,
   AccordionPanel,
   Meter,
+  CardHeader,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -74,19 +75,23 @@ export default function Home({ tunebooks, session, score }) {
                   {tunebook.tunes.map((tune) => (
                     <Stack anchor="top-right" key={tune._id}>
                       <AnimatedCard
+                        disabled={true}
                         onClick={() => {
                           setLoading(true);
                           router.push(`/exercise/${tune._id}`);
                         }}
                         background="white"
                       >
-                        <CardBody pad="small">
+                        <CardHeader pad="small">
                           <Text size="medium">{tune.title}</Text>
-                        </CardBody>
+                        </CardHeader>
+
+                        <CardBody pad="small">...</CardBody>
 
                         <CardFooter
-                          pad={{ horizontal: "medium", vertical: "small" }}
+                          pad="small"
                           justify="end"
+                          background="light-2"
                         >
                           {!tune.highscore && (
                             <Box direction="row" gap="xsmall">
