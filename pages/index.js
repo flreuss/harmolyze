@@ -77,7 +77,7 @@ export default function Home({ tunebooks, session, score }) {
                       <AnimatedCard
                         onClick={() => {
                           setLoading(true);
-                          router.push(`/tune/${tune._id}?score=${score}`);
+                          router.push(`/exercise/${tune._id}?score=${score}`);
                         }}
                         background="white"
                       >
@@ -129,7 +129,7 @@ export default function Home({ tunebooks, session, score }) {
             ))}
           </Accordion>
         </Box>
-        <Link href="/tune/new" passHref>
+        <Link href="/exercise/new" passHref>
           <Box
             round="full"
             overflow="hidden"
@@ -154,7 +154,7 @@ export default function Home({ tunebooks, session, score }) {
           confirmLabel="Löschen"
           onCancel={() => setOpenDeleteDialog(undefined)}
           onConfirm={() => {
-            fetch("/api/secured/tune", {
+            fetch("/api/secured/exercise", {
               method: "DELETE",
               body: JSON.stringify(openDeleteDialog.tune),
               headers: {

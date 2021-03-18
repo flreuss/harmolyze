@@ -45,7 +45,7 @@ export default function CreateTune({ tunebooks, session }) {
             onSubmit={({ value }) => {
               value.points = calculatePoints(value);
 
-              fetch("/api/secured/tune", {
+              fetch("/api/secured/exercise", {
                 method: "POST",
                 body: JSON.stringify(value),
                 headers: {

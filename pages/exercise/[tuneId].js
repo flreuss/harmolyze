@@ -117,7 +117,7 @@ export default function Tune({ tune, session }) {
                   resetTime();
                   createAttempt(successfulAttempt, () =>
                     router.push(
-                      `/tune/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
+                      `/exercise/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
                     )
                   );
                 }
