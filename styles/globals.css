@@ -45,11 +45,11 @@ body {
 }
 
 .abcjs-given {
-  fill: gray;
+  fill: #CCCCCC;
 }
 
 .abcjs-mistake {
-  fill: red;
+  fill: #ff4040;
 }
 
 .abcjs-disabled:hover {
@@ -57,11 +57,11 @@ body {
 }
 
 .abcjs-solved {
-  fill: green;
+  fill: #00c781;
 }
 
 .abcjs-rest {
-  fill: gray;
+  fill: #CCCCCC;
 }
 
 .abcjs-tempo {
