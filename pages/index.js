@@ -140,7 +140,7 @@ export default function Home({ tunebooks, session, score }) {
             background="brand"
             margin="medium"
           >
-            <Button icon={<Add />} hoverIndicator onClick={() => {}} />
+            <Button icon={<Add />} hoverIndicator onClick={() => {setLoading(true)}} />
           </Box>
         </Link>
       </Stack>

@@ -15,6 +15,7 @@ import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
 import { signOut } from "next-auth/client";
 import { Home } from "grommet-icons";
+import React from "react";
 
 const customTheme = deepMerge(grommet, {});
 
@@ -60,9 +61,14 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
         <Main gridArea="main">
           {children}
           {loading && (
-            <Layer>
-              {/* TODO: Replace by grommet spinner */}
-              <div className="loader" />
+            <Layer
+              position="center"
+              align="center"
+              background={{ opacity: true }}
+              justify="center"
+              responsive={false}
+            >
+              <Box alignSelf="center" className="loader" align="center" />
             </Layer>
           )}
         </Main>
