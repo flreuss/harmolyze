@@ -210,7 +210,7 @@ export default function InteractiveScore({
           displayRestart: true,
           displayPlay: true,
           displayProgress: true,
-          displayWarp: true,
+          displayWarp: device === "large",
         }
       );
     } else {
