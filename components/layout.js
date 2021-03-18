@@ -62,7 +62,7 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
           {loading && (
             <Layer>
               {/* TODO: Replace by grommet spinner */}
-              <div class="loader" />
+              <div className="loader" />
             </Layer>
           )}
         </Main>

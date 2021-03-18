@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Meter, ResponsiveContext, Text } from "grommet";
-
-import Exercise from "../../components/exercise";
-
+import InteractiveScore from "../../components/interactiveScore";
 import { connectToDatabase } from "../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import Layout from "../../components/layout";
@@ -13,7 +11,7 @@ import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
 import createPersistedState from "use-persisted-state";
 import { getInitial, getSolution } from "../../lib/solutions";
 
-export default function Tune({ tune, session }) {
+export default function Exercise({ tune, session }) {
   const defaultAttempt = {
     progress: 0,
     mistakes: 0,
@@ -83,7 +81,7 @@ export default function Tune({ tune, session }) {
       >
         <ResponsiveContext.Consumer>
           {(device) => (
-            <Exercise
+            <InteractiveScore
               abc={attempt.abc}
               initial={getInitial(tune.abc)}
               solution={getSolution(tune.abc)}

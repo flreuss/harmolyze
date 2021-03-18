@@ -3,7 +3,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
 
 import SelectionDialog from "./riemannFunc/selectionDialog";
-import configFromFile from "./exercise.config.json";
+import configFromFile from "./interactiveScore.config.json";
 import RiemannFunc from "../lib/riemannFunc";
 import {
   addClasses,
@@ -19,7 +19,7 @@ import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
 import { getInitial, getSolution } from "../lib/solutions";
 
-export default function Exercise({
+export default function InteractiveScore({
   abc,
   initial,
   solution,

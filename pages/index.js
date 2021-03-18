@@ -14,12 +14,11 @@ import {
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
 import { Add, Clock, Money, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
-import { synth } from "abcjs";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds } from "../lib/stringUtils";
 
@@ -77,7 +76,7 @@ export default function Home({ tunebooks, session, score }) {
                       <AnimatedCard
                         onClick={() => {
                           setLoading(true);
-                          router.push(`/exercise/${tune._id}?score=${score}`);
+                          router.push(`/exercise/${tune._id}`);
                         }}
                         background="white"
                       >
