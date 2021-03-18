@@ -7,10 +7,7 @@ export default async (req, res) => {
   switch (req.method) {
     case "POST":
       const newTune = {
-        abc: req.body.abc,
-        title: req.body.title,
-        points: req.body.points,
-        tunebook_id: req.body.tunebook_id,
+        ...req.body,
         createdAt: new Date(),
         createdBy: session.user._id,
       };

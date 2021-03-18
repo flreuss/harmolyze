@@ -75,7 +75,6 @@ export default function Home({ tunebooks, session, score }) {
                   {tunebook.tunes.map((tune) => (
                     <Stack anchor="top-right" key={tune._id}>
                       <AnimatedCard
-                        disabled={true}
                         onClick={() => {
                           setLoading(true);
                           router.push(`/exercise/${tune._id}`);
@@ -140,7 +139,13 @@ export default function Home({ tunebooks, session, score }) {
             background="brand"
             margin="medium"
           >
-            <Button icon={<Add />} hoverIndicator onClick={() => {setLoading(true)}} />
+            <Button
+              icon={<Add />}
+              hoverIndicator
+              onClick={() => {
+                setLoading(true);
+              }}
+            />
           </Box>
         </Link>
       </Stack>
@@ -197,8 +202,10 @@ function AnimatedCard(props) {
       {...props}
       animation={animation}
       onClick={() => {
-        setAnimation({ type: "pulse", size: "small" });
-        props.onClick();
+        if (!props.disabled) {
+          setAnimation({ type: "pulse", size: "small" });
+          props.onClick();
+        }
       }}
     >
       {props.children}

@@ -5,9 +5,10 @@ import { ObjectId } from "mongodb";
 export default async (req, res) => {
   const session = await getSession({ req });
   const newAttempt = {
+    ...req.body,
+    completedAt: new Date(req.body.completedAt),
     time: +req.body.time,
     mistakes: +req.body.mistakes,
-    user_id: req.body.user_id,
     tune_id: ObjectId(req.body.tune_id),
   };
   if (session && newAttempt.user_id === session.user._id) {

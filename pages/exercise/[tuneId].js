@@ -110,6 +110,7 @@ export default function Exercise({ tune, session }) {
                     ...attempt,
                     progress: 1,
                     time: time,
+                    completedAt: new Date(),
                   };
                   resetAttempt();
                   resetTime();
