@@ -26,6 +26,7 @@ import { millisToMinutesAndSeconds } from "../lib/stringUtils";
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
   const [notification, setNotification] = useState(undefined);
+  const [loading, setLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
   const [activeIndex, setActiveIndex] = useState([
     tunebooks.findIndex((tunebook) =>
@@ -40,6 +41,7 @@ export default function Home({ tunebooks, session, score }) {
 
   return (
     <Layout
+      loading={loading}
       user={session.user}
       status={
         <Box direction="row" gap="xsmall">
@@ -78,9 +80,10 @@ export default function Home({ tunebooks, session, score }) {
                   {tunebook.tunes.map((tune) => (
                     <Stack anchor="top-right" key={tune._id}>
                       <AnimatedCard
-                        onClick={() =>
-                          router.push(`/tune/${tune._id}?score=${score}`)
-                        }
+                        onClick={() => {
+                          setLoading(true);
+                          router.push(`/tune/${tune._id}?score=${score}`);
+                        }}
                         background="white"
                       >
                         <CardBody pad="small">
@@ -305,7 +308,8 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
-    const score = successfulAttempts.length > 0 ? successfulAttempts[0].score : 0;
+    const score =
+      successfulAttempts.length > 0 ? successfulAttempts[0].score : 0;
 
     return {
       props: {

@@ -13,6 +13,7 @@ import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
 
 export default function Tune({ tune, session }) {
   const [time, setTime] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState({
     startedAt: new Date(),
     completedAt: undefined,
@@ -33,6 +34,7 @@ export default function Tune({ tune, session }) {
 
   return (
     <Layout
+      loading={loading}
       status={
         <Box
           direction="row"
@@ -79,6 +81,7 @@ export default function Tune({ tune, session }) {
                   let newAttempt = attempt;
                   newAttempt.completedAt = new Date();
                   newAttempt.progress = 1;
+                  setLoading(true);
                   createAttempt(newAttempt, () =>
                     router.push(
                       `/tune/success?tune_title=${tune.title}&mistakes=${attempt.mistakes}&time=${time}`

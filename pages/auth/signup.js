@@ -18,6 +18,7 @@ import path from "path";
 
 export default function SignIn({ avatars }) {
   const [nameError, setNameError] = useState();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [value, setValue] = useState({
     name: router.query.name ? router.query.name : "",
@@ -26,7 +27,7 @@ export default function SignIn({ avatars }) {
   });
 
   return (
-    <Layout>
+    <Layout loading={loading}>
       <Box fill pad="medium" align="center" justify="center" gap="large">
         <Heading margin="none">Benutzerkonto anlegen</Heading>
 
@@ -39,6 +40,7 @@ export default function SignIn({ avatars }) {
               setValue(nextValue);
             }}
             onSubmit={({ value }) => {
+              setLoading(true);
               fetch("/api/signup", {
                 method: "POST",
                 body: JSON.stringify(value),
@@ -137,11 +139,12 @@ export default function SignIn({ avatars }) {
               </RadioButtonGroup>
             </FormField>
 
-            <Box direction="row" justify="between" margin={{ top: "medium", bottom: "medium" }}>
-              <Link
-                href={`/auth/signin?name=${value.name || ""}`}
-                passHref
-              >
+            <Box
+              direction="row"
+              justify="between"
+              margin={{ top: "medium", bottom: "medium" }}
+            >
+              <Link href={`/auth/signin?name=${value.name || ""}`} passHref>
                 <Button label="Einloggen" secondary />
               </Link>
               <Button

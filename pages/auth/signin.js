@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 
 export default function SignIn() {
   const [unauthorized, setUnauthorized] = useState();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [value, setValue] = useState({
     name: router.query.name || "",
@@ -22,7 +23,7 @@ export default function SignIn() {
   });
 
   return (
-    <Layout>
+    <Layout loading={loading}>
       <Box fill pad="medium" align="center" justify="center" gap="large">
         <Heading margin="none">Einloggen</Heading>
         <Box width="medium">
@@ -34,6 +35,7 @@ export default function SignIn() {
               setUnauthorized(undefined);
             }}
             onSubmit={({ value }) => {
+              setLoading(true);
               signIn("credentials", {
                 name: value.name,
                 password: value.password,
@@ -89,7 +91,11 @@ export default function SignIn() {
                 primary
               />
             </Box>
-            <Box direction="row" justify="between" margin={{ top: "medium", bottom: "medium" }}>
+            <Box
+              direction="row"
+              justify="between"
+              margin={{ top: "medium", bottom: "medium" }}
+            >
               <Anchor
                 onClick={() => alert("Legen Sie einen neuen Account an.")}
               >

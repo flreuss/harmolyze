@@ -8,6 +8,7 @@ import {
   Nav,
   Avatar,
   Menu,
+  Layer,
 } from "grommet";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
@@ -17,7 +18,7 @@ import { Home } from "grommet-icons";
 
 const customTheme = deepMerge(grommet, {});
 
-export default function Layout({ children, user, status, homeIcon }) {
+export default function Layout({ children, user, status, homeIcon, loading }) {
   return (
     <Grommet full theme={customTheme}>
       <Grid
@@ -56,7 +57,15 @@ export default function Layout({ children, user, status, homeIcon }) {
             )}
           </Box>
         </Header>
-        <Main gridArea="main">{children}</Main>
+        <Main gridArea="main">
+          {children}
+          {loading && (
+            <Layer>
+              {/* TODO: Replace by grommet spinner */}
+              <div class="loader" />
+            </Layer>
+          )}
+        </Main>
       </Grid>
     </Grommet>
   );
