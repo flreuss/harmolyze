@@ -1,7 +1,6 @@
 import { renderAbc, synth } from "abcjs";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
-
 import SelectionDialog from "./riemannFunc/selectionDialog";
 import configFromFile from "./interactiveScore.config.json";
 import RiemannFunc from "../lib/riemannFunc";
@@ -17,7 +16,6 @@ import {
 import { insert, replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
-import { getInitial, getSolution } from "../lib/solutions";
 
 export default function InteractiveScore({
   abc,
@@ -40,7 +38,7 @@ export default function InteractiveScore({
   var notesHighlighted = [];
   var synthControl;
 
-  //State
+//State
   const size = useWindowSize();
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
@@ -53,10 +51,10 @@ export default function InteractiveScore({
   }, [abc, solved]);
   useLayoutEffect(() => {
     renderVisualObjs();
-  }, [size, device]);
+  }, [size]);
 
-  //Methods
-  function findMistakes(solutionAbcString) {
+  //Event handlers
+  function handleValidate() {
     //TODO: Check why this render call is necessary...
     renderVisualObjs();
     const solutionVoicesArray = new NotesVoicesArray(
@@ -99,7 +97,6 @@ export default function InteractiveScore({
     onValidate(mistakes, solvedCount, solvedArray);
   }
 
-  //Event handlers
   function handleSelectionDialogClose(abcelem, riemannFunc) {
     if (riemannFunc) {
       if (!abcelem.chord) {
@@ -274,9 +271,7 @@ export default function InteractiveScore({
             <strong>Überprüfen</strong>
           </Text>
         }
-        onClick={() => {
-          findMistakes(solution);
-        }}
+        onClick={handleValidate}
         primary
       />
       {openSelectionDialog && (
