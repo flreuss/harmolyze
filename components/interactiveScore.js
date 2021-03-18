@@ -58,7 +58,7 @@ export default function InteractiveScore({
     //TODO: Check why this render call is necessary...
     renderVisualObjs();
     const solutionVoicesArray = new NotesVoicesArray(
-      renderAbc("*", solutionAbcString)[0]
+      renderAbc("*", solution)[0]
     );
 
     const initialVoicesArray = new NotesVoicesArray(renderAbc("*", initial)[0]);
