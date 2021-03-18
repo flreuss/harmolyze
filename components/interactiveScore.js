@@ -85,11 +85,13 @@ export default function InteractiveScore({
               addClasses(elem, ["abcjs-mistake"]);
             }
           );
-        } else if (!hasClass(elem, "abcjs-solved")) {
+        } else {
           solvedCount += 1;
-          solvedArray = solvedArray.concat(
-            simultaneousNotesArray.get(elem.counters)
-          );
+          if (!hasClass(elem, "abcjs-solved")) {
+            solvedArray = solvedArray.concat(
+              simultaneousNotesArray.get(elem.counters)
+            );
+          }
         }
       }
     });
