@@ -11,6 +11,7 @@ import {
   AccordionPanel,
   Meter,
   CardHeader,
+  Menu,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -18,7 +19,15 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import Layout from "../components/layout";
 import { connectToDatabase } from "../lib/mongodb";
-import { Add, Clock, Money, StatusCritical, Trash } from "grommet-icons";
+import {
+  Add,
+  Clock,
+  Edit,
+  Money,
+  MoreVertical,
+  StatusCritical,
+  Trash,
+} from "grommet-icons";
 import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds } from "../lib/stringUtils";
@@ -116,12 +125,39 @@ export default function Home({ tunebooks, session, score }) {
                       </AnimatedCard>
                       {(tune.createdBy === session.user._id ||
                         session.user.isAdmin) && (
-                        <Button
-                          size="small"
-                          hoverIndicator
-                          icon={<Trash color="status-critical" />}
-                          onClick={() => {
-                            setOpenDeleteDialog({ tune });
+                        <Menu
+                          icon={<MoreVertical />}
+                          alignSelf="center"
+                          dropProps={{
+                            align: { top: "bottom", left: "left" },
+                            elevation: "xlarge",
+                          }}
+                          items={[
+                            {
+                              label: "Löschen",
+                              onClick: () => {
+                                setOpenDeleteDialog({ tune });
+                              },
+                              icon: (
+                                <Box pad={{ right: "medium" }}>
+                                  <Trash />
+                                </Box>
+                              ),
+                            },
+                            {
+                              label: "Bearbeiten",
+                              onClick: () => {
+                                router.push(`/exercise/${tune._id}/edit`);
+                              },
+                              icon: (
+                                <Box pad={{ right: "medium" }}>
+                                  <Edit />
+                                </Box>
+                              ),
+                            },
+                          ]}
+                          dropProps={{
+                            align: { top: "bottom", right: "right" },
                           }}
                         />
                       )}
