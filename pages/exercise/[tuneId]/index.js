@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Box, Meter, ResponsiveContext, Text } from "grommet";
-import InteractiveScore from "../../components/interactiveScore";
-import { connectToDatabase } from "../../lib/mongodb";
+import InteractiveScore from "../../../components/interactiveScore";
+import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
-import Layout from "../../components/layout";
+import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
-import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
+import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
 import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
 import createPersistedState from "use-persisted-state";
-import { getInitial, getSolution } from "../../lib/solutions";
+import { getInitial, getSolution } from "../../../lib/solutions";
 
 export default function Exercise({ tune, session }) {
   const defaultAttempt = {
@@ -116,7 +116,7 @@ export default function Exercise({ tune, session }) {
                   resetTime();
                   createAttempt(successfulAttempt, () =>
                     router.push(
-                      `/exercise/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
+                      `/exercise/${tune._id}/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
                     )
                   );
                 }

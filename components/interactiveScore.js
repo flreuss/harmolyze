@@ -38,7 +38,7 @@ export default function InteractiveScore({
   var notesHighlighted = [];
   var synthControl;
 
-//State
+  //State
   const size = useWindowSize();
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
@@ -178,24 +178,28 @@ export default function InteractiveScore({
     voicesArray = new NotesVoicesArray(visualObjs[0]);
     simultaneousNotesArray = new SimultaneousNotesArray(voicesArray);
 
-    const solutionVoicesArray = new NotesVoicesArray(
-      renderAbc("*", solution)[0]
-    );
-    const initialVoicesArray = new NotesVoicesArray(renderAbc("*", initial)[0]);
+    if (solution && initial) {
+      const solutionVoicesArray = new NotesVoicesArray(
+        renderAbc("*", solution)[0]
+      );
+      const initialVoicesArray = new NotesVoicesArray(
+        renderAbc("*", initial)[0]
+      );
 
-    voicesArray.forEachElem((elem, pos) => {
-      if (
-        !chordOf(elem, solutionVoicesArray, simultaneousNotesArray) ||
-        chordOf(elem, initialVoicesArray, simultaneousNotesArray)
-      ) {
-        addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
-      } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
-        addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
-      } else if (showMistakes) {
-        elem.highlight(undefined, "red");
-        notesHighlighted.push(elem);
-      }
-    });
+      voicesArray.forEachElem((elem, pos) => {
+        if (
+          !chordOf(elem, solutionVoicesArray, simultaneousNotesArray) ||
+          chordOf(elem, initialVoicesArray, simultaneousNotesArray)
+        ) {
+          addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
+        } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
+          addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+        } else if (showMistakes) {
+          elem.highlight(undefined, "red");
+          notesHighlighted.push(elem);
+        }
+      });
+    }
 
     loadAudio(visualObjs);
   }
@@ -262,18 +266,20 @@ export default function InteractiveScore({
         fill="horizontal"
         id="audioContainer"
       />
-      <Button
-        pad="medium"
-        type="submit"
-        margin="medium"
-        label={
-          <Text color="white">
-            <strong>Überprüfen</strong>
-          </Text>
-        }
-        onClick={handleValidate}
-        primary
-      />
+      {onValidate && (
+        <Button
+          pad="medium"
+          type="submit"
+          margin="medium"
+          label={
+            <Text color="white">
+              <strong>Überprüfen</strong>
+            </Text>
+          }
+          onClick={handleValidate}
+          primary
+        />
+      )}
       {openSelectionDialog && (
         <SelectionDialog
           onClose={openSelectionDialog.onClose}

@@ -2,8 +2,8 @@ import { Box, Button, Heading, Image, Text, Tip } from "grommet";
 import { Clock, Home, StatusCritical } from "grommet-icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Layout from "../../components/layout";
-import { millisToMinutesAndSeconds } from "../../lib/stringUtils";
+import Layout from "../../../components/layout";
+import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
 
 export default function Success(props) {
   const router = useRouter();
