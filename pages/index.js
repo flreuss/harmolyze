@@ -90,8 +90,16 @@ export default function Home({ tunebooks, session, score }) {
                         }}
                         background="white"
                       >
-                        <CardHeader background="light-2">
-                          <Box pad={{left:"small",top:"small",bottom:"small"}}>
+                        <CardHeader
+                          background={tune.highscore ? "light-2" : "neutral-3"}
+                        >
+                          <Box
+                            pad={{
+                              left: "small",
+                              top: "small",
+                              bottom: "small",
+                            }}
+                          >
                             <Text size="medium">{tune.title}</Text>
                           </Box>
                           {(tune.createdBy === session.user._id ||
@@ -141,7 +149,7 @@ export default function Home({ tunebooks, session, score }) {
                         <CardFooter
                           pad="small"
                           justify="end"
-                          background="light-2"
+                          background={tune.highscore ? "light-2" : "neutral-3"}
                         >
                           {!tune.highscore && (
                             <Box direction="row" gap="xsmall">
