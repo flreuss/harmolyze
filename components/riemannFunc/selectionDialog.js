@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, CheckBox, Heading, Layer, Text } from "grommet";
+import { Box, Button, CheckBox, Heading, Layer, Select, Text } from "grommet";
 import RiemannFunc, { CondensedFunc } from "../../lib/riemannFunc";
 import NumberSelector from "../numberSelector";
 import NumberMultiSelector from "../numberMultiSelector";
@@ -70,42 +70,64 @@ export default function RiemannFuncSelectionDialog({
           max={2}
         />
 
-        <SelectionWheel
-          lineWidth={
-            device === "small"
-              ? Math.floor(
-                  Math.min(windowSize.height, windowSize.width) / 2.3 / 3.5
-                )
-              : Math.floor(
-                  Math.min(windowSize.height, windowSize.width) / 5 / 3.5
-                )
-          }
-          radius={
-            device === "small"
-              ? Math.floor(Math.min(windowSize.height, windowSize.width) / 2.3)
-              : Math.floor(Math.min(windowSize.height, windowSize.width) / 5)
-          }
-          value={
-            riemannFunc.isSecondaryDominant
-              ? `(${riemannFunc.baseFuncString})`
-              : riemannFunc.incomplete
-              ? `/${riemannFunc.baseFuncString}`
-              : riemannFunc.baseFuncString
-          }
-          onChange={(val) => {
-            setRiemannFunc((riemannFunc) => ({
-              ...riemannFunc,
-              baseFuncString: val.startsWith("(")
-                ? val.slice(1, -1)
-                : val.startsWith("/")
-                ? val.slice(1)
-                : val,
-              isSecondaryDominant: val.startsWith("("),
-              incomplete: val.startsWith("/"),
-            }));
-          }}
-          mode={mode}
-        />
+        {device === "small" && windowSize.width > windowSize.height ? (
+          <Select
+            labelKey="label"
+            valueKey={{ key: "value", reduce: true }}
+            options={Object.values(riemannFunc.validBaseFuncs).map(
+              (baseFunc) => ({
+                label: `${baseFunc.long} (${baseFunc.short})`,
+                value: baseFunc.short,
+              })
+            )}
+            value={riemannFunc.baseFuncString}
+            onChange={({ option }) =>
+              setRiemannFunc((riemannFunc) => ({
+                ...riemannFunc,
+                baseFuncString: option.value,
+              }))
+            }
+          />
+        ) : (
+          <SelectionWheel
+            lineWidth={
+              device === "small"
+                ? Math.floor(
+                    Math.min(windowSize.height, windowSize.width) / 2.3 / 3.5
+                  )
+                : Math.floor(
+                    Math.min(windowSize.height, windowSize.width) / 5 / 3.5
+                  )
+            }
+            radius={
+              device === "small"
+                ? Math.floor(
+                    Math.min(windowSize.height, windowSize.width) / 2.3
+                  )
+                : Math.floor(Math.min(windowSize.height, windowSize.width) / 5)
+            }
+            value={
+              riemannFunc.isSecondaryDominant
+                ? `(${riemannFunc.baseFuncString})`
+                : riemannFunc.incomplete
+                ? `/${riemannFunc.baseFuncString}`
+                : riemannFunc.baseFuncString
+            }
+            onChange={(val) => {
+              setRiemannFunc((riemannFunc) => ({
+                ...riemannFunc,
+                baseFuncString: val.startsWith("(")
+                  ? val.slice(1, -1)
+                  : val.startsWith("/")
+                  ? val.slice(1)
+                  : val,
+                isSecondaryDominant: val.startsWith("("),
+                incomplete: val.startsWith("/"),
+              }));
+            }}
+            mode={mode}
+          />
+        )}
 
         <NumberSelector
           name="baseSelector"
