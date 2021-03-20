@@ -40,7 +40,7 @@ export default function InteractiveScore({
   var synthControl;
 
   //State
-  const size = useWindowSize();
+  const windowSize = useWindowSize();
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function InteractiveScore({
   }, [abc, solved]);
   useLayoutEffect(() => {
     renderVisualObjs();
-  }, [size]);
+  }, [windowSize]);
 
   //Event handlers
   function handleValidate() {
@@ -171,16 +171,16 @@ export default function InteractiveScore({
     config.clickListener = handleClick;
     switch (device) {
       case "small":
-        config.staffwidth = size.width;
+        config.staffwidth = windowSize.width;
         break;
       case "medium":
-        config.staffwidth = size.width / 1.5;
+        config.staffwidth = windowSize.width / 1.5;
         break;
       case "large":
-        config.staffwidth = size.width / 2;
+        config.staffwidth = windowSize.width / 2;
         break;
       default:
-        config.staffwidth = size.width / 2.5;
+        config.staffwidth = windowSize.width / 2.5;
     }
 
     visualObjs = renderAbc("scoreContainer", abc, config);
@@ -291,6 +291,8 @@ export default function InteractiveScore({
       )}
       {openSelectionDialog && (
         <SelectionDialog
+          windowSize={windowSize}
+          device={device}
           onClose={openSelectionDialog.onClose}
           defaultValue={openSelectionDialog.defaultValue}
           mode={openSelectionDialog.mode}

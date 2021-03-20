@@ -3,7 +3,7 @@ import React from "react";
 
 import ColorWheel from "../colorWheel";
 
-export default function SelectionWheel({ value, onChange, radius, mode }) {
+export default function SelectionWheel({ value, onChange, mode, radius, lineWidth }) {
   // Important global variable! Do not delete!
   let colorWheel;
 
@@ -96,7 +96,7 @@ export default function SelectionWheel({ value, onChange, radius, mode }) {
       }
       radius={radius}
       padding={10}
-      lineWidth={50}
+      lineWidth={lineWidth}
       onValueSelected={onChange}
       onRef={(ref) => (colorWheel = ref)}
       spacers={{

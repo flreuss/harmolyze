@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Box, Button, CheckBox, Heading, Layer, Text } from "grommet";
-
 import RiemannFunc, { CondensedFunc } from "../../lib/riemannFunc";
 import NumberSelector from "../numberSelector";
 import NumberMultiSelector from "../numberMultiSelector";
@@ -11,6 +10,8 @@ export default function RiemannFuncSelectionDialog({
   onClose,
   target,
   mode,
+  windowSize,
+  device,
 }) {
   const [riemannFunc, setRiemannFunc] = useState({
     ...defaultValue,
@@ -70,6 +71,20 @@ export default function RiemannFuncSelectionDialog({
         />
 
         <SelectionWheel
+          lineWidth={
+            device === "small"
+              ? Math.floor(
+                  Math.min(windowSize.height, windowSize.width) / 2.3 / 3.5
+                )
+              : Math.floor(
+                  Math.min(windowSize.height, windowSize.width) / 5 / 3.5
+                )
+          }
+          radius={
+            device === "small"
+              ? Math.floor(Math.min(windowSize.height, windowSize.width) / 2.3)
+              : Math.floor(Math.min(windowSize.height, windowSize.width) / 5)
+          }
           value={
             riemannFunc.isSecondaryDominant
               ? `(${riemannFunc.baseFuncString})`
@@ -89,7 +104,6 @@ export default function RiemannFuncSelectionDialog({
               incomplete: val.startsWith("/"),
             }));
           }}
-          radius={175}
           mode={mode}
         />
 
@@ -106,11 +120,7 @@ export default function RiemannFuncSelectionDialog({
         />
 
         {typeof riemannFunc.given !== "undefined" && (
-          <Box
-            direction="row"
-            align="center"
-            justify="end"
-          >
+          <Box direction="row" align="center" justify="end">
             <CheckBox
               checked={riemannFunc.given}
               label="Vorgegeben?"
