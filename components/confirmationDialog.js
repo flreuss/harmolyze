@@ -9,7 +9,12 @@ export default function ConfirmationDialog({
   confirmLabel,
 }) {
   return (
-    <Layer position="center" onClickOutside={onCancel} onEsc={onCancel}>
+    <Layer
+      position="center"
+      onClickOutside={onCancel}
+      onEsc={onCancel}
+      responsive={false}
+    >
       <Box pad="medium" gap="small" width="medium">
         <Heading level={3} margin="none">
           {heading}

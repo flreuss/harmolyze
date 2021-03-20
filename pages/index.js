@@ -90,8 +90,50 @@ export default function Home({ tunebooks, session, score }) {
                         }}
                         background="white"
                       >
-                        <CardHeader pad="small">
-                          <Text size="medium">{tune.title}</Text>
+                        <CardHeader background="light-2">
+                          <Box pad={{left:"small",top:"small",bottom:"small"}}>
+                            <Text size="medium">{tune.title}</Text>
+                          </Box>
+                          {(tune.createdBy === session.user._id ||
+                            session.user.isAdmin) && (
+                            <Menu
+                              icon={<MoreVertical />}
+                              hoverIndicator
+                              focusIndicator={false}
+                              alignSelf="start"
+                              dropProps={{
+                                align: { top: "bottom", left: "left" },
+                                elevation: "xlarge",
+                              }}
+                              items={[
+                                {
+                                  label: "Löschen",
+                                  onClick: () => {
+                                    setOpenDeleteDialog({ tune });
+                                  },
+                                  icon: (
+                                    <Box pad={{ right: "medium" }}>
+                                      <Trash />
+                                    </Box>
+                                  ),
+                                },
+                                {
+                                  label: "Bearbeiten",
+                                  onClick: () => {
+                                    router.push(`/exercise/${tune._id}/edit`);
+                                  },
+                                  icon: (
+                                    <Box pad={{ right: "medium" }}>
+                                      <Edit />
+                                    </Box>
+                                  ),
+                                },
+                              ]}
+                              dropProps={{
+                                align: { top: "bottom", right: "right" },
+                              }}
+                            />
+                          )}
                         </CardHeader>
 
                         <CardBody pad="small">...</CardBody>
@@ -123,44 +165,6 @@ export default function Home({ tunebooks, session, score }) {
                           )}
                         </CardFooter>
                       </AnimatedCard>
-                      {(tune.createdBy === session.user._id ||
-                        session.user.isAdmin) && (
-                        <Menu
-                          icon={<MoreVertical />}
-                          alignSelf="center"
-                          dropProps={{
-                            align: { top: "bottom", left: "left" },
-                            elevation: "xlarge",
-                          }}
-                          items={[
-                            {
-                              label: "Löschen",
-                              onClick: () => {
-                                setOpenDeleteDialog({ tune });
-                              },
-                              icon: (
-                                <Box pad={{ right: "medium" }}>
-                                  <Trash />
-                                </Box>
-                              ),
-                            },
-                            {
-                              label: "Bearbeiten",
-                              onClick: () => {
-                                router.push(`/exercise/${tune._id}/edit`);
-                              },
-                              icon: (
-                                <Box pad={{ right: "medium" }}>
-                                  <Edit />
-                                </Box>
-                              ),
-                            },
-                          ]}
-                          dropProps={{
-                            align: { top: "bottom", right: "right" },
-                          }}
-                        />
-                      )}
                     </Stack>
                   ))}
                 </Grid>
