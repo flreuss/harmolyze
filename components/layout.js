@@ -14,7 +14,7 @@ import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
 import { signOut } from "next-auth/client";
-import { Home } from "grommet-icons";
+import { Home, Logout } from "grommet-icons";
 import React from "react";
 
 const customTheme = deepMerge(grommet, {});
@@ -52,6 +52,11 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
                     onClick: () => {
                       signOut();
                     },
+                    icon: (
+                      <Box pad={{ right: "small" }}>
+                        <Logout />
+                      </Box>
+                    ),
                   },
                 ]}
               />

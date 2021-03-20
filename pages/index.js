@@ -110,7 +110,7 @@ export default function Home({ tunebooks, session, score }) {
                               focusIndicator={false}
                               alignSelf="start"
                               dropProps={{
-                                align: { top: "bottom", left: "left" },
+                                align: { top: "bottom", right: "right" },
                                 elevation: "xlarge",
                               }}
                               items={[
@@ -137,9 +137,6 @@ export default function Home({ tunebooks, session, score }) {
                                   ),
                                 },
                               ]}
-                              dropProps={{
-                                align: { top: "bottom", right: "right" },
-                              }}
                             />
                           )}
                         </CardHeader>
