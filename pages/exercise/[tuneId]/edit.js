@@ -1,21 +1,49 @@
-import React, { useState } from "react";
-import { Box, ResponsiveContext } from "grommet";
+import React, { useEffect, useState } from "react";
+import { Box, Button, ResponsiveContext } from "grommet";
 import InteractiveScore from "../../../components/interactiveScore";
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
-import { useRouter } from "next/router";
-import { LinkPrevious } from "grommet-icons";
+import { LinkPrevious, Undo } from "grommet-icons";
 import { calculatePoints } from "../../../lib/solutions";
 
 export default function Exercise({ tune, session }) {
-  const [abc, setAbc] = useState(tune.abc);
+  const [abcHistory, setAbcHistory] = useState([tune.abc]);
   //TODO: Wie Nutzer beim Bearbeiten auf Autosave hinweisen (schauen wie es GoogleDocs macht)?
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    updateExercise(
+      {
+        ...tune,
+        abc: abcHistory.slice(-1)[0],
+        points: calculatePoints(abcHistory.slice(-1)[0]),
+      },
+      () => {
+        //TODO: Notification on autosave
+      }
+    );
+  }, [abcHistory]);
+
   return (
-    <Layout user={session.user} homeIcon={<LinkPrevious />}>
+    <Layout
+      user={session.user}
+      status={
+        <Box direction="row" gap="xsmall">
+          <Button
+            disabled={abcHistory.length < 2}
+            icon={<Undo />}
+            onClick={() => {
+              const nextAbcHistory = [...abcHistory];
+              nextAbcHistory.pop();
+              setAbcHistory(nextAbcHistory);
+            }}
+          />
+        </Box>
+      }
+      homeIcon={<LinkPrevious />}
+    >
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -25,15 +53,11 @@ export default function Exercise({ tune, session }) {
         <ResponsiveContext.Consumer>
           {(device) => (
             <InteractiveScore
-              abc={abc}
+              abc={abcHistory.slice(-1)[0]}
               showSolution={true}
               device={device}
               onChange={(newAbc) => {
-                setAbc(newAbc);
-                updateExercise(
-                  { ...tune, abc: newAbc, points: calculatePoints(abc) },
-                  () => {}
-                );
+                setAbcHistory((abcHistory) => [...abcHistory, newAbc]);
               }}
             />
           )}
