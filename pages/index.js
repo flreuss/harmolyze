@@ -1,33 +1,21 @@
 import {
   Box,
   Grid,
-  Card,
-  CardBody,
-  CardFooter,
   Text,
   Stack,
   Button,
   Accordion,
   AccordionPanel,
   Meter,
-  CardHeader,
-  Menu,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Layout from "../components/layout";
+import TuneCard from "../components/tuneCard";
 import { connectToDatabase } from "../lib/mongodb";
-import {
-  Add,
-  Clock,
-  Edit,
-  Money,
-  MoreVertical,
-  StatusCritical,
-  Trash,
-} from "grommet-icons";
+import { Add, Clock, Edit, Money, StatusCritical, Trash } from "grommet-icons";
 import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds } from "../lib/stringUtils";
@@ -82,95 +70,65 @@ export default function Home({ tunebooks, session, score }) {
               >
                 <Grid gap="small" columns="small" margin="medium">
                   {tunebook.tunes.map((tune) => (
-                    <Stack anchor="top-right" key={tune._id}>
-                      <AnimatedCard
-                        onClick={() => {
-                          setLoading(true);
-                          router.push(`/exercise/${tune._id}`);
-                        }}
-                        background="white"
-                      >
-                        <CardHeader
-                          background={tune.highscore ? "light-2" : "neutral-3"}
-                        >
-                          <Box
-                            pad={{
-                              left: "small",
-                              top: "small",
-                              bottom: "small",
-                            }}
-                          >
-                            <Text size="medium">{tune.title}</Text>
-                          </Box>
-                          {(tune.createdBy === session.user._id ||
-                            session.user.isAdmin) && (
-                            <Menu
-                              icon={<MoreVertical />}
-                              hoverIndicator
-                              focusIndicator={false}
-                              alignSelf="start"
-                              dropProps={{
-                                align: { top: "bottom", right: "right" },
-                                elevation: "xlarge",
-                              }}
-                              items={[
-                                {
-                                  label: "Löschen",
-                                  onClick: () => {
-                                    setOpenDeleteDialog({ tune });
-                                  },
-                                  icon: (
-                                    <Box pad={{ right: "medium" }}>
-                                      <Trash />
-                                    </Box>
-                                  ),
-                                },
-                                {
-                                  label: "Bearbeiten",
-                                  onClick: () => {
-                                    router.push(`/exercise/${tune._id}/edit`);
-                                  },
-                                  icon: (
-                                    <Box pad={{ right: "medium" }}>
-                                      <Edit />
-                                    </Box>
-                                  ),
-                                },
-                              ]}
-                            />
-                          )}
-                        </CardHeader>
-
-                        <CardBody pad="small">...</CardBody>
-
-                        <CardFooter
-                          pad="small"
-                          justify="end"
-                          background={tune.highscore ? "light-2" : "neutral-3"}
-                        >
-                          {!tune.highscore && (
-                            <Box direction="row" gap="xsmall">
-                              <Money />
-                              <Text>{tune.points}</Text>
+                    <TuneCard
+                      background={tune.highscore ? "light-2" : "neutral-3"}
+                      onClick={() => {
+                        setLoading(true);
+                        router.push(`/exercise/${tune._id}`);
+                      }}
+                      menuItems={[
+                        {
+                          label: "Löschen",
+                          onClick: () => {
+                            setOpenDeleteDialog({ tune });
+                          },
+                          icon: (
+                            <Box pad={{ right: "medium" }}>
+                              <Trash />
                             </Box>
-                          )}
-                          {tune.highscore && (
-                            <Box direction="row" gap="xsmall">
-                              <StatusCritical />
-                              <Text>{tune.highscore.mistakes}</Text>
+                          ),
+                        },
+                        {
+                          label: "Bearbeiten",
+                          onClick: () => {
+                            setLoading(true);
+                            router.push(`/exercise/${tune._id}/edit`);
+                          },
+                          icon: (
+                            <Box pad={{ right: "medium" }}>
+                              <Edit />
                             </Box>
-                          )}
-                          {tune.highscore && (
-                            <Box direction="row" gap="xsmall">
-                              <Clock />
-                              <Text>
-                                {millisToMinutesAndSeconds(tune.highscore.time)}
-                              </Text>
-                            </Box>
-                          )}
-                        </CardFooter>
-                      </AnimatedCard>
-                    </Stack>
+                          ),
+                        },
+                      ]}
+                      footerItems={
+                        tune.highscore
+                          ? [
+                              {
+                                icon: <StatusCritical />,
+                                label: tune.highscore.mistakes,
+                              },
+                              {
+                                icon: <Clock />,
+                                label: millisToMinutesAndSeconds(
+                                  tune.highscore.time
+                                ),
+                              },
+                            ]
+                          : [
+                              {
+                                icon: <Money />,
+                                label: tune.points,
+                              },
+                            ]
+                      }
+                      showMenu={
+                        tune.createdBy === session.user._id ||
+                        session.user.isAdmin
+                      }
+                      title={tune.title}
+                      key={tune._id}
+                    />
                   ))}
                 </Grid>
               </AccordionPanel>
@@ -233,28 +191,6 @@ export default function Home({ tunebooks, session, score }) {
         </ConfirmationDialog>
       )}
     </Layout>
-  );
-}
-
-function AnimatedCard(props) {
-  const [animation, setAnimation] = useState({
-    type: "fadeIn",
-    size: "medium",
-  });
-
-  return (
-    <Card
-      {...props}
-      animation={animation}
-      onClick={() => {
-        if (!props.disabled) {
-          setAnimation({ type: "pulse", size: "small" });
-          props.onClick();
-        }
-      }}
-    >
-      {props.children}
-    </Card>
   );
 }
 
