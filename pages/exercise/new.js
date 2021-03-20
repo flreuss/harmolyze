@@ -13,11 +13,7 @@ import {
   Select,
 } from "grommet";
 import { connectToDatabase } from "../../lib/mongodb";
-import { renderAbc } from "abcjs";
-import { getSolution, getInitial } from "../../lib/solutions";
-import { NotesVoicesArray } from "../../lib/abcjsUtils";
-import RiemannFunc from "../../lib/riemannFunc";
-import { LinkPrevious } from "grommet-icons";
+import { calculatePoints } from "../../lib/solutions";
 
 export default function CreateTune({ tunebooks, session }) {
   const defaultValue = {
@@ -33,7 +29,9 @@ export default function CreateTune({ tunebooks, session }) {
   return (
     <Layout user={session.user}>
       <Box fill align="center" justify="center" gap="large" pad="medium">
-        <Heading textAlign="center" margin="none">Neue Übungsaufgabe anlegen</Heading>
+        <Heading textAlign="center" margin="none">
+          Neue Übungsaufgabe anlegen
+        </Heading>
 
         <Box width="medium">
           <Form
@@ -42,12 +40,12 @@ export default function CreateTune({ tunebooks, session }) {
             onChange={(nextValue) => {
               setValue(nextValue);
             }}
-            onSubmit={({ value }) => {
-              value.points = calculatePoints(value);
+            onSubmit={({ value: tune }) => {
+              tune.points = calculatePoints(tune.abc);
 
               fetch("/api/secured/exercise", {
                 method: "POST",
-                body: JSON.stringify(value),
+                body: JSON.stringify(tune),
                 headers: {
                   "Content-type": "application/json;charset=utf-8",
                 },
@@ -115,43 +113,6 @@ export default function CreateTune({ tunebooks, session }) {
       )}
     </Layout>
   );
-}
-
-function calculatePoints(tune) {
-  const solutionVisualObjs = renderAbc("*", getSolution(tune.abc));
-  const solutionVoicesArray = new NotesVoicesArray(solutionVisualObjs[0]);
-  const keySignature = solutionVisualObjs[0].getKeySignature();
-
-  const initialVisualObjs = renderAbc("*", getInitial(tune.abc));
-  const initialVoicesArray = new NotesVoicesArray(initialVisualObjs[0]);
-
-  let points = 0;
-  solutionVoicesArray.forEachElem((elem, elemPos) => {
-    const initialElem = initialVoicesArray.getElem(elemPos);
-    if (elem.abcelem.chord && !initialElem.abcelem.chord) {
-      points += Math.min(
-        elem.abcelem.chord.map((chord) => {
-          const riemannFunc = RiemannFunc.fromString(
-            chord.name,
-            keySignature.mode
-          );
-          return riemannFunc.baseFunc.type.points;
-        })
-      );
-    }
-  });
-
-  // Multipliziere mit Bonus für erschwerende Faktoren
-  //	Wie viele Vorzeichen hat der Tune?
-  points *= 1 + 0.2 * keySignature.accidentals.length;
-  // Steht der Tune in Dur oder Moll?
-  // Moll ist 1.3, weil bei einem Drittel der Grundfunktionen Töne auftreten, die nicht leitereigen sind
-  points *= ["m", "min", "minor"].includes(keySignature.mode) ? 1.3 : 1;
-
-  // 	Wie viele verschiedene Stimmen hat der Tune?
-  points *= 1 + 0.1 * (solutionVoicesArray.length - 1);
-
-  return Math.round(points / 5) * 5;
 }
 
 export async function getServerSideProps(context) {

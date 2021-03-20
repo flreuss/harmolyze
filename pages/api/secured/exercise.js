@@ -34,6 +34,31 @@ export default async (req, res) => {
         res.status(500).json(err);
       }
       break;
+    case "PUT":
+      try {
+        const { db } = await connectToDatabase();
+        const tune = await db
+          .collection("tunes")
+          .findOne({ _id: ObjectId(req.body._id) });
+        if (session.user._id === tune.createdBy || session.user.isAdmin) {
+          await db
+            .collection("tunes")
+            .updateOne(
+              { _id: ObjectId(req.body._id) },
+              { $set: { abc: req.body.abc, points: req.body.points } }
+            );
+          //200 OK
+          res.status(200).json(tune.value);
+        } else {
+          // 401 Unauthorized
+          res.status(401).json({});
+        }
+      } catch (err) {
+        //500 Internal Server Error
+        console.error(err);
+        res.status(500).json(err);
+      }
+      break;
     case "DELETE":
       try {
         const { db } = await connectToDatabase();
