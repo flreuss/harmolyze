@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Box, Button, Heading, Layer, Text } from "grommet";
+import { Box, Button, CheckBox, Heading, Layer, Text } from "grommet";
 
-import RiemannFunc from "../../lib/riemannFunc";
+import RiemannFunc, { CondensedFunc } from "../../lib/riemannFunc";
 import NumberSelector from "../numberSelector";
 import NumberMultiSelector from "../numberMultiSelector";
 import SelectionWheel from "./selectionWheel";
@@ -14,20 +14,32 @@ export default function RiemannFuncSelectionDialog({
 }) {
   const [riemannFunc, setRiemannFunc] = useState({
     ...defaultValue,
-    baseFuncString: defaultValue.baseFunc ? defaultValue.baseFunc.short : undefined,
+    baseFuncString: defaultValue.baseFunc
+      ? defaultValue.baseFunc.short
+      : undefined,
   });
 
   function handleClose() {
     onClose(
       riemannFunc.baseFuncString
-        ? new RiemannFunc(
-            riemannFunc.baseFuncString,
-            riemannFunc.addTones,
-            riemannFunc.base,
-            riemannFunc.isSecondaryDominant,
-            riemannFunc.incomplete,
-            mode
-          )
+        ? typeof riemannFunc.given !== "undefined"
+          ? new CondensedFunc(
+              riemannFunc.baseFuncString,
+              riemannFunc.addTones,
+              riemannFunc.base,
+              riemannFunc.isSecondaryDominant,
+              riemannFunc.incomplete,
+              mode,
+              riemannFunc.given
+            )
+          : new RiemannFunc(
+              riemannFunc.baseFuncString,
+              riemannFunc.addTones,
+              riemannFunc.base,
+              riemannFunc.isSecondaryDominant,
+              riemannFunc.incomplete,
+              mode
+            )
         : undefined
     );
   }
@@ -92,6 +104,25 @@ export default function RiemannFuncSelectionDialog({
             }))
           }
         />
+
+        {typeof riemannFunc.given !== "undefined" && (
+          <Box
+            direction="row"
+            align="center"
+            justify="end"
+          >
+            <CheckBox
+              checked={riemannFunc.given}
+              label="Vorgegeben?"
+              onChange={(event) =>
+                setRiemannFunc((riemannFunc) => ({
+                  ...riemannFunc,
+                  given: event.target.checked,
+                }))
+              }
+            />
+          </Box>
+        )}
 
         <Box
           as="footer"

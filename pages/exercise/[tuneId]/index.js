@@ -83,6 +83,7 @@ export default function Exercise({ tune, session }) {
           {(device) => (
             <InteractiveScore
               abc={attempt.abc}
+              //TODO: Move into Score component
               initial={getInitial(tune.abc)}
               solution={getSolution(tune.abc)}
               showMistakes={attempt.showMistakes}

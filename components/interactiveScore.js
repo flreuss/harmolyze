@@ -3,7 +3,7 @@ import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Box, Button, Text } from "grommet";
 import SelectionDialog from "./riemannFunc/selectionDialog";
 import configFromFile from "./interactiveScore.config.json";
-import RiemannFunc from "../lib/riemannFunc";
+import RiemannFunc, { CondensedFunc } from "../lib/riemannFunc";
 import {
   addClasses,
   hasClass,
@@ -26,6 +26,7 @@ export default function InteractiveScore({
   device,
   onValidate,
   onChange,
+  showSolution,
 }) {
   //Attributes
   const ref = React.useRef();
@@ -145,11 +146,19 @@ export default function InteractiveScore({
         onClose: (riemannFunc) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFunc),
         defaultValue: lowestAdjacentNote.chord
-          ? RiemannFunc.fromString(
-              lowestAdjacentNote.chord[0].name,
-              visualObjs[0].getKeySignature().mode
-            )
+          ? showSolution
+            ? CondensedFunc.fromString(
+                lowestAdjacentNote.chord[0].name,
+                visualObjs[0].getKeySignature().mode
+              )
+            : RiemannFunc.fromString(
+                lowestAdjacentNote.chord[0].name,
+                visualObjs[0].getKeySignature().mode
+              )
+          : showSolution
+          ? new CondensedFunc()
           : new RiemannFunc(),
+        //TODO: Das wird doppelt übergeben, einmal in der RiemannFunc, einmal separat...
         mode: visualObjs[0].getKeySignature().mode,
       });
     }
