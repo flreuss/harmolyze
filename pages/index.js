@@ -78,17 +78,6 @@ export default function Home({ tunebooks, session, score }) {
                       }}
                       menuItems={[
                         {
-                          label: "Löschen",
-                          onClick: () => {
-                            setOpenDeleteDialog({ tune });
-                          },
-                          icon: (
-                            <Box pad={{ right: "medium" }}>
-                              <Trash />
-                            </Box>
-                          ),
-                        },
-                        {
                           label: "Bearbeiten",
                           onClick: () => {
                             setLoading(true);
@@ -97,6 +86,17 @@ export default function Home({ tunebooks, session, score }) {
                           icon: (
                             <Box pad={{ right: "medium" }}>
                               <Edit />
+                            </Box>
+                          ),
+                        },
+                        {
+                          label: "Löschen",
+                          onClick: () => {
+                            setOpenDeleteDialog({ tune });
+                          },
+                          icon: (
+                            <Box pad={{ right: "medium" }}>
+                              <Trash />
                             </Box>
                           ),
                         },
