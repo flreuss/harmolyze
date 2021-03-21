@@ -1,16 +1,14 @@
 import {
-    Box,
-    Card,
-    CardBody,
-    CardFooter,
-    Text,
-    CardHeader,
-    Menu,
-  } from "grommet";
-  import { useState } from "react";
-  import {
-    MoreVertical,
-  } from "grommet-icons";
+  Box,
+  Card,
+  CardBody,
+  CardFooter,
+  Text,
+  CardHeader,
+  Menu,
+} from "grommet";
+import { useState } from "react";
+import { MoreVertical } from "grommet-icons";
 
 export default function TuneCard(props) {
   const [animation, setAnimation] = useState({
@@ -18,18 +16,31 @@ export default function TuneCard(props) {
     size: "medium",
   });
 
-  function handleClick() {
-    if (!props.disabled) {
+  function anyParentElementHasAriaLabel(target, label) {
+    return target.parentElement
+      ? target.ariaLabel === label ||
+          anyParentElementHasAriaLabel(target.parentElement, label)
+      : target.ariaLabel === label;
+  }
+
+  function handleClick(event) {
+    if (
+      !props.disabled &&
+      !anyParentElementHasAriaLabel(event.target, "Open Menu")
+    ) {
       setAnimation({ type: "pulse", size: "small" });
       props.onClick();
     }
   }
 
   return (
-    <Card background="white" animation={animation}>
+    <Card
+      onClick={(event) => handleClick(event)}
+      background="white"
+      animation={animation}
+    >
       <CardHeader background={props.background}>
         <Box
-          onClick={handleClick}
           pad={{
             left: "small",
             top: "small",
@@ -53,16 +64,9 @@ export default function TuneCard(props) {
         )}
       </CardHeader>
 
-      <CardBody onClick={handleClick} pad="small">
-        ...
-      </CardBody>
+      <CardBody pad="small">...</CardBody>
 
-      <CardFooter
-        onClick={handleClick}
-        pad="small"
-        justify="end"
-        background={props.background}
-      >
+      <CardFooter pad="small" justify="end" background={props.background}>
         {props.footerItems.map((item) => (
           <Box
             key={`${props.title}_${item.label}`}
