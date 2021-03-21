@@ -1,6 +1,6 @@
 import { renderAbc, synth } from "abcjs";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { Box, Button, Text } from "grommet";
+import { Box, Button, Grid, Text } from "grommet";
 import SelectionDialog from "./riemannFunc/selectionDialog";
 import configFromFile from "./interactiveScore.config.json";
 import RiemannFunc, { CondensedFunc } from "../lib/riemannFunc";
@@ -264,31 +264,39 @@ export default function InteractiveScore({
   }
 
   return (
-    <Box fill align="center" justify="center" gap="none" ref={ref}>
+    <Grid
+      fill
+      align="center"
+      justify="center"
+      gap="none"
+      ref={ref}
+      rows={["auto", "auto"]}
+    >
       <Box id="scoreContainer" />
       <Box
-        pad={{
-          horizontal: "large",
-          top: "none",
-          bottom: "medium",
-        }}
+        direction="column"
         fill="horizontal"
-        id="audioContainer"
-      />
-      {onValidate && (
-        <Button
-          pad="medium"
-          type="submit"
-          margin="medium"
-          label={
-            <Text color="white">
-              <strong>Überprüfen</strong>
-            </Text>
-          }
-          onClick={handleValidate}
-          primary
-        />
-      )}
+        gap="medium"
+        align="center"
+        alignSelf="start"
+        pad={{ bottom: "small", horizontal: "large" }}
+      >
+        <Box fill="horizontal" id="audioContainer" />
+        {onValidate && (
+          <Button
+            pad="medium"
+            type="submit"
+            label={
+              <Text color="white">
+                <strong>Überprüfen</strong>
+              </Text>
+            }
+            fill={false}
+            onClick={handleValidate}
+            primary
+          />
+        )}
+      </Box>
       {openSelectionDialog && (
         <SelectionDialog
           windowSize={windowSize}
@@ -299,6 +307,6 @@ export default function InteractiveScore({
           target={ref.current}
         />
       )}
-    </Box>
+    </Grid>
   );
 }
