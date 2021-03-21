@@ -79,9 +79,11 @@ export default function Home({ tunebooks, session, score }) {
                       menuItems={[
                         {
                           label: "Bearbeiten",
-                          onClick: () => {
+                          onClick: (evt) => {
                             setLoading(true);
                             router.push(`/exercise/${tune._id}/edit`);
+                            //Prevent onClick event from bubbling up to the parent Card
+                            evt.stopPropagation();
                           },
                           icon: (
                             <Box pad={{ right: "medium" }}>
@@ -91,8 +93,10 @@ export default function Home({ tunebooks, session, score }) {
                         },
                         {
                           label: "Löschen",
-                          onClick: () => {
+                          onClick: (evt) => {
                             setOpenDeleteDialog({ tune });
+                            //Prevent onClick event from bubbling up to the parent Card
+                            evt.stopPropagation();
                           },
                           icon: (
                             <Box pad={{ right: "medium" }}>
