@@ -42,105 +42,107 @@ export default function Home({ tunebooks, session, score }) {
         </Box>
       }
     >
-      <Meter
-        value={
-          tunebooks
-            .flatMap((tunebook) => tunebook.tunes)
-            .filter((tune) => tune.highscore).length
-        }
-        max={tunebooks.flatMap((tunebook) => tunebook.tunes).length}
-        size="full"
-        thickness="small"
-      />
       <Stack anchor="bottom-right" fill>
-        <Box
-          pad="large"
-          background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
-          height="100%"
-          fill
-          overflow="scroll"
-        >
-          <Accordion
-            activeIndex={activeIndex}
-            onActive={(newActiveIndex) => setActiveIndex(newActiveIndex)}
+        <Box fill>
+          <Meter
+            value={
+              tunebooks
+                .flatMap((tunebook) => tunebook.tunes)
+                .filter((tune) => tune.highscore).length
+            }
+            max={tunebooks.flatMap((tunebook) => tunebook.tunes).length}
+            size="full"
+            thickness="small"
+          />
+          <Box
+            pad="large"
+            background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
+            height="100%"
+            fill
+            overflow="auto"
           >
-            {tunebooks.map((tunebook) => (
-              <AccordionPanel
-                key={tunebook._id}
-                gap="small"
-                label={tunebook.name}
-              >
-                <Grid gap="small" columns="small" margin="medium">
-                  {tunebook.tunes.map((tune) => (
-                    <TuneCard
-                      image={tunebook.image}
-                      background={tune.highscore ? "light-2" : "neutral-3"}
-                      onClick={() => {
-                        setLoading(true);
-                        router.push(`/tune/${tune._id}`);
-                      }}
-                      menuItems={[
-                        {
-                          label: "Bearbeiten",
-                          onClick: (evt) => {
-                            setLoading(true);
-                            router.push(`/tune/${tune._id}/edit`);
-                            //Prevent onClick event from bubbling up to the parent Card
-                            evt.stopPropagation();
+            <Accordion
+              activeIndex={activeIndex}
+              onActive={(newActiveIndex) => setActiveIndex(newActiveIndex)}
+            >
+              {tunebooks.map((tunebook) => (
+                <AccordionPanel
+                  key={tunebook._id}
+                  gap="small"
+                  label={tunebook.name}
+                >
+                  <Grid gap="small" columns="small" margin="medium">
+                    {tunebook.tunes.map((tune) => (
+                      <TuneCard
+                        image={tunebook.image}
+                        background={tune.highscore ? "light-2" : "neutral-3"}
+                        onClick={() => {
+                          setLoading(true);
+                          router.push(`/tune/${tune._id}`);
+                        }}
+                        menuItems={[
+                          {
+                            label: "Bearbeiten",
+                            onClick: (evt) => {
+                              setLoading(true);
+                              router.push(`/tune/${tune._id}/edit`);
+                              //Prevent onClick event from bubbling up to the parent Card
+                              evt.stopPropagation();
+                            },
+                            icon: (
+                              <Box pad={{ right: "medium" }}>
+                                <Edit />
+                              </Box>
+                            ),
                           },
-                          icon: (
-                            <Box pad={{ right: "medium" }}>
-                              <Edit />
-                            </Box>
-                          ),
-                        },
-                        {
-                          label: "Löschen",
-                          onClick: (evt) => {
-                            setOpenDeleteDialog({ tune });
-                            //Prevent onClick event from bubbling up to the parent Card
-                            evt.stopPropagation();
+                          {
+                            label: "Löschen",
+                            onClick: (evt) => {
+                              setOpenDeleteDialog({ tune });
+                              //Prevent onClick event from bubbling up to the parent Card
+                              evt.stopPropagation();
+                            },
+                            icon: (
+                              <Box pad={{ right: "medium" }}>
+                                <Trash />
+                              </Box>
+                            ),
                           },
-                          icon: (
-                            <Box pad={{ right: "medium" }}>
-                              <Trash />
-                            </Box>
-                          ),
-                        },
-                      ]}
-                      footerItems={
-                        tune.highscore
-                          ? [
-                              {
-                                icon: <StatusCritical />,
-                                label: tune.highscore.mistakes,
-                              },
-                              {
-                                icon: <Clock />,
-                                label: millisToMinutesAndSeconds(
-                                  tune.highscore.time
-                                ),
-                              },
-                            ]
-                          : [
-                              {
-                                icon: <Money />,
-                                label: tune.points,
-                              },
-                            ]
-                      }
-                      showMenu={
-                        tune.createdBy === session.user._id ||
-                        session.user.isAdmin
-                      }
-                      title={tune.title}
-                      key={tune._id}
-                    />
-                  ))}
-                </Grid>
-              </AccordionPanel>
-            ))}
-          </Accordion>
+                        ]}
+                        footerItems={
+                          tune.highscore
+                            ? [
+                                {
+                                  icon: <StatusCritical />,
+                                  label: tune.highscore.mistakes,
+                                },
+                                {
+                                  icon: <Clock />,
+                                  label: millisToMinutesAndSeconds(
+                                    tune.highscore.time
+                                  ),
+                                },
+                              ]
+                            : [
+                                {
+                                  icon: <Money />,
+                                  label: tune.points,
+                                },
+                              ]
+                        }
+                        showMenu={
+                          tune.createdBy === session.user._id ||
+                          session.user.isAdmin
+                        }
+                        title={tune.title}
+                        key={tune._id}
+                      />
+                    ))}
+                  </Grid>
+                </AccordionPanel>
+              ))}
+            </Accordion>
+          </Box>
         </Box>
         <Link href="/tune/new" passHref>
           <Box
@@ -159,6 +161,7 @@ export default function Home({ tunebooks, session, score }) {
           </Box>
         </Link>
       </Stack>
+
       {notification && (
         <Notification
           color="status-error"
