@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, ResponsiveContext } from "grommet";
+import { Box, Button, ResponsiveContext, Text } from "grommet";
 import InteractiveScore from "../../../components/interactiveScore";
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -10,8 +10,7 @@ import { calculatePoints } from "../../../lib/solutions";
 
 export default function EditTune({ tune, session }) {
   const [abcHistory, setAbcHistory] = useState([tune.abc]);
-  //TODO: Wie Nutzer beim Bearbeiten auf Autosave hinweisen (schauen wie es GoogleDocs macht)?
-  const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState();
 
   useEffect(() => {
     updateTune(
@@ -21,7 +20,7 @@ export default function EditTune({ tune, session }) {
         points: calculatePoints(abcHistory.slice(-1)[0]),
       },
       () => {
-        //TODO: Notification on autosave
+        setLastSaved(new Date());
       }
     );
   }, [abcHistory]);
@@ -30,7 +29,10 @@ export default function EditTune({ tune, session }) {
     <Layout
       user={session.user}
       status={
-        <Box direction="row" gap="xsmall">
+        <Box direction="row" gap="small" align="center">
+          {lastSaved && (
+            <Text>Zuletzt gespeichert um {lastSaved.toLocaleTimeString()}</Text>
+          )}
           <Button
             disabled={abcHistory.length < 2}
             icon={<Undo />}
