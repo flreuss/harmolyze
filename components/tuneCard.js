@@ -17,17 +17,17 @@ export default function TuneCard(props) {
     size: "medium",
   });
 
-  function anyParentElementHasAriaLabel(target, label) {
+  function anyParentElementHasId(target, id) {
     return target.parentElement
-      ? target.ariaLabel === label ||
-          anyParentElementHasAriaLabel(target.parentElement, label)
-      : target.ariaLabel === label;
+      ? target.id === id ||
+          anyParentElementHasId(target.parentElement, id)
+      : target.id === id;
   }
 
   function handleClick(event) {
     if (
       !props.disabled &&
-      !anyParentElementHasAriaLabel(event.target, "Open Menu")
+      !anyParentElementHasId(event.target, "tuneCardMenu")
     ) {
       setAnimation({ type: "pulse", size: "small" });
       props.onClick();
@@ -45,6 +45,7 @@ export default function TuneCard(props) {
         {props.showMenu && (
           <Menu
             icon={<MoreVertical />}
+            id="tuneCardMenu"
             hoverIndicator
             focusIndicator={false}
             alignSelf="center"
