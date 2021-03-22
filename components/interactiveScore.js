@@ -234,11 +234,7 @@ export default function InteractiveScore({
     synthControl.disable(true);
     const visualObj = visualObjs[0];
 
-    const activeAudioContext = synth.activeAudioContext();
-    const audioContext =
-      activeAudioContext && activeAudioContext.state !== "closed"
-        ? activeAudioContext
-        : new AudioContext();
+    const audioContext = new AudioContext();
     let midiBuffer = new synth.CreateSynth();
     midiBuffer
       .init({
