@@ -73,6 +73,7 @@ export default function Home({ tunebooks, session, score }) {
                 <Grid gap="small" columns="small" margin="medium">
                   {tunebook.tunes.map((tune) => (
                     <TuneCard
+                      image={tunebook.image}
                       background={tune.highscore ? "light-2" : "neutral-3"}
                       onClick={() => {
                         setLoading(true);
@@ -260,6 +261,7 @@ export async function getServerSideProps(context) {
               highscore: { $first: "$highscore" },
             },
             name: 1,
+            image: 1,
           },
         },
         { $sort: { "tunes_docs.points": 1 } },
@@ -267,6 +269,7 @@ export async function getServerSideProps(context) {
           $group: {
             _id: "$_id",
             name: { $first: "$name" },
+            image: { $first: "$image" },
             tunes: { $push: "$tunes_docs" },
           },
         },
