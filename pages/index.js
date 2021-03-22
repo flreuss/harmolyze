@@ -74,14 +74,14 @@ export default function Home({ tunebooks, session, score }) {
                       background={tune.highscore ? "light-2" : "neutral-3"}
                       onClick={() => {
                         setLoading(true);
-                        router.push(`/exercise/${tune._id}`);
+                        router.push(`/tune/${tune._id}`);
                       }}
                       menuItems={[
                         {
                           label: "Bearbeiten",
                           onClick: (evt) => {
                             setLoading(true);
-                            router.push(`/exercise/${tune._id}/edit`);
+                            router.push(`/tune/${tune._id}/edit`);
                             //Prevent onClick event from bubbling up to the parent Card
                             evt.stopPropagation();
                           },
@@ -139,7 +139,7 @@ export default function Home({ tunebooks, session, score }) {
             ))}
           </Accordion>
         </Box>
-        <Link href="/exercise/new" passHref>
+        <Link href="/tune/new" passHref>
           <Box
             round="full"
             overflow="hidden"
@@ -170,7 +170,7 @@ export default function Home({ tunebooks, session, score }) {
           confirmLabel="Löschen"
           onCancel={() => setOpenDeleteDialog(undefined)}
           onConfirm={() => {
-            fetch("/api/secured/exercise", {
+            fetch("/api/secured/tune", {
               method: "DELETE",
               body: JSON.stringify(openDeleteDialog.tune),
               headers: {

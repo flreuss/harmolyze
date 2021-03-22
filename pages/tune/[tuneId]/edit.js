@@ -8,13 +8,13 @@ import { getSession } from "next-auth/client";
 import { LinkPrevious, Undo } from "grommet-icons";
 import { calculatePoints } from "../../../lib/solutions";
 
-export default function Exercise({ tune, session }) {
+export default function EditTune({ tune, session }) {
   const [abcHistory, setAbcHistory] = useState([tune.abc]);
   //TODO: Wie Nutzer beim Bearbeiten auf Autosave hinweisen (schauen wie es GoogleDocs macht)?
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    updateExercise(
+    updateTune(
       {
         ...tune,
         abc: abcHistory.slice(-1)[0],
@@ -67,10 +67,10 @@ export default function Exercise({ tune, session }) {
   );
 }
 
-function updateExercise(exercise, onSuccess) {
-  fetch("/api/secured/exercise", {
+function updateTune(tune, onSuccess) {
+  fetch("/api/secured/tune", {
     method: "PUT",
-    body: JSON.stringify(exercise),
+    body: JSON.stringify(tune),
     headers: {
       "Content-type": "application/json;charset=utf-8",
     },

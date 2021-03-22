@@ -11,7 +11,7 @@ import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
 import createPersistedState from "use-persisted-state";
 import { getInitial, getSolution } from "../../../lib/solutions";
 
-export default function Exercise({ tune, session }) {
+export default function DisplayTune({ tune, session }) {
   const defaultAttempt = {
     progress: 0,
     mistakes: 0,
@@ -117,7 +117,7 @@ export default function Exercise({ tune, session }) {
                   resetTime();
                   createAttempt(successfulAttempt, () =>
                     router.push(
-                      `/exercise/${tune._id}/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
+                      `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
                     )
                   );
                 }
