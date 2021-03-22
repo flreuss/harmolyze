@@ -6,6 +6,7 @@ import {
   Text,
   CardHeader,
   Menu,
+  Image,
 } from "grommet";
 import { useState } from "react";
 import { MoreVertical } from "grommet-icons";
@@ -40,21 +41,13 @@ export default function TuneCard(props) {
       animation={animation}
     >
       <CardHeader background={props.background}>
-        <Box
-          pad={{
-            left: "small",
-            top: "small",
-            bottom: "small",
-          }}
-        >
-          <Text size="medium">{props.title}</Text>
-        </Box>
+          <Text margin="small" truncate size="medium">{props.title}</Text>
         {props.showMenu && (
           <Menu
             icon={<MoreVertical />}
             hoverIndicator
             focusIndicator={false}
-            alignSelf="start"
+            alignSelf="center"
             dropProps={{
               align: { top: "bottom", right: "right" },
               elevation: "xlarge",
@@ -64,7 +57,9 @@ export default function TuneCard(props) {
         )}
       </CardHeader>
 
-      <CardBody pad="small">...</CardBody>
+      <CardBody pad={{horizontal: "medium"}}>
+        <Image src="/tunebooks/placeholder.png" />
+      </CardBody>
 
       <CardFooter pad="small" justify="end" background={props.background}>
         {props.footerItems.map((item) => (

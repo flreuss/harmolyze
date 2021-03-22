@@ -57,6 +57,8 @@ export default function Home({ tunebooks, session, score }) {
           pad="large"
           background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
           height="100%"
+          fill
+          overflow="scroll"
         >
           <Accordion
             activeIndex={activeIndex}
