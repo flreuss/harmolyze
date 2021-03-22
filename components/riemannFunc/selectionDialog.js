@@ -52,8 +52,12 @@ export default function RiemannFuncSelectionDialog({
       onEsc={handleClose}
       target={target}
       background={{ color: "white", opacity: "strong" }}
+      responsive={false}
     >
-      <Box pad="large" gap="medium">
+      <Box
+        pad={windowSize.height >= 700 ? "large" : "medium"}
+        gap={windowSize.height >= 700 ? "medium" : "small"}
+      >
         <Heading level={3} margin="none">
           Riemann Function
         </Heading>
@@ -70,7 +74,8 @@ export default function RiemannFuncSelectionDialog({
           max={2}
         />
 
-        {device === "small" && windowSize.width > windowSize.height ? (
+        {(device === "small" || windowSize.height < 700) &&
+        windowSize.width > windowSize.height ? (
           <Select
             labelKey="label"
             valueKey={{ key: "value", reduce: true }}
@@ -93,7 +98,9 @@ export default function RiemannFuncSelectionDialog({
             lineWidth={
               device === "small"
                 ? Math.floor(
-                    Math.min(windowSize.height, windowSize.width) / 2.3 / 3.5
+                    Math.min(0.6 * windowSize.height, windowSize.width) /
+                      2.3 /
+                      3.5
                   )
                 : Math.floor(
                     Math.min(windowSize.height, windowSize.width) / 5 / 3.5
@@ -102,7 +109,7 @@ export default function RiemannFuncSelectionDialog({
             radius={
               device === "small"
                 ? Math.floor(
-                    Math.min(windowSize.height, windowSize.width) / 2.3
+                    Math.min(0.6 * windowSize.height, windowSize.width) / 2.3
                   )
                 : Math.floor(Math.min(windowSize.height, windowSize.width) / 5)
             }
