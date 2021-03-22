@@ -44,6 +44,7 @@ export default function SignIn() {
                 if (res.ok) {
                   router.push("/");
                 } else {
+                  setLoading(false);
                   setUnauthorized(
                     "Überprüfen Sie die eingegebenen Zugangsdaten."
                   );

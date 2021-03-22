@@ -59,6 +59,7 @@ export default function SignIn({ avatars }) {
                   return res.json();
                 })
                 .then((err) => {
+                  setLoading(false)
                   //Benutzername existiert bereits
                   if (err && err.code === 11000)
                     setNameError("Der Benutzername ist bereits vergeben.");
