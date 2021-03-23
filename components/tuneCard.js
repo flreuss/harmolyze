@@ -40,7 +40,7 @@ export default function TuneCard(props) {
       background="white"
       animation={animation}
     >
-      <CardHeader background={props.background}>
+      <CardHeader background={props.background} gap="none">
           <Text margin="small" truncate size="medium">{props.title}</Text>
         {props.showMenu && (
           <Menu
