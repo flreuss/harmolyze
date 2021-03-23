@@ -14,12 +14,15 @@ import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
 import { signOut } from "next-auth/client";
-import { Home, Logout } from "grommet-icons";
+import { Analytics, Home, Logout } from "grommet-icons";
 import React from "react";
+import { useRouter } from "next/router";
 
 const customTheme = deepMerge(grommet, {});
 
 export default function Layout({ children, user, status, homeIcon, loading }) {
+  const router = useRouter();
+
   return (
     <Grommet full theme={customTheme}>
       <Grid
@@ -47,6 +50,17 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
                   align: { top: "bottom", right: "right" },
                 }}
                 items={[
+                  {
+                    label: "Statistik",
+                    onClick: () => {
+                      router.push("/stats")
+                    },
+                    icon: (
+                      <Box pad={{ right: "small" }}>
+                        <Analytics />
+                      </Box>
+                    ),
+                  },
                   {
                     label: "Abmelden",
                     onClick: () => {
