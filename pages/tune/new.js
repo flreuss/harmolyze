@@ -9,25 +9,35 @@ import {
   FormField,
   Heading,
   TextInput,
-  TextArea,
   Select,
+  FileInput,
 } from "grommet";
 import { connectToDatabase } from "../../lib/mongodb";
+import Head from "next/head";
 import { calculatePoints } from "../../lib/solutions";
+import xml2abc from "xml2abc";
 
 export default function CreateTune({ tunebooks, session }) {
-  const defaultValue = {
-    abc: "",
+  const defaultTune = {
+    musicXmlFiles: "",
     title: "",
     points: 0,
     tunebook_id: tunebooks[0]._id,
   };
 
   const [notification, setNotification] = useState(undefined);
-  const [value, setValue] = useState(defaultValue);
+  const [tune, setTune] = useState(defaultTune);
 
   return (
     <Layout user={session.user}>
+      <Head>
+        {/* Workaround: add jQuery this way globally to make xml2abc work */}
+        <script
+          src="https://code.jquery.com/jquery-1.12.4.min.js"
+          integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+          crossorigin="anonymous"
+        ></script>
+      </Head>
       <Box fill align="center" justify="center" gap="large" pad="medium">
         <Heading textAlign="center" margin="none">
           Neue Übungsaufgabe anlegen
@@ -35,31 +45,48 @@ export default function CreateTune({ tunebooks, session }) {
 
         <Box width="medium">
           <Form
-            value={value}
+            value={tune}
             validate="submit"
             onChange={(nextValue) => {
-              setValue(nextValue);
+              setTune(nextValue);
             }}
             onSubmit={({ value: tune }) => {
-              tune.points = calculatePoints(tune.abc);
-
-              fetch("/api/secured/tune", {
-                method: "POST",
-                body: JSON.stringify(tune),
-                headers: {
-                  "Content-type": "application/json;charset=utf-8",
-                },
-              }).then((res) => {
-                if (res.status === 201) {
+              //Read file input as UTF-8
+              tune.musicXmlFiles[0].text().then((text) => {
+                const xmlDoc = $.parseXML(text);
+                const res = xml2abc.vertaal(xmlDoc, { x: 1, p: "" });
+                const errtxt = res[1];
+                if (errtxt.length !== 0) {
                   setNotification({
-                    text: "Übungsaufgabe wurde erfolgreich angelegt",
-                    color: "status-ok",
-                  });
-                  setValue(defaultValue);
-                } else {
-                  setNotification({
-                    text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                    text:
+                      "Bei der Konvertierung der .musicxml-Datei ist ein Fehler aufgetreten.",
                     color: "status-error",
+                  });
+                } else {
+                  tune.abc = res[0];
+                  //TODO: TRY-CATCH
+                  tune.points = calculatePoints(tune.abc);
+
+                  fetch("/api/secured/tune", {
+                    method: "POST",
+                    body: JSON.stringify(tune),
+                    headers: {
+                      "Content-type": "application/json;charset=utf-8",
+                    },
+                  }).then((res) => {
+                    if (res.status === 201) {
+                      setNotification({
+                        text: "Übungsaufgabe wurde erfolgreich angelegt",
+                        color: "status-ok",
+                      });
+                      setTune(defaultTune);
+                    } else {
+                      setNotification({
+                        text:
+                          "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                        color: "status-error",
+                      });
+                    }
                   });
                 }
               });
@@ -78,25 +105,36 @@ export default function CreateTune({ tunebooks, session }) {
               />
             </FormField>
 
-            <FormField label="ABC" name="abc">
-              <TextArea
-                name="abc"
-                size="small"
-                resize="vertical"
-                placeholder="Paste here"
-              />
+            <FormField
+              label="MusicXML-Datei"
+              name="musicXmlFiles"
+              validate={(musicXmlFiles) => {
+                if (
+                  musicXmlFiles[0] &&
+                  musicXmlFiles[0].name.slice(-9) !== ".musicxml"
+                ) {
+                  return "Die ausgewählte Datei ist keine .musicxml-Datei.";
+                } else if (!musicXmlFiles[0]) {
+                  return "Laden Sie eine Datei hoch.";
+                }
+                return undefined;
+              }}
+            >
+              <FileInput name="musicXmlFiles" />
             </FormField>
 
             <Box
               alignContent="end"
               direction="row"
-              justify="between"
+              justify="end"
               margin={{ top: "medium" }}
             >
               <Button
                 type="submit"
                 label="Erstellen"
-                disabled={!value || !value.title || !value.abc}
+                disabled={
+                  !tune || !tune.title || tune.musicXmlFiles.length === 0
+                }
                 primary
               />
             </Box>
