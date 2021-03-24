@@ -55,13 +55,16 @@ export default function RiemannFuncSelectionDialog({
       responsive={false}
     >
       <Box
-        pad={windowSize.height >= 700 ? "large" : "medium"}
+        pad={
+          windowSize.height >= 700
+            ? "large"
+            : { horizontal: "medium", vertical: "small" }
+        }
         gap={windowSize.height >= 700 ? "medium" : "small"}
       >
-        <Heading level={3} margin="none">
-          Riemann Function
+        <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
+          Zusatztöne (max. 2):
         </Heading>
-
         <NumberMultiSelector
           options={RiemannFunc.validAddTones}
           selected={riemannFunc.addTones}
@@ -74,6 +77,11 @@ export default function RiemannFuncSelectionDialog({
           max={2}
         />
 
+        {windowSize.height >= 700 && (
+          <Heading level={6} margin="none">
+            Grundfunktion:
+          </Heading>
+        )}
         {(device === "small" || windowSize.height < 700) &&
         windowSize.width > windowSize.height ? (
           <Select
@@ -136,6 +144,9 @@ export default function RiemannFuncSelectionDialog({
           />
         )}
 
+        <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
+          Basston:
+        </Heading>
         <NumberSelector
           name="baseSelector"
           options={RiemannFunc.validBaseNotes}
