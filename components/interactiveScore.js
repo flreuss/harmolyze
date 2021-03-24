@@ -52,7 +52,7 @@ export default function InteractiveScore({
   }, [abc, solved]);
   useLayoutEffect(() => {
     renderVisualObjs();
-  }, [windowSize]);
+  }, [windowSize, device]);
 
   //Event handlers
   function handleValidate() {

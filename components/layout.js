@@ -9,6 +9,7 @@ import {
   Avatar,
   Menu,
   Layer,
+  Spinner,
 } from "grommet";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
@@ -87,7 +88,7 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
               justify="center"
               responsive={false}
             >
-              <Box alignSelf="center" className="loader" align="center" />
+              <Spinner size="large" />
             </Layer>
           )}
         </Main>
