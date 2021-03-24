@@ -167,10 +167,11 @@ export async function getServerSideProps(context) {
 
     const tunebooks = await db
       .collection("tunebooks")
-      .find({ $or: [{ public: !session.user.isAdmin }, { public: true }] })
+      .find({ "permissions.write": { $in: session.user.groups } })
       .project({
         tunes: 0,
       })
+      .sort({ _id: 1 })
       .toArray();
 
     return {

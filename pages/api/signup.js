@@ -12,7 +12,7 @@ export default async (req, res) => {
           password: hashedPassword,
           createdAt: new Date(),
           image: req.body.image,
-          isAdmin: false,
+          groups: ["global"]
         };
         const users = await db.collection("users").insertOne(user);
         //201 Created

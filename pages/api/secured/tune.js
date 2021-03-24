@@ -16,7 +16,11 @@ export default async (req, res) => {
         const tunebook = await db
           .collection("tunebooks")
           .findOne({ _id: newTune.tunebook_id });
-        if (tunebook.public || session.user.isAdmin) {
+        if (
+          tunebook.permissions.read.some((group) =>
+            session.user.groups.includes(group)
+          )
+        ) {
           const tunes = await db.collection("tunes").insertOne(newTune);
           db.collection("tunebooks").updateOne(
             { _id: tunebook._id },
@@ -40,7 +44,10 @@ export default async (req, res) => {
         const tune = await db
           .collection("tunes")
           .findOne({ _id: ObjectId(req.body._id) });
-        if (session.user._id === tune.createdBy || session.user.isAdmin) {
+        if (
+          session.user._id === tune.createdBy ||
+          session.user.groups.includes("admin")
+        ) {
           await db
             .collection("tunes")
             .updateOne(
@@ -65,7 +72,10 @@ export default async (req, res) => {
         const tune = await db
           .collection("tunes")
           .findOne({ _id: ObjectId(req.body._id) });
-        if (session.user._id === tune.createdBy || session.user.isAdmin) {
+        if (
+          session.user._id === tune.createdBy ||
+          session.user.groups.includes("admin")
+        ) {
           await db
             .collection("tunes")
             .deleteOne({ _id: ObjectId(req.body._id) });

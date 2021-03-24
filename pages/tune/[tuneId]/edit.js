@@ -103,7 +103,7 @@ export async function getServerSideProps(context) {
 
   if (
     session &&
-    (session.user._id === tune.createdBy || session.user.isAdmin)
+    (session.user._id === tune.createdBy || session.user.groups.includes("admin"))
   ) {
     return {
       props: {

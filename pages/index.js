@@ -132,7 +132,7 @@ export default function Home({ tunebooks, session, score }) {
                         }
                         showMenu={
                           tune.createdBy === session.user._id ||
-                          session.user.isAdmin
+                          session.user.groups.includes("admin")
                         }
                         title={tune.title}
                         key={tune._id}
@@ -265,6 +265,7 @@ export async function getServerSideProps(context) {
             },
             name: 1,
             image: 1,
+            permissions: 1,
           },
         },
         { $sort: { "tunes_docs.points": 1 } },
@@ -273,6 +274,7 @@ export async function getServerSideProps(context) {
             _id: "$_id",
             name: { $first: "$name" },
             image: { $first: "$image" },
+            permissions: { $first: "$permissions" },
             tunes: { $push: "$tunes_docs" },
           },
         },
