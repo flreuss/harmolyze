@@ -64,6 +64,8 @@ export default function CreateTune({ tunebooks, session }) {
                   });
                 } else {
                   tune.abc = res[0];
+                  //TODO: Fallback if empty
+                  tune.title = $(xmlDoc).find("work-title").text();
                   //TODO: TRY-CATCH
                   tune.points = calculatePoints(tune.abc);
 
@@ -76,7 +78,7 @@ export default function CreateTune({ tunebooks, session }) {
                   }).then((res) => {
                     if (res.status === 201) {
                       setNotification({
-                        text: "Übungsaufgabe wurde erfolgreich angelegt",
+                        text: `"${tune.title}" wurde erfolgreich angelegt`,
                         color: "status-ok",
                       });
                       setTune(defaultTune);
@@ -92,10 +94,6 @@ export default function CreateTune({ tunebooks, session }) {
               });
             }}
           >
-            <FormField label="Titel" name="title" required>
-              <TextInput name="title" type="name" />
-            </FormField>
-
             <FormField label="Kategorie" name="tunebook_id">
               <Select
                 name="tunebook_id"
@@ -132,9 +130,7 @@ export default function CreateTune({ tunebooks, session }) {
               <Button
                 type="submit"
                 label="Erstellen"
-                disabled={
-                  !tune || !tune.title || tune.musicXmlFiles.length === 0
-                }
+                disabled={!tune || tune.musicXmlFiles.length === 0}
                 primary
               />
             </Box>
