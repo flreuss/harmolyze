@@ -8,7 +8,7 @@ import {
   addClasses,
   hasClass,
   NotesVoicesArray,
-  SimultaneousNotesArray,
+  SimultaneousNotesMap,
   adjacentElemsOf,
   chordOf,
   unhighlight,
@@ -35,7 +35,7 @@ export default function InteractiveScore({
   var visualObjs;
   var voicesArray;
   //TODO: Memoized (useMemo), muss nur bei resize neu berechnet werden
-  var simultaneousNotesArray;
+  var simultaneousNotesMap;
   var notesHighlighted = [];
   var synthControl;
 
@@ -73,13 +73,13 @@ export default function InteractiveScore({
 
       if (
         solutionChord &&
-        !chordOf(elem, initialVoicesArray, simultaneousNotesArray)
+        !chordOf(elem, initialVoicesArray, simultaneousNotesMap)
       ) {
         const solutionChords = solutionChord[0].name.split("\n");
 
         if (!filledInChord || !solutionChords.includes(filledInChord[0].name)) {
           mistakes += 1;
-          adjacentElemsOf(elem, voicesArray, simultaneousNotesArray).forEach(
+          adjacentElemsOf(elem, voicesArray, simultaneousNotesMap).forEach(
             (elem) => {
               addClasses(elem, ["abcjs-mistake"]);
             }
@@ -88,7 +88,7 @@ export default function InteractiveScore({
           solvedCount += 1;
           if (!hasClass(elem, "abcjs-solved")) {
             solvedArray = solvedArray.concat(
-              simultaneousNotesArray.get(elem.counters)
+              simultaneousNotesMap.get(elem.counters)
             );
           }
         }
@@ -132,7 +132,7 @@ export default function InteractiveScore({
       const adjacentElems = adjacentElemsOf(
         abcelem.abselem,
         voicesArray,
-        simultaneousNotesArray
+        simultaneousNotesMap
       );
       const lowestAdjacentNote =
         adjacentElems[adjacentElems.length - 1].abcelem;
@@ -185,7 +185,7 @@ export default function InteractiveScore({
 
     visualObjs = renderAbc("scoreContainer", abc, config);
     voicesArray = new NotesVoicesArray(visualObjs[0]);
-    simultaneousNotesArray = new SimultaneousNotesArray(voicesArray);
+    simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
 
     if (solution && initial) {
       const solutionVoicesArray = new NotesVoicesArray(
@@ -197,8 +197,8 @@ export default function InteractiveScore({
 
       voicesArray.forEachElem((elem, pos) => {
         if (
-          !chordOf(elem, solutionVoicesArray, simultaneousNotesArray) ||
-          chordOf(elem, initialVoicesArray, simultaneousNotesArray)
+          !chordOf(elem, solutionVoicesArray, simultaneousNotesMap) ||
+          chordOf(elem, initialVoicesArray, simultaneousNotesMap)
         ) {
           addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
         } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
