@@ -78,7 +78,7 @@ export default function RiemannFuncSelectionDialog({
         />
 
         {windowSize.height >= 700 && (
-          <Heading level={6} margin="none">
+          <Heading level={4} margin="none">
             Grundfunktion:
           </Heading>
         )}
