@@ -5,12 +5,15 @@ import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
-import { LinkPrevious, Undo } from "grommet-icons";
+import { LinkPrevious, Undo, View } from "grommet-icons";
 import { calculatePoints } from "../../../lib/solutions";
+import { useRouter } from "next/router";
 
 export default function EditTune({ tune, session }) {
   const [abcHistory, setAbcHistory] = useState([tune.abc]);
   const [lastSaved, setLastSaved] = useState();
+
+  const router = useRouter();
 
   useEffect(() => {
     updateTune(
@@ -42,9 +45,9 @@ export default function EditTune({ tune, session }) {
               setAbcHistory(nextAbcHistory);
             }}
           />
+          <Button icon={<View />} onClick={() => {router.push(`/tune/${tune._id}`)}} hoverIndicator />
         </Box>
       }
-      homeIcon={<LinkPrevious />}
     >
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
@@ -103,7 +106,8 @@ export async function getServerSideProps(context) {
 
   if (
     session &&
-    (session.user._id === tune.createdBy || session.user.groups.includes("admin"))
+    (session.user._id === tune.createdBy ||
+      session.user.groups.includes("admin"))
   ) {
     return {
       props: {

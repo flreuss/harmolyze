@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Meter, ResponsiveContext, Text } from "grommet";
+import { Box, Button, Meter, ResponsiveContext, Text } from "grommet";
 import InteractiveScore from "../../../components/interactiveScore";
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -7,7 +7,7 @@ import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
-import { Clock, LinkPrevious, StatusCritical } from "grommet-icons";
+import { Clock, Edit, StatusCritical } from "grommet-icons";
 import createPersistedState from "use-persisted-state";
 import { getInitial, getSolution } from "../../../lib/solutions";
 
@@ -50,11 +50,7 @@ export default function DisplayTune({ tune, session }) {
     <Layout
       loading={loading}
       status={
-        <Box
-          direction="row"
-          gap="medium"
-          pad={{ horizontal: "medium", vertical: "small" }}
-        >
+        <Box direction="row" gap="small" align="center">
           <Box direction="row" gap="xsmall">
             <StatusCritical />
             <Text>{attempt.mistakes}</Text>
@@ -63,9 +59,18 @@ export default function DisplayTune({ tune, session }) {
             <Clock />
             <Text>{millisToMinutesAndSeconds(time)}</Text>
           </Box>
+          {session.user.groups.includes("admin") && (
+            <Button
+              icon={<Edit />}
+              onClick={() => {
+                router.push(`/tune/${tune._id}/edit`);
+              }}
+              hoverIndicator
+            />
+          )}
         </Box>
       }
-      homeIcon={<LinkPrevious />}
+      user={session.user}
     >
       <Meter
         value={Math.floor(attempt.progress * 100)}
