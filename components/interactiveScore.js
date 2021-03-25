@@ -158,8 +158,6 @@ export default function InteractiveScore({
           : showSolution
           ? new CondensedFunc(visualObjs[0].getKeySignature().mode)
           : new RiemannFunc(visualObjs[0].getKeySignature().mode),
-        //TODO: Das wird doppelt übergeben, einmal in der RiemannFunc, einmal separat...
-        mode: visualObjs[0].getKeySignature().mode,
       });
     }
   }
@@ -299,7 +297,6 @@ export default function InteractiveScore({
           device={device}
           onClose={openSelectionDialog.onClose}
           defaultValue={openSelectionDialog.defaultValue}
-          mode={openSelectionDialog.mode}
           target={ref.current}
         />
       )}

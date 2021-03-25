@@ -9,7 +9,6 @@ export default function RiemannFuncSelectionDialog({
   defaultValue,
   onClose,
   target,
-  mode,
   windowSize,
   device,
 }) {
@@ -25,7 +24,7 @@ export default function RiemannFuncSelectionDialog({
       riemannFunc.baseFuncString
         ? typeof riemannFunc.given !== "undefined"
           ? new CondensedFunc(
-              mode,
+              riemannFunc.mode,
               riemannFunc.baseFuncString,
               riemannFunc.addTones,
               riemannFunc.base,
@@ -34,7 +33,7 @@ export default function RiemannFuncSelectionDialog({
               riemannFunc.given
             )
           : new RiemannFunc(
-              mode,
+              riemannFunc.mode,
               riemannFunc.baseFuncString,
               riemannFunc.addTones,
               riemannFunc.base,
@@ -140,7 +139,7 @@ export default function RiemannFuncSelectionDialog({
                 incomplete: val.startsWith("/"),
               }));
             }}
-            mode={mode}
+            mode={riemannFunc.mode}
           />
         )}
 
