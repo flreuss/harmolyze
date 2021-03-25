@@ -11,6 +11,7 @@ import {
   TextInput,
   Select,
   FileInput,
+  RadioButtonGroup,
 } from "grommet";
 import { connectToDatabase } from "../../lib/mongodb";
 import Head from "next/head";
@@ -23,6 +24,7 @@ export default function CreateTune({ tunebooks, session }) {
     title: "",
     points: 0,
     tunebook_id: tunebooks[0]._id,
+    mode: "major",
   };
 
   const [notification, setNotification] = useState(undefined);
@@ -53,7 +55,17 @@ export default function CreateTune({ tunebooks, session }) {
             onSubmit={({ value: tune }) => {
               //Read file input as UTF-8
               tune.musicXmlFiles[0].text().then((text) => {
-                const xmlDoc = $.parseXML(text);
+                let xmlDoc = $.parseXML(text);
+                let keyElem = $(xmlDoc).find("key");
+
+                if (keyElem.find("mode")) {
+                  keyElem
+                    .find("mode")
+                    .replaceWith($(`<mode>${tune.mode}</mode>`));
+                } else {
+                  keyElem.append($(`<mode>${tune.mode}</mode>`));
+                }
+
                 const res = xml2abc.vertaal(xmlDoc, { x: 1, p: "" });
                 const errtxt = res[1];
                 if (errtxt.length !== 0) {
@@ -100,6 +112,16 @@ export default function CreateTune({ tunebooks, session }) {
                 options={tunebooks}
                 labelKey="name"
                 valueKey={{ key: "_id", reduce: true }}
+              />
+            </FormField>
+
+            <FormField label="Tongeschlecht" name="mode">
+              <RadioButtonGroup
+                name="mode"
+                options={[
+                  { value: "major", label: "Dur" },
+                  { value: "minor", label: "Moll" },
+                ]}
               />
             </FormField>
 
