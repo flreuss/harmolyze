@@ -8,7 +8,6 @@ import {
   Form,
   FormField,
   Heading,
-  TextInput,
   Select,
   FileInput,
   RadioButtonGroup,
@@ -78,8 +77,6 @@ export default function CreateTune({ tunebooks, session }) {
                   tune.abc = res[0];
                   //TODO: Fallback if empty
                   tune.title = $(xmlDoc).find("work-title").text();
-                  //TODO: TRY-CATCH
-                  tune.points = calculatePoints(tune.abc);
 
                   fetch("/api/secured/tune", {
                     method: "POST",
