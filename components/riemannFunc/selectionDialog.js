@@ -25,21 +25,21 @@ export default function RiemannFuncSelectionDialog({
       riemannFunc.baseFuncString
         ? typeof riemannFunc.given !== "undefined"
           ? new CondensedFunc(
+              mode,
               riemannFunc.baseFuncString,
               riemannFunc.addTones,
               riemannFunc.base,
               riemannFunc.isSecondaryDominant,
               riemannFunc.incomplete,
-              mode,
               riemannFunc.given
             )
           : new RiemannFunc(
+              mode,
               riemannFunc.baseFuncString,
               riemannFunc.addTones,
               riemannFunc.base,
               riemannFunc.isSecondaryDominant,
-              riemannFunc.incomplete,
-              mode
+              riemannFunc.incomplete
             )
         : undefined
     );

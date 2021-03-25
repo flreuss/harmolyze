@@ -148,16 +148,16 @@ export default function InteractiveScore({
         defaultValue: lowestAdjacentNote.chord
           ? showSolution
             ? CondensedFunc.fromString(
-                lowestAdjacentNote.chord[0].name,
-                visualObjs[0].getKeySignature().mode
+                visualObjs[0].getKeySignature().mode,
+                lowestAdjacentNote.chord[0].name
               )
             : RiemannFunc.fromString(
-                lowestAdjacentNote.chord[0].name,
-                visualObjs[0].getKeySignature().mode
+                visualObjs[0].getKeySignature().mode,
+                lowestAdjacentNote.chord[0].name
               )
           : showSolution
-          ? new CondensedFunc()
-          : new RiemannFunc(),
+          ? new CondensedFunc(visualObjs[0].getKeySignature().mode)
+          : new RiemannFunc(visualObjs[0].getKeySignature().mode),
         //TODO: Das wird doppelt übergeben, einmal in der RiemannFunc, einmal separat...
         mode: visualObjs[0].getKeySignature().mode,
       });
