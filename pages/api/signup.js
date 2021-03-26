@@ -5,7 +5,7 @@ export default async (req, res) => {
   switch (req.method) {
     case "POST":
       try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const hashedPassword = await bcrypt.hash(req.body.password, 8);
         const { db } = await connectToDatabase();
         const user = {
           _id: req.body.name,
