@@ -13,7 +13,7 @@ import {
   chordOf,
   unhighlight,
 } from "../lib/abcjsUtils";
-import { insert, replace } from "../lib/stringUtils";
+import { replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
 
@@ -98,25 +98,23 @@ export default function InteractiveScore({
     onValidate(mistakes, solvedCount, solvedArray);
   }
 
-  function handleSelectionDialogClose(abcelem, riemannFunc) {
-    if (riemannFunc) {
-      if (!abcelem.chord) {
-        onChange(insert(abc, `"_${riemannFunc}"`, abcelem.startChar));
-      } else if (riemannFunc.toString() !== abcelem.chord[0].name) {
-        onChange(
-          replace(
-            abc,
-            `"_${riemannFunc}"`,
-            abcelem.startChar,
-            abcelem.chord[0].name.length + 3
-          )
-        );
-      } else {
-        unhighlight(notesHighlighted);
-      }
-    } else {
-      unhighlight(notesHighlighted);
+  function handleSelectionDialogClose(abcelem, riemannFuncArray) {
+    if (riemannFuncArray[0]) {
+      const oldChordStringLength = abcelem.chord
+        ? abcelem.chord[0].name.split("\n").reduce((acc, current) => {
+            return acc + current.length + 3;
+          }, 0)
+        : 0;
+      const newChordString = riemannFuncArray.reduce(
+        (acc, current) => acc.concat(`"_${current}"`),
+        ""
+      );
+
+      onChange(
+        replace(abc, newChordString, abcelem.startChar, oldChordStringLength)
+      );
     }
+    unhighlight(notesHighlighted);
     setOpenSelectionDialog(undefined);
   }
 
@@ -143,21 +141,30 @@ export default function InteractiveScore({
         notesHighlighted.push(elem);
       });
       setOpenSelectionDialog({
-        onClose: (riemannFunc) =>
-          handleSelectionDialogClose(lowestAdjacentNote, riemannFunc),
-        defaultValue: lowestAdjacentNote.chord
+        onClose: (riemannFuncArray) =>
+          handleSelectionDialogClose(lowestAdjacentNote, riemannFuncArray),
+        editable: showSolution,
+        defaultValues: lowestAdjacentNote.chord
           ? showSolution
-            ? CondensedFunc.fromString(
-                visualObjs[0].getKeySignature().mode,
-                lowestAdjacentNote.chord[0].name
-              )
-            : RiemannFunc.fromString(
-                visualObjs[0].getKeySignature().mode,
-                lowestAdjacentNote.chord[0].name
-              )
+            ? lowestAdjacentNote.chord[0].name
+                .split("\n")
+                .map((name) =>
+                  CondensedFunc.fromString(
+                    visualObjs[0].getKeySignature().mode,
+                    name
+                  )
+                )
+            : lowestAdjacentNote.chord[0].name
+                .split("\n")
+                .map((name) =>
+                  RiemannFunc.fromString(
+                    visualObjs[0].getKeySignature().mode,
+                    name
+                  )
+                )
           : showSolution
-          ? new CondensedFunc(visualObjs[0].getKeySignature().mode)
-          : new RiemannFunc(visualObjs[0].getKeySignature().mode),
+          ? [new CondensedFunc(visualObjs[0].getKeySignature().mode)]
+          : [new RiemannFunc(visualObjs[0].getKeySignature().mode)],
       });
     }
   }
@@ -296,7 +303,8 @@ export default function InteractiveScore({
           windowSize={windowSize}
           device={device}
           onClose={openSelectionDialog.onClose}
-          defaultValue={openSelectionDialog.defaultValue}
+          defaultValues={openSelectionDialog.defaultValues}
+          editable={openSelectionDialog.editable}
           target={ref.current}
         />
       )}
