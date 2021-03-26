@@ -72,6 +72,7 @@ export default function RiemannFuncSelectionDialog({
     >
       {editable ? (
         <Tabs
+          key={riemannFuncArray}
           activeIndex={activeIndex}
           onActive={(nextIndex) => setActiveIndex(nextIndex)}
         >
@@ -86,7 +87,7 @@ export default function RiemannFuncSelectionDialog({
                   array[index] = riemannFunc;
                   setRiemannFuncArray(array);
                 }}
-                key={index}
+                uid={index}
               />
             </Tab>
           ))}
@@ -100,7 +101,7 @@ export default function RiemannFuncSelectionDialog({
                 array.push(riemannFunc);
                 setRiemannFuncArray(array);
               }}
-              key={riemannFuncArray.length}
+              uid={riemannFuncArray.length}
             />
           </Tab>
         </Tabs>
@@ -114,7 +115,7 @@ export default function RiemannFuncSelectionDialog({
             array[0] = riemannFunc;
             setRiemannFuncArray(array);
           }}
-          key={0}
+          uid={0}
         />
       )}
 
@@ -124,7 +125,7 @@ export default function RiemannFuncSelectionDialog({
         direction="row"
         align="center"
         justify="end"
-        pad={{ top: "medium", bottom: "small" }}
+        pad="medium"
       >
         <Button
           color="status-critical"
@@ -138,11 +139,9 @@ export default function RiemannFuncSelectionDialog({
             let array = [...riemannFuncArray];
             if (array.length > 1) {
               array.splice(activeIndex, 1);
-              //TODO: Was wenn 0 gelöscht wird aber noch weitere da sind?
               setRiemannFuncArray(array);
               setActiveIndex(0);
             } else {
-              //TODO: Letztes Element wird gelöscht
               setRiemannFuncArray([]);
             }
           }}
@@ -166,7 +165,7 @@ function SelectionPanel({
   riemannFunc,
   windowSize,
   setRiemannFunc,
-  key,
+  uid,
   device,
 }) {
   return (
@@ -182,7 +181,7 @@ function SelectionPanel({
         Zusatztöne (max. 2):
       </Heading>
       <NumberMultiSelector
-        key={`NumberMultiSelector${key}`}
+        key={`NumberMultiSelector${uid}`}
         options={RiemannFunc.validAddTones}
         selected={[...riemannFunc.addTones]}
         onChange={(values) =>
@@ -199,7 +198,7 @@ function SelectionPanel({
       {(device === "small" || windowSize.height < 700) &&
       windowSize.width > windowSize.height ? (
         <Select
-          key={`Select${key}`}
+          key={`Select${uid}`}
           labelKey="label"
           valueKey={{ key: "value", reduce: true }}
           options={Object.values(riemannFunc.validBaseFuncs).map(
@@ -218,7 +217,7 @@ function SelectionPanel({
         />
       ) : (
         <SelectionWheel
-          key={`SelectionWheel${key}`}
+          key={`SelectionWheel${uid}`}
           lineWidth={
             device === "small"
               ? Math.floor(

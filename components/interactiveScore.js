@@ -99,21 +99,19 @@ export default function InteractiveScore({
   }
 
   function handleSelectionDialogClose(abcelem, riemannFuncArray) {
-    if (riemannFuncArray[0]) {
-      const oldChordStringLength = abcelem.chord
-        ? abcelem.chord[0].name.split("\n").reduce((acc, current) => {
-            return acc + current.length + 3;
-          }, 0)
-        : 0;
-      const newChordString = riemannFuncArray.reduce(
-        (acc, current) => acc.concat(`"_${current}"`),
-        ""
-      );
+    const oldChordStringLength = abcelem.chord
+      ? abcelem.chord[0].name.split("\n").reduce((acc, current) => {
+          return acc + current.length + 3;
+        }, 0)
+      : 0;
+    const newChordString = riemannFuncArray.reduce(
+      (acc, current) => current ? acc.concat(`"_${current}"`) : "",
+      ""
+    );
 
-      onChange(
-        replace(abc, newChordString, abcelem.startChar, oldChordStringLength)
-      );
-    }
+    onChange(
+      replace(abc, newChordString, abcelem.startChar, oldChordStringLength)
+    );
     unhighlight(notesHighlighted);
     setOpenSelectionDialog(undefined);
   }
@@ -163,7 +161,7 @@ export default function InteractiveScore({
                   )
                 )
           : showSolution
-          ? [new CondensedFunc(visualObjs[0].getKeySignature().mode)]
+          ? []
           : [new RiemannFunc(visualObjs[0].getKeySignature().mode)],
       });
     }
