@@ -41,29 +41,25 @@ export default function SignIn({ avatars }) {
             }}
             onSubmit={({ value }) => {
               setLoading(true);
-              fetch("/api/signup", {
-                method: "POST",
-                body: JSON.stringify(value),
-                headers: {
-                  "Content-type": "application/json;charset=utf-8",
+              createUser(
+                value,
+                () => {
+                  signIn("credentials", {
+                    name: value.name,
+                    password: value.password,
+                    callbackUrl: "/",
+                  });
                 },
-              })
-                .then((res) => {
-                  if (res.status % 200 <= 26) {
-                    signIn("credentials", {
-                      name: value.name,
-                      password: value.password,
-                      callbackUrl: "/",
-                    });
-                  }
-                  return res.json();
-                })
-                .then((err) => {
-                  setLoading(false)
+                (err) => {
+                  setLoading(false);
                   //Benutzername existiert bereits
                   if (err && err.code === 11000)
                     setNameError("Der Benutzername ist bereits vergeben.");
-                });
+                  else {
+                    setNameError("Ein unbekannter Fehler ist aufgetreten.");
+                  }
+                }
+              );
             }}
           >
             <FormField
@@ -166,6 +162,23 @@ export default function SignIn({ avatars }) {
       </Box>
     </Layout>
   );
+}
+
+async function createUser(user, onSuccess, onFailure) {
+  const res = await fetch("/api/signup", {
+    method: "POST",
+    body: JSON.stringify(user),
+    headers: {
+      "Content-type": "application/json;charset=utf-8",
+    },
+  });
+
+  if (res.status % 200 <= 26) {
+    onSuccess();
+  } else {
+    const err = await res.json();
+    onFailure(err);
+  }
 }
 
 export async function getStaticProps() {

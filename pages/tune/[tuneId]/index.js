@@ -120,10 +120,16 @@ export default function DisplayTune({ tune, session }) {
                   };
                   resetAttempt();
                   resetTime();
-                  createAttempt(successfulAttempt, () =>
-                    router.push(
-                      `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
-                    )
+                  createAttempt(
+                    successfulAttempt,
+                    () =>
+                      router.push(
+                        `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
+                      ),
+                    () =>
+                      setNotification(
+                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                      )
                   );
                 }
               }}
@@ -135,20 +141,19 @@ export default function DisplayTune({ tune, session }) {
   );
 }
 
-function createAttempt(attempt, onSuccess) {
-  fetch("/api/secured/successfulAttempt", {
+async function createAttempt(attempt, onSuccess, onFailure) {
+  const res = await fetch("/api/secured/successfulAttempt", {
     method: "POST",
     body: JSON.stringify(attempt),
     headers: {
       "Content-type": "application/json;charset=utf-8",
     },
-  }).then((res) => {
-    if (res.status % 200 <= 26) {
-      onSuccess();
-    } else {
-      //setNotification("Bei der Datenbankanfrage ist ein Fehler aufgetreten");
-    }
   });
+  if (res.status % 200 <= 26) {
+    onSuccess();
+  } else {
+    onFailure();
+  }
 }
 
 export async function getServerSideProps(context) {

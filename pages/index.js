@@ -277,7 +277,7 @@ export default function Home({ tunebooks, session, score }) {
 }
 
 async function deleteTune(tune, onSuccess, onFailure) {
-  let res = await fetch("/api/secured/tune", {
+  const res = await fetch("/api/secured/tune", {
     method: "DELETE",
     body: JSON.stringify(tune),
     headers: {
@@ -285,7 +285,7 @@ async function deleteTune(tune, onSuccess, onFailure) {
     },
   });
   if (res.status % 200 <= 26) {
-    let data = await res.json();
+    const data = await res.json();
     onSuccess(data);
   } else {
     onFailure();
@@ -293,7 +293,7 @@ async function deleteTune(tune, onSuccess, onFailure) {
 }
 
 async function createTune(tune, onSuccess, onFailure) {
-  let res = await fetch("/api/secured/tune", {
+  const res = await fetch("/api/secured/tune", {
     method: "POST",
     body: JSON.stringify(tune),
     headers: {
@@ -301,7 +301,7 @@ async function createTune(tune, onSuccess, onFailure) {
     },
   });
   if (res.status % 200 <= 26) {
-    let data = await res.json();
+    const data = await res.json();
     onSuccess(data);
   } else {
     onFailure();

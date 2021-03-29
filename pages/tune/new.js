@@ -179,7 +179,7 @@ export default function CreateTune({ tunebooks }) {
 }
 
 async function createTune(tune, onSuccess, onFailure) {
-  let res = await fetch("/api/secured/tune", {
+  const res = await fetch("/api/secured/tune", {
     method: "POST",
     body: JSON.stringify(tune),
     headers: {

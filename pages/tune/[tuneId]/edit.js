@@ -24,7 +24,9 @@ export default function EditTune({ tune, session }) {
       },
       () => {
         setLastSaved(new Date());
-      }
+      },
+      () =>
+        setNotification("Bei der Datenbankanfrage ist ein Fehler aufgetreten")
     );
   }, [abcHistory]);
 
@@ -45,7 +47,13 @@ export default function EditTune({ tune, session }) {
               setAbcHistory(nextAbcHistory);
             }}
           />
-          <Button icon={<View />} onClick={() => {router.push(`/tune/${tune._id}`)}} hoverIndicator />
+          <Button
+            icon={<View />}
+            onClick={() => {
+              router.push(`/tune/${tune._id}`);
+            }}
+            hoverIndicator
+          />
         </Box>
       }
     >
@@ -72,20 +80,19 @@ export default function EditTune({ tune, session }) {
   );
 }
 
-function updateTune(tune, onSuccess) {
-  fetch("/api/secured/tune", {
+async function updateTune(tune, onSuccess, onFailure) {
+  const res = await fetch("/api/secured/tune", {
     method: "PUT",
     body: JSON.stringify(tune),
     headers: {
       "Content-type": "application/json;charset=utf-8",
     },
-  }).then((res) => {
-    if (res.status % 200 <= 26) {
-      onSuccess();
-    } else {
-      //setNotification("Bei der Datenbankanfrage ist ein Fehler aufgetreten");
-    }
   });
+  if (res.status % 200 <= 26) {
+    onSuccess();
+  } else {
+    onFailure();
+  }
 }
 
 export async function getServerSideProps(context) {
