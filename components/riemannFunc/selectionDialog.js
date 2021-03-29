@@ -88,6 +88,12 @@ export default function RiemannFuncSelectionDialog({
                   setRiemannFuncArray(array);
                 }}
                 uid={index}
+                pad={
+                  windowSize.height >= 700
+                    ? "medium"
+                    : { horizontal: "medium", vertical: "small" }
+                }
+                gap="small"
               />
             </Tab>
           ))}
@@ -102,6 +108,12 @@ export default function RiemannFuncSelectionDialog({
                 setRiemannFuncArray(array);
               }}
               uid={riemannFuncArray.length}
+              pad={
+                windowSize.height >= 700
+                  ? "medium"
+                  : { horizontal: "medium", vertical: "small" }
+              }
+              gap="small"
             />
           </Tab>
         </Tabs>
@@ -116,6 +128,12 @@ export default function RiemannFuncSelectionDialog({
             setRiemannFuncArray(array);
           }}
           uid={0}
+          pad={
+            windowSize.height >= 700
+              ? "medium"
+              : { horizontal: "medium", vertical: "small" }
+          }
+          gap={windowSize.height >= 700 ? "medium" : "small"}
         />
       )}
 
@@ -125,27 +143,29 @@ export default function RiemannFuncSelectionDialog({
         direction="row"
         align="center"
         justify="end"
-        pad="medium"
+        pad={editable ? "small" : "medium"}
       >
-        <Button
-          color="status-critical"
-          primary
-          label={
-            <Text>
-              <strong>Löschen</strong>
-            </Text>
-          }
-          onClick={() => {
-            let array = [...riemannFuncArray];
-            if (array.length > 1) {
-              array.splice(activeIndex, 1);
-              setRiemannFuncArray(array);
-              setActiveIndex(0);
-            } else {
-              setRiemannFuncArray([]);
+        {editable && (
+          <Button
+            color="status-critical"
+            primary
+            label={
+              <Text>
+                <strong>Löschen</strong>
+              </Text>
             }
-          }}
-        />
+            onClick={() => {
+              let array = [...riemannFuncArray];
+              if (array.length > 1) {
+                array.splice(activeIndex, 1);
+                setRiemannFuncArray(array);
+                setActiveIndex(0);
+              } else {
+                setRiemannFuncArray([]);
+              }
+            }}
+          />
+        )}
         <Button
           type="submit"
           label={
@@ -167,16 +187,11 @@ function SelectionPanel({
   setRiemannFunc,
   uid,
   device,
+  pad,
+  gap,
 }) {
   return (
-    <Box
-      pad={
-        windowSize.height >= 700
-          ? "large"
-          : { horizontal: "medium", vertical: "small" }
-      }
-      gap={windowSize.height >= 700 ? "medium" : "small"}
-    >
+    <Box pad={pad} gap={gap}>
       <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
         Zusatztöne (max. 2):
       </Heading>

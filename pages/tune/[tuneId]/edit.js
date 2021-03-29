@@ -34,7 +34,7 @@ export default function EditTune({ tune, session }) {
       status={
         <Box direction="row" gap="small" align="center">
           {lastSaved && (
-            <Text>Zuletzt gespeichert um {lastSaved.toLocaleTimeString()}</Text>
+            <Text size="small">💾 um {lastSaved.toLocaleTimeString()}</Text>
           )}
           <Button
             disabled={abcHistory.length < 2}
