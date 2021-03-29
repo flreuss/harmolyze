@@ -1,4 +1,4 @@
-import { getSession } from "next-auth/client";
+import { useSession } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
 import Notification from "../../components/notification";
@@ -11,14 +11,14 @@ import {
   Select,
   FileInput,
   RadioButtonGroup,
+  Text,
 } from "grommet";
 import { connectToDatabase } from "../../lib/mongodb";
 import Head from "next/head";
-import { calculatePoints } from "../../lib/solutions";
 import xml2abc from "xml2abc";
 import { useRouter } from "next/router";
 
-export default function CreateTune({ tunebooks, session }) {
+export default function CreateTune({ tunebooks }) {
   const defaultTune = {
     musicXmlFiles: "",
     title: "",
@@ -30,11 +30,15 @@ export default function CreateTune({ tunebooks, session }) {
   const [notification, setNotification] = useState(undefined);
   const [value, setValue] = useState(defaultTune);
   const [loading, setLoading] = useState();
+  const [ session, load ] = useSession()
 
   const router = useRouter();
 
+  if (load) return null
+  if (!load && !session) return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>
+
   return (
-    <Layout user={session.user} loading={loading}>
+    <Layout user={session && session.user} loading={loading}>
       <Head>
         {/* Workaround: add jQuery this way globally to make xml2abc work */}
         <script
@@ -103,14 +107,20 @@ export default function CreateTune({ tunebooks, session }) {
               });
             }}
           >
-            <FormField label="Kategorie" name="tunebook_id">
-              <Select
-                name="tunebook_id"
-                options={tunebooks}
-                labelKey="name"
-                valueKey={{ key: "_id", reduce: true }}
-              />
-            </FormField>
+            {session && (
+              <FormField label="Kategorie" name="tunebook_id">
+                <Select
+                  name="tunebook_id"
+                  options={tunebooks.filter((tunebook) =>
+                    tunebook.permissions.write.some((perm) =>
+                      session.user.groups.includes(perm)
+                    )
+                  )}
+                  labelKey="name"
+                  valueKey={{ key: "_id", reduce: true }}
+                />
+              </FormField>
+            )}
 
             <FormField label="Tongeschlecht" name="mode">
               <RadioButtonGroup
@@ -184,32 +194,22 @@ async function createTune(tune, onSuccess, onFailure) {
   }
 }
 
-export async function getServerSideProps(context) {
-  const session = await getSession(context);
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/api/auth/signin",
-        permanent: false,
-      },
-    };
-  } else {
-    const { db } = await connectToDatabase();
+export async function getStaticProps() {
+  const { db } = await connectToDatabase();
 
-    const tunebooks = await db
-      .collection("tunebooks")
-      .find({ "permissions.write": { $in: session.user.groups } })
-      .project({
-        tunes: 0,
-      })
-      .sort({ _id: 1 })
-      .toArray();
+  const tunebooks = await db
+    .collection("tunebooks")
+    .find()
+    .project({
+      tunes: 0,
+    })
+    .sort({ _id: 1 })
+    .toArray();
 
-    return {
-      props: {
-        tunebooks,
-        session,
-      },
-    };
-  }
+  return {
+    props: {
+      tunebooks,
+    },
+    revalidate: 60,
+  };
 }

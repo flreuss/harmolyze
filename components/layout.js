@@ -54,7 +54,7 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
                   {
                     label: "Statistik",
                     onClick: () => {
-                      router.push("/stats")
+                      router.push("/stats");
                     },
                     icon: (
                       <Box pad={{ right: "small" }}>
@@ -65,7 +65,7 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
                   {
                     label: "Abmelden",
                     onClick: () => {
-                      signOut();
+                      signOut({ callbackUrl: "/" });
                     },
                     icon: (
                       <Box pad={{ right: "small" }}>
