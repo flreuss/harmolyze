@@ -28,12 +28,13 @@ export default function CreateTune({ tunebooks, session }) {
   };
 
   const [notification, setNotification] = useState(undefined);
-  const [tune, setTune] = useState(defaultTune);
+  const [value, setValue] = useState(defaultTune);
+  const [loading, setLoading] = useState();
 
   const router = useRouter();
 
   return (
-    <Layout user={session.user}>
+    <Layout user={session.user} loading={loading}>
       <Head>
         {/* Workaround: add jQuery this way globally to make xml2abc work */}
         <script
@@ -49,28 +50,31 @@ export default function CreateTune({ tunebooks, session }) {
 
         <Box width="medium">
           <Form
-            value={tune}
+            value={value}
             validate="submit"
             onChange={(nextValue) => {
-              setTune(nextValue);
+              setValue(nextValue);
             }}
-            onSubmit={({ value: tune }) => {
+            onSubmit={({ value }) => {
+              setLoading(true);
+              let tune = { tunebook_id: value.tunebook_id };
               //Read file input as UTF-8
-              tune.musicXmlFiles[0].text().then((text) => {
+              value.musicXmlFiles[0].text().then((text) => {
                 let xmlDoc = $.parseXML(text);
                 let keyElem = $(xmlDoc).find("key");
 
                 if (keyElem.find("mode")) {
                   keyElem
                     .find("mode")
-                    .replaceWith($(`<mode>${tune.mode}</mode>`));
+                    .replaceWith($(`<mode>${value.mode}</mode>`));
                 } else {
-                  keyElem.append($(`<mode>${tune.mode}</mode>`));
+                  keyElem.append($(`<mode>${value.mode}</mode>`));
                 }
 
                 const res = xml2abc.vertaal(xmlDoc, { x: 1, p: "" });
                 const errtxt = res[1];
                 if (errtxt.length !== 0) {
+                  setLoading(false);
                   setNotification({
                     text:
                       "Bei der Konvertierung der .musicxml-Datei ist ein Fehler aufgetreten.",
@@ -84,18 +88,16 @@ export default function CreateTune({ tunebooks, session }) {
                   createTune(
                     tune,
                     (data) => {
-                      setNotification({
-                        text: `"${tune.title}" wurde erfolgreich angelegt`,
-                        color: "status-ok",
-                      });
                       router.push(`/tune/${data._id}/edit`);
                     },
-                    () =>
+                    () => {
+                      setLoading(false);
                       setNotification({
                         text:
                           "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
                         color: "status-error",
-                      })
+                      });
+                    }
                   );
                 }
               });
@@ -147,7 +149,7 @@ export default function CreateTune({ tunebooks, session }) {
               <Button
                 type="submit"
                 label="Erstellen"
-                disabled={!tune || tune.musicXmlFiles.length === 0}
+                disabled={!value || value.musicXmlFiles.length === 0}
                 primary
               />
             </Box>
