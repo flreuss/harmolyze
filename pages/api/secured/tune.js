@@ -8,6 +8,7 @@ export default async (req, res) => {
     case "POST":
       const newTune = {
         ...req.body,
+        _id: new ObjectId(),
         createdAt: new Date(),
         createdBy: session.user._id,
       };
@@ -79,12 +80,12 @@ export default async (req, res) => {
           await db
             .collection("tunes")
             .deleteOne({ _id: ObjectId(req.body._id) });
-          db.collection("tunebooks").updateOne(
+          await db.collection("tunebooks").updateOne(
             { _id: tune.tunebook_id },
             { $pull: { tunes: ObjectId(req.body._id) } }
           );
           //200 OK
-          res.status(200).json(tune.value);
+          res.status(200).json(tune);
         } else {
           // 401 Unauthorized
           res.status(401).json({});

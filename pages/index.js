@@ -7,6 +7,7 @@ import {
   Accordion,
   AccordionPanel,
   Meter,
+  Select,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -15,7 +16,15 @@ import { useState } from "react";
 import Layout from "../components/layout";
 import TuneCard from "../components/tuneCard";
 import { connectToDatabase } from "../lib/mongodb";
-import { Add, Clock, Edit, Money, StatusCritical, Trash } from "grommet-icons";
+import {
+  Add,
+  Clock,
+  DocumentTransfer,
+  Edit,
+  Money,
+  StatusCritical,
+  Trash,
+} from "grommet-icons";
 import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds } from "../lib/stringUtils";
@@ -25,6 +34,7 @@ export default function Home({ tunebooks, session, score }) {
   const [notification, setNotification] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
+  const [openMoveDialog, setOpenMoveDialog] = useState(undefined);
   const [activeIndex, setActiveIndex] = useState([
     tunebooks.findIndex((tunebook) =>
       tunebook.tunes.some((tune) => !tune.highscore)
@@ -92,6 +102,19 @@ export default function Home({ tunebooks, session, score }) {
                             icon: (
                               <Box pad={{ right: "medium" }}>
                                 <Edit />
+                              </Box>
+                            ),
+                          },
+                          {
+                            label: "Verschieben",
+                            onClick: (evt) => {
+                              setOpenMoveDialog({ tune, tunebook });
+                              //Prevent onClick event from bubbling up to the parent Card
+                              evt.stopPropagation();
+                            },
+                            icon: (
+                              <Box pad={{ right: "medium" }}>
+                                <DocumentTransfer />
                               </Box>
                             ),
                           },
@@ -170,27 +193,76 @@ export default function Home({ tunebooks, session, score }) {
           timeout={3000}
         />
       )}
+      {openMoveDialog && (
+        <ConfirmationDialog
+          heading="Verschieben nach..."
+          confirmLabel="OK"
+          onCancel={() => setOpenMoveDialog(undefined)}
+          onConfirm={() => {
+            if (openMoveDialog.moveTo) {
+              deleteTune(
+                openMoveDialog.tune,
+                (data) => {
+                  createTune(
+                    {
+                      ...data,
+                      tunebook_id: openMoveDialog.moveTo._id,
+                    },
+                    () => {
+                      router.push("/");
+                    },
+                    () =>
+                      setNotification(
+                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                      )
+                  );
+                },
+                () =>
+                  setNotification(
+                    "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                  )
+              );
+            }
+            setOpenMoveDialog(undefined);
+          }}
+        >
+          <Text>
+            Wohin möchten Sie "{openMoveDialog.tune.title}" verschieben?
+          </Text>
+          <Select
+            id="select"
+            name="select"
+            value={openMoveDialog.moveTo && openMoveDialog.moveTo._id}
+            labelKey="name"
+            valueKey={{ key: "_id", reduce: true }}
+            options={tunebooks.filter(
+              (tunebook) =>
+                tunebook._id !== openMoveDialog.tunebook._id &&
+                tunebook.permissions.write.some((group) =>
+                  session.user.groups.includes(group)
+                )
+            )}
+            onChange={({ option }) =>
+              setOpenMoveDialog((dialog) => ({ ...dialog, moveTo: option }))
+            }
+          />
+        </ConfirmationDialog>
+      )}
       {openDeleteDialog && (
         <ConfirmationDialog
           heading="Löschen"
           confirmLabel="Löschen"
           onCancel={() => setOpenDeleteDialog(undefined)}
           onConfirm={() => {
-            fetch("/api/secured/tune", {
-              method: "DELETE",
-              body: JSON.stringify(openDeleteDialog.tune),
-              headers: {
-                "Content-type": "application/json;charset=utf-8",
-              },
-            }).then((res) => {
-              if (res.status % 200 <= 26) {
-                router.push("/");
-              } else {
+            deleteTune(
+              openDeleteDialog.tune,
+              () => router.push("/"),
+              () =>
                 setNotification(
                   "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                );
-              }
-            });
+                )
+            );
+
             setOpenDeleteDialog(undefined);
           }}
         >
@@ -202,6 +274,38 @@ export default function Home({ tunebooks, session, score }) {
       )}
     </Layout>
   );
+}
+
+async function deleteTune(tune, onSuccess, onFailure) {
+  let res = await fetch("/api/secured/tune", {
+    method: "DELETE",
+    body: JSON.stringify(tune),
+    headers: {
+      "Content-type": "application/json;charset=utf-8",
+    },
+  });
+  if (res.status % 200 <= 26) {
+    let data = await res.json();
+    onSuccess(data);
+  } else {
+    onFailure();
+  }
+}
+
+async function createTune(tune, onSuccess, onFailure) {
+  let res = await fetch("/api/secured/tune", {
+    method: "POST",
+    body: JSON.stringify(tune),
+    headers: {
+      "Content-type": "application/json;charset=utf-8",
+    },
+  });
+  if (res.status % 200 <= 26) {
+    let data = await res.json();
+    onSuccess(data);
+  } else {
+    onFailure();
+  }
 }
 
 export async function getServerSideProps(context) {
