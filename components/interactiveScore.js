@@ -141,7 +141,7 @@ export default function InteractiveScore({
       setOpenSelectionDialog({
         onClose: (riemannFuncArray) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFuncArray),
-        editable: showSolution,
+        edit: showSolution ? visualObjs[0].getKeySignature().mode : undefined,
         defaultValues: lowestAdjacentNote.chord
           ? showSolution
             ? lowestAdjacentNote.chord[0].name
@@ -302,7 +302,7 @@ export default function InteractiveScore({
           device={device}
           onClose={openSelectionDialog.onClose}
           defaultValues={openSelectionDialog.defaultValues}
-          editable={openSelectionDialog.editable}
+          edit={openSelectionDialog.edit}
           target={ref.current}
         />
       )}

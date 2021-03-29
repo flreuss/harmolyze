@@ -22,7 +22,7 @@ export default function RiemannFuncSelectionDialog({
   target,
   windowSize,
   device,
-  editable,
+  edit,
 }) {
   const [riemannFuncArray, setRiemannFuncArray] = useState(
     defaultValues.map((riemannFunc) => ({
@@ -70,7 +70,7 @@ export default function RiemannFuncSelectionDialog({
       background={{ color: "white", opacity: "strong" }}
       responsive={false}
     >
-      {editable ? (
+      {typeof edit !== "undefined" ? (
         <Tabs
           key={riemannFuncArray}
           activeIndex={activeIndex}
@@ -100,7 +100,7 @@ export default function RiemannFuncSelectionDialog({
           <Tab title="Hinzufügen..." icon={<Add />}>
             <SelectionPanel
               device={device}
-              riemannFunc={new CondensedFunc()}
+              riemannFunc={new CondensedFunc(edit)}
               windowSize={windowSize}
               setRiemannFunc={(riemannFunc) => {
                 let array = [...riemannFuncArray];
@@ -143,9 +143,9 @@ export default function RiemannFuncSelectionDialog({
         direction="row"
         align="center"
         justify="end"
-        pad={editable ? "small" : "medium"}
+        pad={edit ? "small" : "medium"}
       >
-        {editable && (
+        {edit && (
           <Button
             color="status-critical"
             primary
