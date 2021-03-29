@@ -16,6 +16,7 @@ import { connectToDatabase } from "../../lib/mongodb";
 import Head from "next/head";
 import { calculatePoints } from "../../lib/solutions";
 import xml2abc from "xml2abc";
+import { useRouter } from "next/router";
 
 export default function CreateTune({ tunebooks, session }) {
   const defaultTune = {
@@ -28,6 +29,8 @@ export default function CreateTune({ tunebooks, session }) {
 
   const [notification, setNotification] = useState(undefined);
   const [tune, setTune] = useState(defaultTune);
+
+  const router = useRouter();
 
   return (
     <Layout user={session.user}>
@@ -78,27 +81,22 @@ export default function CreateTune({ tunebooks, session }) {
                   //TODO: Fallback if empty
                   tune.title = $(xmlDoc).find("work-title").text();
 
-                  fetch("/api/secured/tune", {
-                    method: "POST",
-                    body: JSON.stringify(tune),
-                    headers: {
-                      "Content-type": "application/json;charset=utf-8",
-                    },
-                  }).then((res) => {
-                    if (res.status === 201) {
+                  createTune(
+                    tune,
+                    (data) => {
                       setNotification({
                         text: `"${tune.title}" wurde erfolgreich angelegt`,
                         color: "status-ok",
                       });
-                      setTune(defaultTune);
-                    } else {
+                      router.push(`/tune/${data._id}/edit`);
+                    },
+                    () =>
                       setNotification({
                         text:
                           "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
                         color: "status-error",
-                      });
-                    }
-                  });
+                      })
+                  );
                 }
               });
             }}
@@ -166,6 +164,22 @@ export default function CreateTune({ tunebooks, session }) {
       )}
     </Layout>
   );
+}
+
+async function createTune(tune, onSuccess, onFailure) {
+  let res = await fetch("/api/secured/tune", {
+    method: "POST",
+    body: JSON.stringify(tune),
+    headers: {
+      "Content-type": "application/json;charset=utf-8",
+    },
+  });
+  if (res.status % 200 <= 26) {
+    let data = await res.json();
+    onSuccess(data);
+  } else {
+    onFailure();
+  }
 }
 
 export async function getServerSideProps(context) {
