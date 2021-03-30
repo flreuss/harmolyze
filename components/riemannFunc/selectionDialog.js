@@ -210,7 +210,7 @@ function SelectionPanel({
           Grundfunktion:
         </Heading>
       )}
-      {(device === "small" || windowSize.height < 700) &&
+      {(windowSize.height < 700) &&
       windowSize.width > windowSize.height ? (
         <Select
           key={`Select${uid}`}
