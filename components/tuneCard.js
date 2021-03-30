@@ -19,19 +19,15 @@ export default function TuneCard(props) {
 
   function anyParentElementHasId(target, id) {
     return target.parentElement
-      ? target.id === id ||
-          anyParentElementHasId(target.parentElement, id)
+      ? target.id === id || anyParentElementHasId(target.parentElement, id)
       : target.id === id;
   }
 
   function handleClick(event) {
-    if (
-      !props.disabled &&
-      !anyParentElementHasId(event.target, "tuneCardMenu")
-    ) {
-      setAnimation({ type: "pulse", size: "small" });
+    if (!anyParentElementHasId(event.target, "tuneCardMenu")) {
+      props.onClick(props.disabled);
+      if (!props.disabled) setAnimation({ type: "pulse", size: "small" });
     }
-    props.onClick(props.disabled);
   }
 
   return (
@@ -41,7 +37,9 @@ export default function TuneCard(props) {
       animation={animation}
     >
       <CardHeader background={props.background} gap="none">
-          <Text margin="small" truncate size="medium">{props.title}</Text>
+        <Text margin="small" truncate size="medium">
+          {props.title}
+        </Text>
         {props.showMenu && (
           <Menu
             icon={<MoreVertical />}
@@ -58,7 +56,7 @@ export default function TuneCard(props) {
         )}
       </CardHeader>
 
-      <CardBody pad={{horizontal: "medium"}}>
+      <CardBody pad={{ horizontal: "medium" }}>
         <Image src={props.image} />
       </CardBody>
 
