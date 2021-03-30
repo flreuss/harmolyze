@@ -139,7 +139,6 @@ class ColorWheel extends Component {
     if (this.props.onRef) this.props.onRef(this);
 
     // Initialising our canvas & context objs.
-    this.canvasEl = document.getElementById("color-picker");
     this.ctx = this.canvasEl.getContext("2d");
 
     if (this.props.preset) {
@@ -187,6 +186,39 @@ class ColorWheel extends Component {
     } else {
       this.drawOuterWheel();
       this.drawSpacers();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.radius !== this.props.radius) {
+      setTimeout(() => {
+        if (this.canvasEl) {
+          const { radius, lineWidth, padding } = this.props;
+          // Setting effective radii:
+          this.outerWheelRadius = radius;
+          this.innerWheelRadius = this.outerWheelRadius - lineWidth - padding;
+          this.centerCircleRadius = this.innerWheelRadius - lineWidth - padding;
+          this.firstSpacerRadius = this.outerWheelRadius - lineWidth; // NOTE: effectiveRadius will take into account padding as lineWidth.
+          this.secondSpacerRadius = this.innerWheelRadius - lineWidth;
+
+          // Defining our bounds-objects, exposes a .inside(e) -> boolean method:
+          this.outerWheelBounds = calculateBounds(radius - lineWidth, radius); // Draw this one out to illustrate
+          this.innerWheelBounds = calculateBounds(
+            this.innerWheelRadius - lineWidth,
+            this.innerWheelRadius
+          );
+          this.centerCircleBounds = calculateBounds(0, this.centerCircleRadius);
+          this.firstSpacerBounds = calculateBounds(
+            this.firstSpacerRadius - padding,
+            this.firstSpacerRadius
+          );
+          this.secondSpacerBounds = calculateBounds(
+            this.secondSpacerRadius - padding,
+            this.secondSpacerRadius
+          );
+          this.componentDidMount();
+        }
+      }, 250);
     }
   }
 
@@ -578,6 +610,7 @@ class ColorWheel extends Component {
         onMouseMove={this.onCanvasHover}
         width={`${radius * 2}px`}
         height={`${radius * 2}px`}
+        ref={(canvas) => (this.canvasEl = canvas)}
       />
     ) : (
       <canvas
@@ -585,6 +618,7 @@ class ColorWheel extends Component {
         onClick={this.onCanvasClick}
         width={`${radius * 2}px`}
         height={`${radius * 2}px`}
+        ref={(canvas) => (this.canvasEl = canvas)}
       />
     );
   }
