@@ -86,9 +86,27 @@ export default function Home({ tunebooks, session, score }) {
                       <TuneCard
                         image={tunebook.image}
                         background={tune.highscore ? "light-2" : "neutral-3"}
-                        onClick={() => {
-                          setLoading(true);
-                          router.push(`/tune/${tune._id}`);
+                        disabled={
+                          tune.highscore &&
+                          Date.now() - new Date(tune.highscore.last) <=
+                            7 * (24 * 60 * 60 * 1000)
+                        }
+                        onClick={(disabled) => {
+                          if (!disabled) {
+                            setLoading(true);
+                            router.push(`/tune/${tune._id}`);
+                          } else {
+                            const thresholdForRetry = 7 * (24 * 60 * 60 * 1000);
+                            const timeSinceLastAttempt =
+                              Date.now() - new Date(tune.highscore.last);
+                            const daysTilRetry = Math.floor(
+                              (thresholdForRetry - timeSinceLastAttempt) /
+                                (24 * 60 * 60 * 1000)
+                            );
+                            setNotification({text:
+                              `Sie können die Aufgabe in ${daysTilRetry} Tagen erneut versuchen.`, color: "accent-1"
+                            });
+                          }
                         }}
                         menuItems={[
                           {
@@ -187,9 +205,9 @@ export default function Home({ tunebooks, session, score }) {
 
       {notification && (
         <Notification
-          color="status-error"
+          color={notification.color}
           onClose={() => setNotification(undefined)}
-          text={notification}
+          text={notification.text}
           timeout={3000}
         />
       )}
@@ -212,14 +230,14 @@ export default function Home({ tunebooks, session, score }) {
                       router.push("/");
                     },
                     () =>
-                      setNotification(
-                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                      )
+                      setNotification({text:
+                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten", color: "status-error"
+                      })
                   );
                 },
                 () =>
-                  setNotification(
-                    "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                  setNotification({text:
+                    "Bei der Datenbankanfrage ist ein Fehler aufgetreten", color: "status-error"}
                   )
               );
             }
@@ -258,8 +276,8 @@ export default function Home({ tunebooks, session, score }) {
               openDeleteDialog.tune,
               () => router.push("/"),
               () =>
-                setNotification(
-                  "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                setNotification({text:
+                  "Bei der Datenbankanfrage ist ein Fehler aufgetreten", color: "status-error"}
                 )
             );
 
@@ -343,7 +361,7 @@ export async function getServerSideProps(context) {
                     $and: [
                       { $eq: ["$user_id", session.user._id] },
                       { $eq: ["$tune_id", "$$tune_id"] },
-                      { $eq: ["$progress", 1]}
+                      { $eq: ["$progress", 1] },
                     ],
                   },
                 },
@@ -353,6 +371,14 @@ export async function getServerSideProps(context) {
                   _id: null,
                   mistakes: { $min: "$mistakes" },
                   time: { $min: "$time" },
+                  last: { $max: "$validatedAt" },
+                },
+              },
+              {
+                $project: {
+                  mistakes: 1,
+                  time: 1,
+                  last: { $toString: "$last" },
                 },
               },
             ],
@@ -414,8 +440,7 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
-    const score =
-      attempts.length > 0 ? attempts[0].score : 0;
+    const score = attempts.length > 0 ? attempts[0].score : 0;
 
     return {
       props: {

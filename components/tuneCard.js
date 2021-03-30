@@ -30,8 +30,8 @@ export default function TuneCard(props) {
       !anyParentElementHasId(event.target, "tuneCardMenu")
     ) {
       setAnimation({ type: "pulse", size: "small" });
-      props.onClick();
     }
+    props.onClick(props.disabled);
   }
 
   return (
