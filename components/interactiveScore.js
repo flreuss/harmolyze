@@ -28,8 +28,6 @@ export default function InteractiveScore({
   onChange,
   showSolution,
 }) {
-  //Attributes
-  const ref = React.useRef();
 
   //Global
   var visualObjs;
@@ -268,7 +266,6 @@ export default function InteractiveScore({
       align="center"
       justify="center"
       gap="none"
-      ref={ref}
       rows={["auto", "auto"]}
     >
       <Box id="scoreContainer" />
@@ -303,7 +300,7 @@ export default function InteractiveScore({
           onClose={openSelectionDialog.onClose}
           defaultValues={openSelectionDialog.defaultValues}
           edit={openSelectionDialog.edit}
-          target={ref.current}
+          target={document.querySelector("main")}
         />
       )}
     </Grid>
