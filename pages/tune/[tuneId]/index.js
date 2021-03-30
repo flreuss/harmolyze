@@ -8,10 +8,9 @@ import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
 import { Clock, Edit, StatusCritical } from "grommet-icons";
-import createPersistedState from "use-persisted-state";
 import { getInitial, getSolution } from "../../../lib/solutions";
 
-export default function DisplayTune({ tune, session }) {
+export default function DisplayTune({ tune, session, lastAttempt }) {
   const defaultAttempt = {
     progress: 0,
     mistakes: 0,
@@ -20,31 +19,22 @@ export default function DisplayTune({ tune, session }) {
     abc: getInitial(tune.abc),
     solved: [],
     showMistakes: false,
+    time: 0,
   };
 
-  const useTime = createPersistedState(
-    `user_${session.user._id}_tune_${tune._id}_time`
-  );
-  const [time, setTime] = useTime(0);
-  const resetTime = () => setTime(0);
-
   const [loading, setLoading] = useState(false);
-
-  const useAttempt = createPersistedState(
-    `user_${session.user._id}_tune_${tune._id}_attempt`
-  );
-  const [attempt, setAttempt] = useAttempt(defaultAttempt);
-  const resetAttempt = () => setAttempt(defaultAttempt);
-
+  const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const router = useRouter();
+
+  //TODO: Component will unmount, update attempt
 
   useEffect(() => {
     let interval = null;
     interval = setInterval(() => {
-      setTime(time + 1000);
+      setAttempt((attempt) => ({ ...attempt, time: attempt.time + 1000 }));
     }, 1000);
     return () => clearInterval(interval);
-  }, [time]);
+  }, [attempt.time]);
 
   return (
     <Layout
@@ -57,7 +47,7 @@ export default function DisplayTune({ tune, session }) {
           </Box>
           <Box direction="row" gap="xsmall">
             <Clock />
-            <Text>{millisToMinutesAndSeconds(time)}</Text>
+            <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
           </Box>
           {session.user.groups.includes("admin") && (
             <Button
@@ -102,36 +92,30 @@ export default function DisplayTune({ tune, session }) {
                 }));
               }}
               onValidate={(nextMistakes, nextSolved, nextSolvedArray) => {
-                if (nextMistakes > 0) {
-                  setAttempt((attempt) => ({
-                    ...attempt,
-                    showMistakes: true,
-                    mistakes: attempt.mistakes + nextMistakes,
-                    progress: nextSolved / (nextMistakes + nextSolved),
-                    solved: attempt.solved.concat(nextSolvedArray),
-                  }));
-                } else {
-                  setLoading(true);
-                  const successfulAttempt = {
-                    ...attempt,
-                    progress: 1,
-                    time: time,
-                    completedAt: new Date(),
-                  };
-                  resetAttempt();
-                  resetTime();
-                  createAttempt(
-                    successfulAttempt,
-                    () =>
+                const nextAttempt = {
+                  ...attempt,
+                  showMistakes: true,
+                  mistakes: attempt.mistakes + nextMistakes,
+                  progress: nextSolved / (nextMistakes + nextSolved),
+                  solved: attempt.solved.concat(nextSolvedArray),
+                  validatedAt: new Date(),
+                  tune_id: tune._id,
+                };
+                setAttempt(nextAttempt);
+
+                createAttempt(
+                  nextAttempt,
+                  () => {
+                    if (nextMistakes === 0)
                       router.push(
-                        `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${successfulAttempt.mistakes}&time=${successfulAttempt.time}`
-                      ),
-                    () =>
-                      setNotification(
-                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                      )
-                  );
-                }
+                        `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${nextAttempt.mistakes}&time=${nextAttempt.time}`
+                      );
+                  },
+                  () =>
+                    setNotification(
+                      "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
+                    )
+                );
               }}
             />
           )}
@@ -141,8 +125,12 @@ export default function DisplayTune({ tune, session }) {
   );
 }
 
-async function createAttempt(attempt, onSuccess, onFailure) {
-  const res = await fetch("/api/secured/successfulAttempt", {
+async function createAttempt(
+  attempt,
+  onSuccess = () => {},
+  onFailure = () => {}
+) {
+  const res = await fetch("/api/secured/attempt", {
     method: "POST",
     body: JSON.stringify(attempt),
     headers: {
@@ -167,16 +155,38 @@ export async function getServerSideProps(context) {
     };
   } else {
     const { db } = await connectToDatabase();
-    const tune = await db.collection("tunes").findOne(
+    let tune = await db.collection("tunes").findOne(
       {
         _id: ObjectId(context.params.tuneId),
       },
-      { projection: { _id: { $toString: "$_id" }, abc: 1, title: 1 } }
+      {
+        projection: {
+          _id: { $toString: "$_id" },
+          abc: 1,
+          title: 1,
+          lastModifiedAt: 1,
+        },
+      }
     );
+    const attempts = await db
+      .collection("attempts")
+      .find({
+        tune_id: ObjectId(context.params.tuneId),
+        user_id: session.user._id,
+        validatedAt: { $gt: tune.lastModifiedAt },
+      })
+      .sort({ validatedAt: -1 })
+      .project({ _id: 0, tune_id: 0, validatedAt: 0 })
+      .toArray();
+
+    const lastAttempt =
+      attempts.length > 0 && attempts[0].progress !== 1 ? attempts[0] : null;
+    tune = { _id: tune._id, abc: tune.abc, title: tune.title };
 
     return {
       props: {
         tune,
+        lastAttempt,
         session,
       },
     };

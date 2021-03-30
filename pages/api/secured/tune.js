@@ -9,6 +9,7 @@ export default async (req, res) => {
       const newTune = {
         ...req.body,
         _id: new ObjectId(),
+        lastModifiedAt: new Date(),
         createdAt: new Date(),
         createdBy: session.user._id,
       };
@@ -53,7 +54,7 @@ export default async (req, res) => {
             .collection("tunes")
             .updateOne(
               { _id: ObjectId(req.body._id) },
-              { $set: { abc: req.body.abc, points: req.body.points } }
+              { $set: { abc: req.body.abc, points: req.body.points, lastModifiedAt: new Date() } }
             );
           //200 OK
           res.status(200).json(tune.value);

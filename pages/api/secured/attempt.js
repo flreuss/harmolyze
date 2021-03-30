@@ -6,7 +6,7 @@ export default async (req, res) => {
   const session = await getSession({ req });
   const newAttempt = {
     ...req.body,
-    completedAt: new Date(req.body.completedAt),
+    validatedAt: new Date(req.body.validatedAt),
     time: +req.body.time,
     mistakes: +req.body.mistakes,
     tune_id: ObjectId(req.body.tune_id),
@@ -16,19 +16,19 @@ export default async (req, res) => {
       case "POST":
         try {
           const { db } = await connectToDatabase();
-          const successfulAttempts = await db
-            .collection("successfulAttempts")
+          const attempts = await db
+            .collection("attempts")
             .insertOne(newAttempt);
           db.collection("users").updateOne(
             { _id: newAttempt.user_id },
             {
               $push: {
-                successfulAttempts: ObjectId(successfulAttempts.insertedId),
+                attempts: ObjectId(attempts.insertedId),
               },
             }
           );
           //201 Created
-          res.status(201).json(successfulAttempts.ops[0]);
+          res.status(201).json(attempts.ops[0]);
         } catch (err) {
           //500 Internal Server Error
           console.error(err);

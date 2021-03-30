@@ -334,7 +334,7 @@ export async function getServerSideProps(context) {
         { $unwind: { path: "$tunes_docs", preserveNullAndEmptyArrays: false } },
         {
           $lookup: {
-            from: "successfulAttempts",
+            from: "attempts",
             let: { tune_id: "$tunes_docs._id" },
             pipeline: [
               {
@@ -343,6 +343,7 @@ export async function getServerSideProps(context) {
                     $and: [
                       { $eq: ["$user_id", session.user._id] },
                       { $eq: ["$tune_id", "$$tune_id"] },
+                      { $eq: ["$progress", 1]}
                     ],
                   },
                 },
@@ -386,8 +387,8 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
-    const successfulAttempts = await db
-      .collection("successfulAttempts")
+    const attempts = await db
+      .collection("attempts")
       .aggregate([
         { $match: { user_id: session.user._id } },
         {
@@ -414,7 +415,7 @@ export async function getServerSideProps(context) {
       .toArray();
 
     const score =
-      successfulAttempts.length > 0 ? successfulAttempts[0].score : 0;
+      attempts.length > 0 ? attempts[0].score : 0;
 
     return {
       props: {
