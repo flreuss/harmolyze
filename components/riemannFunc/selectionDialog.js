@@ -143,9 +143,9 @@ export default function RiemannFuncSelectionDialog({
         direction="row"
         align="center"
         justify="end"
-        pad={edit ? "small" : "medium"}
+        pad={typeof edit !== "undefined" ? "small" : "medium"}
       >
-        {edit && (
+        {typeof edit !== "undefined" && (
           <Button
             color="status-critical"
             primary
@@ -192,9 +192,11 @@ function SelectionPanel({
 }) {
   return (
     <Box pad={pad} gap={gap}>
-      <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
-        Zusatztöne (max. 2):
-      </Heading>
+      {windowSize.height >= 575 && (
+        <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
+          Zusatztöne (max. 2):
+        </Heading>
+      )}
       <NumberMultiSelector
         key={`NumberMultiSelector${uid}`}
         options={RiemannFunc.validAddTones}
@@ -274,9 +276,11 @@ function SelectionPanel({
         />
       )}
 
-      <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
-        Basston:
-      </Heading>
+      {windowSize.height >= 575 && (
+        <Heading level={windowSize.height >= 700 ? 4 : 6} margin="none">
+          Basston:
+        </Heading>
+      )}
       <NumberSelector
         name="baseSelector"
         options={RiemannFunc.validBaseNotes}
