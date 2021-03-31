@@ -216,7 +216,7 @@ export default function InteractiveScore({
     } catch (err) {
       document.querySelector(
         "main"
-      ).innerHTML = `<Box align="center"><Text>Diese .musicxml-Datei ist fehlerhaft und kann nicht dargestellt werden. Bitte reparieren Sie die zugehörige .musicxml-Datei.</Text></Box>`;
+      ).innerHTML = `<div align="center">Diese .musicxml-Datei ist fehlerhaft und kann nicht dargestellt werden. Bitte reparieren Sie die zugehörige .musicxml-Datei.</div>`;
     }
   }
 
