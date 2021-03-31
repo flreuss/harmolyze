@@ -8,6 +8,7 @@ import {
   AccordionPanel,
   Meter,
   Select,
+  ResponsiveContext,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -28,9 +29,11 @@ import {
 import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds, romanNumeral } from "../lib/stringUtils";
+import useWindowSize from "../lib/useWindowSize";
 
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
+  const windowSize = useWindowSize();
   const [notification, setNotification] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
@@ -79,107 +82,125 @@ export default function Home({ tunebooks, session, score }) {
                 <AccordionPanel
                   key={tunebook._id}
                   gap="small"
-                  label={`${romanNumeral(tunebookIndex+1)}. ${tunebook.name}`}
+                  label={`${romanNumeral(tunebookIndex + 1)}. ${tunebook.name}`}
                 >
-                  <Grid gap="small" columns="small" margin="medium">
-                    {tunebook.tunes.map((tune, tuneIndex) => (
-                      <TuneCard
-                        image={tunebook.image}
-                        background={tune.highscore ? "light-2" : "neutral-3"}
-                        disabled={
-                          tune.highscore &&
-                          Date.now() - new Date(tune.highscore.last) <=
-                            7 * (24 * 60 * 60 * 1000)
+                  <ResponsiveContext.Consumer>
+                    {(device) => (
+                      <Grid
+                        gap="small"
+                        columns={
+                          device === "small"
+                            ? windowSize.height > windowSize.width
+                              ? ["50%", "50%"]
+                              : ["33%", "33%", "33%"]
+                            : "small"
                         }
-                        onClick={(disabled) => {
-                          if (!disabled) {
-                            setLoading(true);
-                            router.push(`/tune/${tune._id}`);
-                          } else {
-                            const thresholdForRetry = 7 * (24 * 60 * 60 * 1000);
-                            const timeSinceLastAttempt =
-                              Date.now() - new Date(tune.highscore.last);
-                            const daysTilRetry = Math.floor(
-                              (thresholdForRetry - timeSinceLastAttempt) /
-                                (24 * 60 * 60 * 1000)
-                            );
-                            setNotification({text:
-                              `Sie können die Aufgabe in ${daysTilRetry} Tagen erneut versuchen.`, color: "accent-1"
-                            });
-                          }
-                        }}
-                        menuItems={[
-                          {
-                            label: "Bearbeiten",
-                            onClick: (evt) => {
-                              setLoading(true);
-                              router.push(`/tune/${tune._id}/edit`);
-                              //Prevent onClick event from bubbling up to the parent Card
-                              evt.stopPropagation();
-                            },
-                            icon: (
-                              <Box pad={{ right: "medium" }}>
-                                <Edit />
-                              </Box>
-                            ),
-                          },
-                          {
-                            label: "Verschieben",
-                            onClick: (evt) => {
-                              setOpenMoveDialog({ tune, tunebook });
-                              //Prevent onClick event from bubbling up to the parent Card
-                              evt.stopPropagation();
-                            },
-                            icon: (
-                              <Box pad={{ right: "medium" }}>
-                                <DocumentTransfer />
-                              </Box>
-                            ),
-                          },
-                          {
-                            label: "Löschen",
-                            onClick: (evt) => {
-                              setOpenDeleteDialog({ tune });
-                              //Prevent onClick event from bubbling up to the parent Card
-                              evt.stopPropagation();
-                            },
-                            icon: (
-                              <Box pad={{ right: "medium" }}>
-                                <Trash />
-                              </Box>
-                            ),
-                          },
-                        ]}
-                        footerItems={
-                          tune.highscore
-                            ? [
-                                {
-                                  icon: <StatusCritical />,
-                                  label: tune.highscore.mistakes,
+                        margin="medium"
+                      >
+                        {tunebook.tunes.map((tune, tuneIndex) => (
+                          <TuneCard
+                            image={tunebook.image}
+                            background={
+                              tune.highscore ? "light-2" : "neutral-3"
+                            }
+                            disabled={
+                              tune.highscore &&
+                              Date.now() - new Date(tune.highscore.last) <=
+                                7 * (24 * 60 * 60 * 1000)
+                            }
+                            onClick={(disabled) => {
+                              if (!disabled) {
+                                setLoading(true);
+                                router.push(`/tune/${tune._id}`);
+                              } else {
+                                const thresholdForRetry =
+                                  7 * (24 * 60 * 60 * 1000);
+                                const timeSinceLastAttempt =
+                                  Date.now() - new Date(tune.highscore.last);
+                                const daysTilRetry = Math.floor(
+                                  (thresholdForRetry - timeSinceLastAttempt) /
+                                    (24 * 60 * 60 * 1000)
+                                );
+                                setNotification({
+                                  text: `Sie können die Aufgabe in ${daysTilRetry} Tagen erneut versuchen.`,
+                                  color: "accent-1",
+                                });
+                              }
+                            }}
+                            menuItems={[
+                              {
+                                label: "Bearbeiten",
+                                onClick: (evt) => {
+                                  setLoading(true);
+                                  router.push(`/tune/${tune._id}/edit`);
+                                  //Prevent onClick event from bubbling up to the parent Card
+                                  evt.stopPropagation();
                                 },
-                                {
-                                  icon: <Clock />,
-                                  label: millisToMinutesAndSeconds(
-                                    tune.highscore.time
-                                  ),
+                                icon: (
+                                  <Box pad={{ right: "medium" }}>
+                                    <Edit />
+                                  </Box>
+                                ),
+                              },
+                              {
+                                label: "Verschieben",
+                                onClick: (evt) => {
+                                  setOpenMoveDialog({ tune, tunebook });
+                                  //Prevent onClick event from bubbling up to the parent Card
+                                  evt.stopPropagation();
                                 },
-                              ]
-                            : [
-                                {
-                                  icon: <Money />,
-                                  label: tune.points,
+                                icon: (
+                                  <Box pad={{ right: "medium" }}>
+                                    <DocumentTransfer />
+                                  </Box>
+                                ),
+                              },
+                              {
+                                label: "Löschen",
+                                onClick: (evt) => {
+                                  setOpenDeleteDialog({ tune });
+                                  //Prevent onClick event from bubbling up to the parent Card
+                                  evt.stopPropagation();
                                 },
-                              ]
-                        }
-                        showMenu={
-                          tune.createdBy === session.user._id ||
-                          session.user.groups.includes("admin")
-                        }
-                        title={`${tuneIndex+1}. ${tune.title}`}
-                        key={tune._id}
-                      />
-                    ))}
-                  </Grid>
+                                icon: (
+                                  <Box pad={{ right: "medium" }}>
+                                    <Trash />
+                                  </Box>
+                                ),
+                              },
+                            ]}
+                            footerItems={
+                              tune.highscore
+                                ? [
+                                    {
+                                      icon: <StatusCritical />,
+                                      label: tune.highscore.mistakes,
+                                    },
+                                    {
+                                      icon: <Clock />,
+                                      label: millisToMinutesAndSeconds(
+                                        tune.highscore.time
+                                      ),
+                                    },
+                                  ]
+                                : [
+                                    {
+                                      icon: <Money />,
+                                      label: tune.points,
+                                    },
+                                  ]
+                            }
+                            showMenu={
+                              tune.createdBy === session.user._id ||
+                              session.user.groups.includes("admin")
+                            }
+                            title={`${tuneIndex + 1}. ${tune.title}`}
+                            key={tune._id}
+                          />
+                        ))}
+                      </Grid>
+                    )}
+                  </ResponsiveContext.Consumer>
                 </AccordionPanel>
               ))}
             </Accordion>
@@ -230,15 +251,18 @@ export default function Home({ tunebooks, session, score }) {
                       router.push("/");
                     },
                     () =>
-                      setNotification({text:
-                        "Bei der Datenbankanfrage ist ein Fehler aufgetreten", color: "status-error"
+                      setNotification({
+                        text:
+                          "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                        color: "status-error",
                       })
                   );
                 },
                 () =>
-                  setNotification({text:
-                    "Bei der Datenbankanfrage ist ein Fehler aufgetreten", color: "status-error"}
-                  )
+                  setNotification({
+                    text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                    color: "status-error",
+                  })
               );
             }
             setOpenMoveDialog(undefined);
@@ -276,9 +300,10 @@ export default function Home({ tunebooks, session, score }) {
               openDeleteDialog.tune,
               () => router.push("/"),
               () =>
-                setNotification({text:
-                  "Bei der Datenbankanfrage ist ein Fehler aufgetreten", color: "status-error"}
-                )
+                setNotification({
+                  text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                  color: "status-error",
+                })
             );
 
             setOpenDeleteDialog(undefined);

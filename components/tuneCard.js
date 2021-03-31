@@ -7,6 +7,7 @@ import {
   CardHeader,
   Menu,
   Image,
+  Heading,
 } from "grommet";
 import { useState } from "react";
 import { MoreVertical } from "grommet-icons";
@@ -37,9 +38,9 @@ export default function TuneCard(props) {
       animation={animation}
     >
       <CardHeader background={props.background} gap="none">
-        <Text margin="small" truncate size="medium">
+        <Heading level="5" margin="small" truncate size="medium">
           {props.title}
-        </Text>
+        </Heading>
         {props.showMenu && (
           <Menu
             icon={<MoreVertical />}
