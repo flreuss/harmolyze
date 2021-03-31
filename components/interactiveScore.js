@@ -28,7 +28,6 @@ export default function InteractiveScore({
   onChange,
   showSolution,
 }) {
-
   //Global
   var visualObjs;
   var voicesArray;
@@ -45,7 +44,8 @@ export default function InteractiveScore({
     renderVisualObjs();
     return () => {
       if (synthControl) synthControl.pause();
-      synth.activeAudioContext().close();
+      const ctx = synth.activeAudioContext();
+      if (ctx.state !== "closed") ctx.close();
     };
   }, [abc, solved]);
   useLayoutEffect(() => {
@@ -103,7 +103,7 @@ export default function InteractiveScore({
         }, 0)
       : 0;
     const newChordString = riemannFuncArray.reduce(
-      (acc, current) => current ? acc.concat(`"_${current}"`) : "",
+      (acc, current) => (current ? acc.concat(`"_${current}"`) : ""),
       ""
     );
 
@@ -167,7 +167,6 @@ export default function InteractiveScore({
 
   //Rendering
   function renderVisualObjs() {
-    console.log("Rendering VisualObjs...");
     let config = configFromFile;
     config.clickListener = handleClick;
     switch (device) {
@@ -184,34 +183,41 @@ export default function InteractiveScore({
         config.staffwidth = windowSize.width / 2.5;
     }
 
-    visualObjs = renderAbc("scoreContainer", abc, config);
-    voicesArray = new NotesVoicesArray(visualObjs[0]);
-    simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
+    try {
+      console.log("Rendering VisualObjs...");
+      visualObjs = renderAbc("scoreContainer", abc, config);
+      voicesArray = new NotesVoicesArray(visualObjs[0]);
+      simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
 
-    if (solution && initial) {
-      const solutionVoicesArray = new NotesVoicesArray(
-        renderAbc("*", solution)[0]
-      );
-      const initialVoicesArray = new NotesVoicesArray(
-        renderAbc("*", initial)[0]
-      );
+      if (solution && initial) {
+        const solutionVoicesArray = new NotesVoicesArray(
+          renderAbc("*", solution)[0]
+        );
+        const initialVoicesArray = new NotesVoicesArray(
+          renderAbc("*", initial)[0]
+        );
 
-      voicesArray.forEachElem((elem, pos) => {
-        if (
-          !chordOf(elem, solutionVoicesArray, simultaneousNotesMap) ||
-          chordOf(elem, initialVoicesArray, simultaneousNotesMap)
-        ) {
-          addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
-        } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
-          addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
-        } else if (showMistakes) {
-          elem.highlight(undefined, "red");
-          notesHighlighted.push(elem);
-        }
-      });
+        voicesArray.forEachElem((elem, pos) => {
+          if (
+            !chordOf(elem, solutionVoicesArray, simultaneousNotesMap) ||
+            chordOf(elem, initialVoicesArray, simultaneousNotesMap)
+          ) {
+            addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
+          } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
+            addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+          } else if (showMistakes) {
+            elem.highlight(undefined, "red");
+            notesHighlighted.push(elem);
+          }
+        });
+      }
+
+      loadAudio(visualObjs);
+    } catch (err) {
+      document.querySelector(
+        "main"
+      ).innerHTML = `<Box align="center"><Text>Diese .musicxml-Datei ist fehlerhaft und kann nicht dargestellt werden. Bitte reparieren Sie die zugehörige .musicxml-Datei.</Text></Box>`;
     }
-
-    loadAudio(visualObjs);
   }
 
   function loadAudio(visualObjs) {
