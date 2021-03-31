@@ -27,7 +27,7 @@ import {
 } from "grommet-icons";
 import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
-import { millisToMinutesAndSeconds } from "../lib/stringUtils";
+import { millisToMinutesAndSeconds, romanNumeral } from "../lib/stringUtils";
 
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
@@ -75,14 +75,14 @@ export default function Home({ tunebooks, session, score }) {
               activeIndex={activeIndex}
               onActive={(newActiveIndex) => setActiveIndex(newActiveIndex)}
             >
-              {tunebooks.map((tunebook) => (
+              {tunebooks.map((tunebook, tunebookIndex) => (
                 <AccordionPanel
                   key={tunebook._id}
                   gap="small"
-                  label={tunebook.name}
+                  label={`${romanNumeral(tunebookIndex+1)}. ${tunebook.name}`}
                 >
                   <Grid gap="small" columns="small" margin="medium">
-                    {tunebook.tunes.map((tune) => (
+                    {tunebook.tunes.map((tune, tuneIndex) => (
                       <TuneCard
                         image={tunebook.image}
                         background={tune.highscore ? "light-2" : "neutral-3"}
@@ -175,7 +175,7 @@ export default function Home({ tunebooks, session, score }) {
                           tune.createdBy === session.user._id ||
                           session.user.groups.includes("admin")
                         }
-                        title={tune.title}
+                        title={`${tuneIndex+1}. ${tune.title}`}
                         key={tune._id}
                       />
                     ))}
