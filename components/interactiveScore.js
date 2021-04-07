@@ -185,7 +185,9 @@ export default function InteractiveScore({
 
     try {
       console.log("Rendering VisualObjs...");
-      visualObjs = renderAbc("scoreContainer", abc, config);
+      const abcWithoutInstrumentNames = abc.replace(/s?nm="[a-zA-Z.]*"/g, "");
+      visualObjs = renderAbc("scoreContainer", abcWithoutInstrumentNames, config);
+      console.log("Rendered abc: ", abcWithoutInstrumentNames);
       voicesArray = new NotesVoicesArray(visualObjs[0]);
       simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
 
