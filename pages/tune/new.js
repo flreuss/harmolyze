@@ -75,7 +75,7 @@ export default function CreateTune({ tunebooks }) {
                   keyElem.append($(`<mode>${value.mode}</mode>`));
                 }
 
-                const res = xml2abc.vertaal(xmlDoc, { x: 1, p: "", noped: 1 });
+                const res = xml2abc.vertaal(xmlDoc, { x: 1, p: "", noped: 1, d:16 });
                 const errtxt = res[1];
                 if (errtxt.length !== 0) {
                   setLoading(false);
