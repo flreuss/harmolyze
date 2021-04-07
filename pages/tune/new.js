@@ -75,8 +75,14 @@ export default function CreateTune({ tunebooks }) {
                 } else {
                   keyElem.append($(`<mode>${value.mode}</mode>`));
                 }
+
+                //Remove instrument names from Score
+                $(xmlDoc).find("part-name").remove()
+                $(xmlDoc).find("part-abbreviation").remove()
+
                 //The divisions element indicates how many divisions per quarter note are used to indicate a note's duration
                 const divisions = $(xmlDoc).find("divisions").text();
+
                 const res = xml2abc.vertaal(xmlDoc, {
                   x: 1,
                   p: "",
