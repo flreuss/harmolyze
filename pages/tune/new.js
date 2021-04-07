@@ -30,12 +30,13 @@ export default function CreateTune({ tunebooks }) {
   const [notification, setNotification] = useState(undefined);
   const [value, setValue] = useState(defaultTune);
   const [loading, setLoading] = useState();
-  const [ session, load ] = useSession()
+  const [session, load] = useSession();
 
   const router = useRouter();
 
-  if (load) return null
-  if (!load && !session) return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>
+  if (load) return null;
+  if (!load && !session)
+    return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>;
 
   return (
     <Layout user={session && session.user} loading={loading}>
@@ -67,15 +68,21 @@ export default function CreateTune({ tunebooks }) {
                 let xmlDoc = $.parseXML(text);
                 let keyElem = $(xmlDoc).find("key");
 
-                if (keyElem.find("mode").text()) {
+                if (!keyElem.find("mode").empty()) {
                   keyElem
                     .find("mode")
                     .replaceWith($(`<mode>${value.mode}</mode>`));
                 } else {
                   keyElem.append($(`<mode>${value.mode}</mode>`));
                 }
-
-                const res = xml2abc.vertaal(xmlDoc, { x: 1, p: "", noped: 1, d:16 });
+                //The divisions element indicates how many divisions per quarter note are used to indicate a note's duration
+                const divisions = $(xmlDoc).find("divisions").text();
+                const res = xml2abc.vertaal(xmlDoc, {
+                  x: 1,
+                  p: "",
+                  noped: 1,
+                  d: +divisions * 4,
+                });
                 const errtxt = res[1];
                 if (errtxt.length !== 0) {
                   setLoading(false);
