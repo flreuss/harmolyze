@@ -67,7 +67,7 @@ export default function CreateTune({ tunebooks }) {
                 let xmlDoc = $.parseXML(text);
                 let keyElem = $(xmlDoc).find("key");
 
-                if (keyElem.find("mode")) {
+                if (keyElem.find("mode").text()) {
                   keyElem
                     .find("mode")
                     .replaceWith($(`<mode>${value.mode}</mode>`));
