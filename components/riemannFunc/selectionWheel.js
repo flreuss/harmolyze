@@ -1,5 +1,5 @@
 import React from "react";
-// import { produceRgbShades } from "../lib/tinycolorUtils";
+import { colorToRgbObj, convertObjToString, produceRgbShade, produceRgbShades, tinycolor } from "../../lib/tinycolorUtils";
 
 import ColorWheel from "../colorWheel";
 
@@ -13,40 +13,40 @@ export default function SelectionWheel({ value, onChange, mode, radius, lineWidt
         ["m", "min", "minor"].includes(mode)
           ? [
               {
-                color: "rgb(255,0,0)",
+                color: "#A2423D",
                 values: ["D", "(D)", "/D", "d"],
                 children: [
-                  { color: "rgb(179,0,0)", values: ["Dp", "DP", "dG", "dg"] },
+                  { color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[0]), values: ["Dp", "DP", "dG", "dg"] },
                   {
-                    color: "rgb(255,25,51)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[1]),
                     values: ["Dg", "DG", "dP", "dp"],
                   },
                 ],
               },
               {
-                color: "rgb(0,255,0)",
+                color: "#00873D",
                 values: ["s", "S"],
                 children: [
                   {
-                    color: "rgb(51, 255, 51)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[0]),
                     values: ["sG", "sg", "Sp", "SP"],
                   },
                   {
-                    color: "rgb(0, 179, 0)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[1]),
                     values: ["sP", "sp", "Sg", "SG"],
                   },
                 ],
               },
               {
-                color: "rgb(0,0,255)",
+                color: "#00739D",
                 values: ["t", "T"],
                 children: [
                   {
-                    color: "rgb(51, 51, 255)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[0]),
                     values: ["tG", "tg", "Tp", "TP"],
                   },
                   {
-                    color: "rgb(0, 0, 179)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[1]),
                     values: ["tP", "tp", "Tg", "TG"],
                   },
                 ],
@@ -54,40 +54,40 @@ export default function SelectionWheel({ value, onChange, mode, radius, lineWidt
             ]
           : [
               {
-                color: "rgb(255,0,0)",
+                color: "#A2423D",
                 values: ["D", "(D)", "/D", "d"],
                 children: [
-                  { color: "rgb(179,0,0)", values: ["Dp", "DP", "dG", "dg"] },
+                  { color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[0]), values: ["Dp", "DP", "dG", "dg"] },
                   {
-                    color: "rgb(255,25,51)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[1]),
                     values: ["Dg", "DG", "dP", "dp"],
                   },
                 ],
               },
               {
-                color: "rgb(0,255,0)",
+                color: "#00873D",
                 values: ["S", "s"],
                 children: [
                   {
-                    color: "rgb(51, 255, 51)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[0]),
                     values: ["Sp", "SP", "sG", "sg"],
                   },
                   {
-                    color: "rgb(0, 179, 0)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[1]),
                     values: ["Sg", "SG", "sP", "sp"],
                   },
                 ],
               },
               {
-                color: "rgb(0,0,255)",
+                color: "#00739D",
                 values: ["T", "t"],
                 children: [
                   {
-                    color: "rgb(51, 51, 255)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[0]),
                     values: ["Tp", "TP", "tG", "tg"],
                   },
                   {
-                    color: "rgb(0, 0, 179)",
+                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[1]),
                     values: ["Tg", "TG", "tP", "tp"],
                   },
                 ],
@@ -100,7 +100,7 @@ export default function SelectionWheel({ value, onChange, mode, radius, lineWidt
       onValueSelected={onChange}
       onRef={(ref) => (colorWheel = ref)}
       spacers={{
-        color: "#FFFFFF",
+        color: "white",
         shadowColor: "grey",
         shadowBlur: 5,
       }}

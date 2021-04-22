@@ -3,6 +3,7 @@ import { Box, Text } from "grommet";
 import {
   convertObjToString,
   produceRgbShade,
+  tinycolor,
 } from "../lib/tinycolorUtils";
 
 export default function NumberMultiSelector({
@@ -54,7 +55,7 @@ function Field({ value, onClick, selected }) {
         selected
           ? {
               //TODO: Replace by fetching rgb values from "brand"
-              color: convertObjToString(produceRgbShade(125, 76, 219, 0.7)),
+              color: convertObjToString(produceRgbShade(tinycolor("rgb(125, 76, 219)"), 0.7)),
             }
           : "light-4"
       }
