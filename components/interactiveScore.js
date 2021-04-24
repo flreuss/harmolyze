@@ -230,8 +230,11 @@ export default function InteractiveScore({
               )
             ) {
               addClasses(elem, ["abcjs-almostSolved"]);
-            } else if (showMistakes) {
-              elem.highlight(undefined, "red");
+            } else if (
+              showMistakes &&
+              chordOf(elem, voicesArray, simultaneousNotesMap)
+            ) {
+              elem.highlight(undefined, "#ff4040");
               notesHighlighted.push(elem);
             }
           });
