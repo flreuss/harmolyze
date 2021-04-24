@@ -90,9 +90,7 @@ export default function Home({ tunebooks, session, score }) {
                         gap="small"
                         columns={
                           device === "small"
-                            ? windowSize.height > windowSize.width
-                              ? ["50%", "50%"]
-                              : ["33%", "33%", "33%"]
+                            ? "xsmall"
                             : "small"
                         }
                         margin="medium"
