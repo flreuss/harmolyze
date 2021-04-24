@@ -45,7 +45,8 @@ export default function InteractiveScore({
     return () => {
       if (synthControl) synthControl.pause();
       const ctx = synth.activeAudioContext();
-      if (ctx.state !== "closed") ctx.close();
+      //TODO: Flush content of the AudioContext after suspension (then...)
+      if (ctx.state !== "closed") ctx.suspend().then(() => {});
     };
   }, [abc, solved]);
   useLayoutEffect(() => {
@@ -184,39 +185,42 @@ export default function InteractiveScore({
     }
 
     try {
-      console.log("Rendering VisualObjs...");
-      visualObjs = renderAbc("scoreContainer", abc, config);
-      voicesArray = new NotesVoicesArray(visualObjs[0]);
-      simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
+      if (document.getElementById("scoreContainer")) {
+        console.log("Rendering VisualObjs...");
+        visualObjs = renderAbc("scoreContainer", abc, config);
+        voicesArray = new NotesVoicesArray(visualObjs[0]);
+        simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
 
-      if (solution && initial) {
-        const solutionVoicesArray = new NotesVoicesArray(
-          renderAbc("*", solution)[0]
-        );
-        const initialVoicesArray = new NotesVoicesArray(
-          renderAbc("*", initial)[0]
-        );
+        if (solution && initial) {
+          const solutionVoicesArray = new NotesVoicesArray(
+            renderAbc("*", solution)[0]
+          );
+          const initialVoicesArray = new NotesVoicesArray(
+            renderAbc("*", initial)[0]
+          );
 
-        voicesArray.forEachElem((elem, pos) => {
-          if (
-            !chordOf(elem, solutionVoicesArray, simultaneousNotesMap) ||
-            chordOf(elem, initialVoicesArray, simultaneousNotesMap)
-          ) {
-            addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
-          } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
-            addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
-          } else if (showMistakes) {
-            elem.highlight(undefined, "red");
-            notesHighlighted.push(elem);
-          }
-        });
+          voicesArray.forEachElem((elem, pos) => {
+            if (
+              !chordOf(elem, solutionVoicesArray, simultaneousNotesMap) ||
+              chordOf(elem, initialVoicesArray, simultaneousNotesMap)
+            ) {
+              addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
+            } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
+              addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+            } else if (showMistakes) {
+              elem.highlight(undefined, "red");
+              notesHighlighted.push(elem);
+            }
+          });
+        }
+
+        if (document.getElementById("audioContainer")) {
+          loadAudio(visualObjs);
+        }
       }
-
-      loadAudio(visualObjs);
     } catch (err) {
-      document.querySelector(
-        "main"
-      ).innerHTML = `<div align="center">Diese .musicxml-Datei ist fehlerhaft und kann nicht dargestellt werden. Bitte reparieren Sie die zugehörige .musicxml-Datei.</div>`;
+      //TODO: Notify user of error via notification
+      console.error(err);
     }
   }
 
@@ -240,19 +244,17 @@ export default function InteractiveScore({
 
     synthControl.disable(true);
     const visualObj = visualObjs[0];
-
-    const audioContext = new AudioContext();
+    
     let midiBuffer = new synth.CreateSynth();
     midiBuffer
       .init({
-        visualObj,
-        audioContext,
+        visualObj
       })
       .then((response) => {
         console.log(response);
         if (synthControl) {
           synthControl
-            .setTune(visualObj, false, { audioContext })
+            .setTune(visualObj, false)
             .then((response) => {
               console.log("Audio successfully loaded.");
             })
