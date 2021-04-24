@@ -44,12 +44,16 @@ body {
   fill: #ff4040;
 }
 
-.abcjs-disabled:hover {
-  cursor: default;
-}
-
 .abcjs-solved {
   fill: #00c781;
+}
+
+.abcjs-almostSolved {
+  fill: #FFAA15;
+}
+
+.abcjs-disabled:hover {
+  cursor: default;
 }
 
 .abcjs-rest {

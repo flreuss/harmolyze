@@ -17,6 +17,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
     user_id: session.user._id,
     tune_id: tune._id,
     abc: getInitial(tune.abc),
+    almostSolved: [],
     solved: [],
     showMistakes: false,
     time: 0,
@@ -83,6 +84,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               solution={getSolution(tune.abc)}
               showMistakes={attempt.showMistakes}
               solved={attempt.solved}
+              almostSolved={attempt.almostSolved}
               device={device}
               onChange={(newAbc) => {
                 setAttempt((attempt) => ({
@@ -91,13 +93,14 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                   showMistakes: false,
                 }));
               }}
-              onValidate={(nextMistakes, nextSolved, nextSolvedArray) => {
+              onValidate={(nextMistakes, nextSolved, nextSolvedArray, nextAlmostSolvedArray) => {
                 const nextAttempt = {
                   ...attempt,
                   showMistakes: true,
                   mistakes: attempt.mistakes + nextMistakes,
                   progress: nextSolved / (nextMistakes + nextSolved),
                   solved: attempt.solved.concat(nextSolvedArray),
+                  almostSolved: attempt.almostSolved.concat(nextAlmostSolvedArray),
                   validatedAt: new Date(),
                   tune_id: tune._id,
                 };

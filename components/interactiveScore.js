@@ -22,6 +22,7 @@ export default function InteractiveScore({
   initial,
   solution,
   solved,
+  almostSolved,
   showMistakes,
   device,
   onValidate,
@@ -66,35 +67,51 @@ export default function InteractiveScore({
     let mistakes = 0;
     let solvedCount = 0;
     let solvedArray = [];
+    let almostSolvedArray = [];
     voicesArray.forEachElem((elem, pos) => {
       const filledInChord = elem.abcelem.chord;
-      const solutionChord = solutionVoicesArray.getElem(pos).abcelem.chord;
+      const solutionPossibilities = solutionVoicesArray.getElem(pos).abcelem
+        .chord;
 
       if (
-        solutionChord &&
+        solutionPossibilities &&
         !chordOf(elem, initialVoicesArray, simultaneousNotesMap)
       ) {
-        const solutionChords = solutionChord[0].name.split("\n");
+        const solutionChords = solutionPossibilities[0].name.split("\n");
 
-        if (!filledInChord || !solutionChords.includes(filledInChord[0].name)) {
-          mistakes += 1;
-          adjacentElemsOf(elem, voicesArray, simultaneousNotesMap).forEach(
-            (elem) => {
-              addClasses(elem, ["abcjs-mistake"]);
-            }
-          );
-        } else {
+        if (filledInChord && solutionChords.includes(filledInChord[0].name)) {
           solvedCount += 1;
           if (!hasClass(elem, "abcjs-solved")) {
             solvedArray = solvedArray.concat(
               simultaneousNotesMap.get(elem.counters)
             );
           }
+        } else if (
+          filledInChord &&
+          solutionChords.some(
+            (solutionChord) =>
+              RiemannFunc.fromString(
+                visualObjs[0].getKeySignature().mode,
+                solutionChord
+              ).baseFunc.short ===
+              RiemannFunc.fromString(
+                visualObjs[0].getKeySignature().mode,
+                filledInChord[0].name
+              ).baseFunc.short
+          )
+        ) {
+          if (!hasClass(elem, "abcjs-almostSolved")) {
+            almostSolvedArray = almostSolvedArray.concat(
+              simultaneousNotesMap.get(elem.counters)
+            );
+          }
+        } else {
+          mistakes += 1;
         }
       }
     });
 
-    onValidate(mistakes, solvedCount, solvedArray);
+    onValidate(mistakes, solvedCount, solvedArray, almostSolvedArray);
   }
 
   function handleSelectionDialogClose(abcelem, riemannFuncArray) {
@@ -207,6 +224,12 @@ export default function InteractiveScore({
               addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
             } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
               addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
+            } else if (
+              almostSolved.some((almostSolvedPos) =>
+                pos.equals(almostSolvedPos)
+              )
+            ) {
+              addClasses(elem, ["abcjs-almostSolved"]);
             } else if (showMistakes) {
               elem.highlight(undefined, "red");
               notesHighlighted.push(elem);
@@ -244,11 +267,11 @@ export default function InteractiveScore({
 
     synthControl.disable(true);
     const visualObj = visualObjs[0];
-    
+
     let midiBuffer = new synth.CreateSynth();
     midiBuffer
       .init({
-        visualObj
+        visualObj,
       })
       .then((response) => {
         console.log(response);
