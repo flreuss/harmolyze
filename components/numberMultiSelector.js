@@ -54,7 +54,6 @@ function Field({ value, onClick, selected }) {
       hoverIndicator={
         selected
           ? {
-              //TODO: Replace by fetching rgb values from "brand"
               color: convertObjToString(produceRgbShade(tinycolor("rgb(125, 76, 219)"), 0.7)),
             }
           : "light-4"

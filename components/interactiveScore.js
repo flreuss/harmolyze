@@ -25,7 +25,6 @@ export default function InteractiveScore({
   almostSolved,
   showMistakes,
   device,
-  onValidate,
   onChange,
   showSolution,
 }) {
@@ -55,23 +54,23 @@ export default function InteractiveScore({
   }, [windowSize, device]);
 
   //Event handlers
-  function handleValidate() {
-    //TODO: Check why this render call is necessary...
-    renderVisualObjs();
-    const solutionVoicesArray = new NotesVoicesArray(
-      renderAbc("*", solution)[0]
-    );
+  function validate(elem) {
+    if (!showSolution) {
+      const solutionVoicesArray = new NotesVoicesArray(
+        renderAbc("*", solution)[0]
+      );
+      const initialVoicesArray = new NotesVoicesArray(
+        renderAbc("*", initial)[0]
+      );
 
-    const initialVoicesArray = new NotesVoicesArray(renderAbc("*", initial)[0]);
-
-    let mistakes = 0;
-    let solvedCount = 0;
-    let solvedArray = [];
-    let almostSolvedArray = [];
-    voicesArray.forEachElem((elem, pos) => {
       const filledInChord = elem.abcelem.chord;
-      const solutionPossibilities = solutionVoicesArray.getElem(pos).abcelem
-        .chord;
+      const solutionPossibilities = chordOf(
+        elem,
+        solutionVoicesArray,
+        simultaneousNotesMap
+      );
+
+      let abcjsClass = "mistake";
 
       if (
         solutionPossibilities &&
@@ -79,15 +78,9 @@ export default function InteractiveScore({
       ) {
         const solutionChords = solutionPossibilities[0].name.split("\n");
 
-        if (filledInChord && solutionChords.includes(filledInChord[0].name)) {
-          solvedCount += 1;
-          if (!hasClass(elem, "abcjs-solved")) {
-            solvedArray = solvedArray.concat(
-              simultaneousNotesMap.get(elem.counters)
-            );
-          }
+        if (solutionChords.includes(filledInChord)) {
+          abcjsClass = "abcjs-solved";
         } else if (
-          filledInChord &&
           solutionChords.some(
             (solutionChord) =>
               RiemannFunc.fromString(
@@ -96,22 +89,18 @@ export default function InteractiveScore({
               ).baseFunc.short ===
               RiemannFunc.fromString(
                 visualObjs[0].getKeySignature().mode,
-                filledInChord[0].name
+                filledInChord
               ).baseFunc.short
           )
         ) {
-          if (!hasClass(elem, "abcjs-almostSolved")) {
-            almostSolvedArray = almostSolvedArray.concat(
-              simultaneousNotesMap.get(elem.counters)
-            );
-          }
+          abcjsClass = "abcjs-almostSolved";
         } else {
-          mistakes += 1;
+          abcjsClass = "abcjs-mistake";
         }
       }
-    });
 
-    onValidate(mistakes, solvedCount, solvedArray, almostSolvedArray);
+      return [simultaneousNotesMap.get(elem.counters), abcjsClass];
+    }
   }
 
   function handleSelectionDialogClose(abcelem, riemannFuncArray) {
@@ -125,9 +114,19 @@ export default function InteractiveScore({
       ""
     );
 
-    onChange(
-      replace(abc, newChordString, abcelem.startChar, oldChordStringLength)
-    );
+    if (
+      newChordString.length > 0 &&
+      (!abcelem.chord ||
+      riemannFuncArray[0].toString() !== abcelem.chord[0].name)
+    ) {
+      let newAbcElem = abcelem;
+      newAbcElem.abselem.abcelem.chord = riemannFuncArray[0].toString();
+      onChange(
+        replace(abc, newChordString, abcelem.startChar, oldChordStringLength),
+        validate(newAbcElem.abselem)
+      );
+    }
+
     unhighlight(notesHighlighted);
     setOpenSelectionDialog(undefined);
   }
@@ -154,6 +153,7 @@ export default function InteractiveScore({
         elem.highlight(undefined, configFromFile.selectionColor);
         notesHighlighted.push(elem);
       });
+      //TODO: Wenn der Chord schon almostSolved ist, dann kann die Base Function nicht mehr geändert werden (ausgegraut)
       setOpenSelectionDialog({
         onClose: (riemannFuncArray) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFuncArray),
@@ -185,21 +185,22 @@ export default function InteractiveScore({
 
   //Rendering
   function renderVisualObjs() {
-    let config = configFromFile;
-    config.clickListener = handleClick;
+    let zoomFactor = 1;
     switch (device) {
-      case "small":
-        config.staffwidth = windowSize.width;
-        break;
       case "medium":
-        config.staffwidth = windowSize.width / 1.5;
+        zoomFactor = 1.5;
         break;
       case "large":
-        config.staffwidth = windowSize.width / 2;
+        zoomFactor = 2;
         break;
       default:
-        config.staffwidth = windowSize.width / 2.5;
+        zoomFactor = 2.5;
     }
+    const config = {
+      ...configFromFile,
+      clickListener: handleClick,
+      staffwidth: windowSize.width / zoomFactor,
+    };
 
     try {
       if (document.getElementById("scoreContainer")) {
@@ -281,7 +282,7 @@ export default function InteractiveScore({
         if (synthControl) {
           synthControl
             .setTune(visualObj, false)
-            .then((response) => {
+            .then(() => {
               console.log("Audio successfully loaded.");
             })
             .catch((error) => {
@@ -304,28 +305,12 @@ export default function InteractiveScore({
     >
       <Box id="scoreContainer" />
       <Box
-        direction="column"
         fill="horizontal"
-        gap="medium"
         align="center"
         alignSelf="start"
         pad={{ bottom: "small", horizontal: "large" }}
       >
         <Box fill="horizontal" id="audioContainer" />
-        {onValidate && (
-          <Button
-            pad="medium"
-            type="submit"
-            label={
-              <Text color="white">
-                <strong>Überprüfen</strong>
-              </Text>
-            }
-            fill={false}
-            onClick={handleValidate}
-            primary
-          />
-        )}
       </Box>
       {openSelectionDialog && (
         <SelectionDialog

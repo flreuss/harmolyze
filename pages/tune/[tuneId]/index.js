@@ -34,8 +34,25 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
     interval = setInterval(() => {
       setAttempt((attempt) => ({ ...attempt, time: attempt.time + 1000 }));
     }, 1000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [attempt.time]);
+
+  useEffect(() => {
+    createAttempt(
+      attempt,
+      () => {
+        //TODO: if completely solved
+        if (false)
+          router.push(
+            `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${nextAttempt.mistakes}&time=${nextAttempt.time}`
+          );
+      },
+      () =>
+        setNotification("Bei der Datenbankanfrage ist ein Fehler aufgetreten")
+    );
+  }, [attempt.abc]);
 
   return (
     <Layout
@@ -86,39 +103,28 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               solved={attempt.solved}
               almostSolved={attempt.almostSolved}
               device={device}
-              onChange={(newAbc) => {
-                setAttempt((attempt) => ({
-                  ...attempt,
-                  abc: newAbc,
-                  showMistakes: false,
-                }));
-              }}
-              onValidate={(nextMistakes, nextSolved, nextSolvedArray, nextAlmostSolvedArray) => {
+              onChange={(newAbc, [elems, abcjsClass]) => {
                 const nextAttempt = {
-                  ...attempt,
                   showMistakes: true,
-                  mistakes: attempt.mistakes + nextMistakes,
-                  progress: nextSolved / (nextMistakes + nextSolved),
-                  solved: attempt.solved.concat(nextSolvedArray),
-                  almostSolved: attempt.almostSolved.concat(nextAlmostSolvedArray),
+                  mistakes:
+                    abcjsClass == "abcjs-mistake"
+                      ? attempt.mistakes + 1
+                      : attempt.mistakes,
+                  //TODO: Wie berechnen jetzt?
+                  progress: 0,
+                  solved:
+                    abcjsClass == "abcjs-solved"
+                      ? attempt.solved.concat(elems)
+                      : attempt.solved,
+                  almostSolved:
+                    abcjsClass == "abcjs-almostSolved"
+                      ? attempt.almostSolved.concat(elems)
+                      : attempt.almostSolved,
                   validatedAt: new Date(),
+                  abc: newAbc,
                   tune_id: tune._id,
                 };
-                setAttempt(nextAttempt);
-
-                createAttempt(
-                  nextAttempt,
-                  () => {
-                    if (nextMistakes === 0)
-                      router.push(
-                        `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${nextAttempt.mistakes}&time=${nextAttempt.time}`
-                      );
-                  },
-                  () =>
-                    setNotification(
-                      "Bei der Datenbankanfrage ist ein Fehler aufgetreten"
-                    )
-                );
+                setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
               }}
             />
           )}
@@ -184,6 +190,7 @@ export async function getServerSideProps(context) {
 
     const lastAttempt =
       attempts.length > 0 && attempts[0].progress !== 1 ? attempts[0] : null;
+    console.log(lastAttempt);
     tune = { _id: tune._id, abc: tune.abc, title: tune.title };
 
     return {
