@@ -1,6 +1,6 @@
 ## Beschränkungen
 
-Hinweis: Folgende Funktionen werden aktuell nicht von Riemann-App unterstützt:
+Hinweis: Folgende Funktionen werden aktuell nicht von HarmoLyze unterstützt:
 - Alterationen
 - Modulationen
 - Doppelsubdominanten

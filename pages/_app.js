@@ -4,11 +4,11 @@ import Head from "next/head";
 
 import "../styles/globals.css";
 
-export default function RiemannApp({ Component, pageProps }) {
+export default function HarmoLyzeApp({ Component, pageProps }) {
   return (
     <Provider session={pageProps.session}>
       <Head>
-        <title>Riemann App</title>
+        <title>HarmoLyze</title>
       </Head>
       <Component {...pageProps} />
     </Provider>
