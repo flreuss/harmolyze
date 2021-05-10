@@ -106,7 +106,13 @@ export default function Home({ tunebooks, session, score }) {
                             onClick={(disabled) => {
                               if (!disabled) {
                                 setLoading(true);
-                                router.push(`/tune/${tune._id}`);
+                                router.push(
+                                  `/tune/${tune._id}${
+                                    tune.createdBy === session.user._id
+                                      ? "/edit"
+                                      : ""
+                                  }`
+                                );
                               } else {
                                 const thresholdForRetry =
                                   7 * (24 * 60 * 60 * 1000);

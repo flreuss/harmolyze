@@ -48,13 +48,16 @@ export default function EditTune({ tune, session }) {
               setAbcHistory(nextAbcHistory);
             }}
           />
-          <Button
-            icon={<View />}
-            onClick={() => {
-              router.push(`/tune/${tune._id}`);
-            }}
-            hoverIndicator
-          />
+          {(tune.createdBy !== session.user._id ||
+            session.user.groups.includes("admin")) && (
+            <Button
+              icon={<View />}
+              onClick={() => {
+                router.push(`/tune/${tune._id}`);
+              }}
+              hoverIndicator
+            />
+          )}
         </Box>
       }
     >
