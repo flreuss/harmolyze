@@ -5,7 +5,7 @@ import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
-import { LinkPrevious, Undo, View } from "grommet-icons";
+import { LinkPrevious, Previous, Undo, View } from "grommet-icons";
 import { calculatePoints } from "../../../lib/solutions";
 import { useRouter } from "next/router";
 
@@ -32,6 +32,7 @@ export default function EditTune({ tune, session }) {
 
   return (
     <Layout
+      homeIcon={<Previous />}
       user={session.user}
       status={
         <Box direction="row" gap="small" align="center">

@@ -433,10 +433,11 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
+    //TODO: Überprüfe, ob das auch für jeden Tune nur genau 1 mal aggregiert oder ob ich tunes doppelt lösen kann und nochmal Geld bekomme
     const attempts = await db
       .collection("attempts")
       .aggregate([
-        { $match: { user_id: session.user._id } },
+        { $match: { user_id: session.user._id, progress:1 } },
         {
           $group: {
             _id: "$tune_id",
