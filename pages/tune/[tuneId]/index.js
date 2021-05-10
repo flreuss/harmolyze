@@ -56,7 +56,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
 
   return (
     <Layout
-    homeIcon={<Previous />}
+      homeIcon={<Previous />}
       loading={loading}
       status={
         <Box direction="row" gap="small" align="center">
@@ -192,7 +192,12 @@ export async function getServerSideProps(context) {
     const lastAttempt =
       attempts.length > 0 && attempts[0].progress !== 1 ? attempts[0] : null;
     console.log(lastAttempt);
-    tune = { _id: tune._id, abc: tune.abc, title: tune.title };
+    tune = {
+      _id: tune._id,
+      //Removes instrument names from abc strings
+      abc: tune.abc.replace(/s?nm=".*"/g, ""),
+      title: tune.title,
+    };
 
     return {
       props: {
