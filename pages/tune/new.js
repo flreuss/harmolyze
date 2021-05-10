@@ -17,6 +17,7 @@ import { connectToDatabase } from "../../lib/mongodb";
 import Head from "next/head";
 import xml2abc from "xml2abc";
 import { useRouter } from "next/router";
+import { Previous } from "grommet-icons";
 
 export default function CreateTune({ tunebooks }) {
   const defaultTune = {
@@ -39,7 +40,11 @@ export default function CreateTune({ tunebooks }) {
     return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>;
 
   return (
-    <Layout user={session && session.user} loading={loading}>
+    <Layout
+      homeIcon={<Previous />}
+      user={session && session.user}
+      loading={loading}
+    >
       <Head>
         {/* Workaround: add jQuery this way globally to make xml2abc work */}
         <script
@@ -77,8 +82,8 @@ export default function CreateTune({ tunebooks }) {
                 }
 
                 //Remove instrument names from Score
-                $(xmlDoc).find("part-name").remove()
-                $(xmlDoc).find("part-abbreviation").remove()
+                $(xmlDoc).find("part-name").remove();
+                $(xmlDoc).find("part-abbreviation").remove();
 
                 //The divisions element indicates how many divisions per quarter note are used to indicate a note's duration
                 const divisions = $(xmlDoc).find("divisions").text();

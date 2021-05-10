@@ -10,6 +10,9 @@ import {
   Menu,
   Layer,
   Spinner,
+  Image,
+  Text,
+  Heading,
 } from "grommet";
 import Link from "next/link";
 import { grommet } from "grommet/themes";
@@ -38,7 +41,13 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
         <Header gridArea="header" background="brand" pad="small">
           <Nav gap="small" direction="row">
             <Link href="/" passHref>
-              <Button size="small" hoverIndicator icon={homeIcon || <Home />} />
+              <Button
+                size="small"
+                hoverIndicator
+                icon={homeIcon || <Image src="/music-clef-treble.png" />}
+                label={homeIcon ? "" :<Heading level="3" margin="none">HarmoLyze</Heading>}
+                plain
+              />
             </Link>
           </Nav>
 
@@ -51,17 +60,6 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
                   align: { top: "bottom", right: "right" },
                 }}
                 items={[
-                  {
-                    label: "Statistik",
-                    onClick: () => {
-                      router.push("/stats");
-                    },
-                    icon: (
-                      <Box pad={{ right: "small" }}>
-                        <Analytics />
-                      </Box>
-                    ),
-                  },
                   {
                     label: "Abmelden",
                     onClick: () => {

@@ -9,6 +9,7 @@ import {
   Meter,
   Select,
   ResponsiveContext,
+  Image,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -88,11 +89,7 @@ export default function Home({ tunebooks, session, score }) {
                     {(device) => (
                       <Grid
                         gap="small"
-                        columns={
-                          device === "small"
-                            ? "xsmall"
-                            : "small"
-                        }
+                        columns={device === "small" ? "xsmall" : "small"}
                         margin="medium"
                       >
                         {tunebook.tunes.map((tune, tuneIndex) => (

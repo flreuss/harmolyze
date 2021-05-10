@@ -7,7 +7,7 @@ import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
-import { Clock, Edit, StatusCritical } from "grommet-icons";
+import { Clock, Edit, Previous, StatusCritical } from "grommet-icons";
 import { getInitial, getSolution } from "../../../lib/solutions";
 
 export default function DisplayTune({ tune, session, lastAttempt }) {
@@ -56,6 +56,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
 
   return (
     <Layout
+    homeIcon={<Previous />}
       loading={loading}
       status={
         <Box direction="row" gap="small" align="center">
