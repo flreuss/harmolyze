@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
 import { Clock, Edit, Previous, StatusCritical } from "grommet-icons";
 import { getInitial, getSolution } from "../../../lib/solutions";
+import Head from "next/head";
 
 export default function DisplayTune({ tune, session, lastAttempt }) {
   const defaultAttempt = {
@@ -81,6 +82,9 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       }
       user={session.user}
     >
+      <Head>
+        <title>HarmoLyze - {tune.title}</title>
+      </Head>
       <Meter
         value={Math.floor(attempt.progress * 100)}
         max={100}

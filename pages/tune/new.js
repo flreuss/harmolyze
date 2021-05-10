@@ -52,6 +52,7 @@ export default function CreateTune({ tunebooks }) {
           integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
           crossorigin="anonymous"
         ></script>
+        <title>HarmoLyze - Neue Übungsaufgabe anlegen</title>
       </Head>
       <Box fill align="center" justify="center" gap="large" pad="medium">
         <Heading textAlign="center" margin="none">

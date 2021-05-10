@@ -8,6 +8,7 @@ import { getSession } from "next-auth/client";
 import { LinkPrevious, Previous, Undo, View } from "grommet-icons";
 import { calculatePoints } from "../../../lib/solutions";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export default function EditTune({ tune, session }) {
   const [abcHistory, setAbcHistory] = useState([tune.abc]);
@@ -61,6 +62,9 @@ export default function EditTune({ tune, session }) {
         </Box>
       }
     >
+      <Head>
+        <title>HarmoLyze - {tune.title} bearbeiten</title>
+      </Head>
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -111,6 +115,7 @@ export async function getServerSideProps(context) {
         _id: { $toString: "$_id" },
         abc: 1,
         createdBy: 1,
+        title: 1,
       },
     }
   );

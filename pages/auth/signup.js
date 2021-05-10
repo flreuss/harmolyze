@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import fs from "fs";
 import path from "path";
+import Head from "next/head";
 
 export default function SignIn({ avatars }) {
   const [nameError, setNameError] = useState();
@@ -28,6 +29,9 @@ export default function SignIn({ avatars }) {
 
   return (
     <Layout loading={loading}>
+       <Head>
+        <title>HarmoLyze - Registrieren</title>
+      </Head>
       <Box fill pad="medium" align="center" justify="center" gap="large">
         <Heading margin="none">Benutzerkonto anlegen</Heading>
 

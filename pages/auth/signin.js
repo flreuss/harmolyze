@@ -12,6 +12,7 @@ import {
 } from "grommet";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export default function SignIn() {
   const [unauthorized, setUnauthorized] = useState();
@@ -24,6 +25,9 @@ export default function SignIn() {
 
   return (
     <Layout loading={loading}>
+      <Head>
+        <title>HarmoLyze - Einloggen</title>
+      </Head>
       <Box fill pad="medium" align="center" justify="center" gap="large">
         <Heading margin="none">Einloggen</Heading>
         <Box width="medium">
