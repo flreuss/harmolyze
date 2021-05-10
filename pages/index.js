@@ -433,7 +433,7 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
-    const attempts = await db
+    const successfulAttemptsOnForeignTunes = await db
       .collection("attempts")
       .aggregate([
         { $match: { user_id: session.user._id, progress: 1 } },
@@ -451,6 +451,7 @@ export async function getServerSideProps(context) {
           },
         },
         { $unwind: { path: "$tune", preserveNullAndEmptyArrays: false } },
+        { $match: { "tune.createdBy": { $ne: session.user._id } } },
         {
           $group: {
             _id: null,
@@ -460,7 +461,10 @@ export async function getServerSideProps(context) {
       ])
       .toArray();
 
-    const score = attempts.length > 0 ? attempts[0].score : 0;
+    const score =
+      successfulAttemptsOnForeignTunes.length > 0
+        ? successfulAttemptsOnForeignTunes[0].score
+        : 0;
 
     return {
       props: {
