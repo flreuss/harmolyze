@@ -6,7 +6,6 @@ import {
   Header,
   Main,
   Nav,
-  Avatar,
   Menu,
   Layer,
   Spinner,
@@ -21,6 +20,7 @@ import { signOut } from "next-auth/client";
 import { Analytics, Home, Logout } from "grommet-icons";
 import React from "react";
 import { useRouter } from "next/router";
+import Avatar from "avataaars";
 
 const customTheme = deepMerge(grommet, {});
 
@@ -38,14 +38,27 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
           ["main", "main"],
         ]}
       >
-        <Header gridArea="header" background="brand" pad="small">
+        <Header
+          gridArea="header"
+          background="brand"
+          pad={{ horizontal: "small" }}
+        >
           <Nav gap="small" direction="row">
             <Link href="/" passHref>
               <Button
+                margin="small"
                 size="small"
                 hoverIndicator
                 icon={homeIcon || <Image src="/music-clef-treble.png" />}
-                label={homeIcon ? "" :<Heading level="3" margin="none">HarmoLyze</Heading>}
+                label={
+                  homeIcon ? (
+                    ""
+                  ) : (
+                    <Heading level="3" margin="none">
+                      HarmoLyze
+                    </Heading>
+                  )
+                }
                 plain
               />
             </Link>
@@ -55,7 +68,15 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
             {status}
             {user && (
               <Menu
-                label={<Avatar src={user.image} size="small" />}
+                label={
+                  <Avatar
+                    style={{ width: "50px", height: "50px" }}
+                    avatarStyle="Circle"
+                    clotheType="Hoodie"
+                    clotheColor="Heather"
+                    {...user.avatar}
+                  />
+                }
                 dropProps={{
                   align: { top: "bottom", right: "right" },
                 }}

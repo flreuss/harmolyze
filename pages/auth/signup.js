@@ -2,20 +2,20 @@ import { signIn } from "next-auth/client";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
 import {
-  Avatar,
   Box,
   Button,
   Form,
   FormField,
   Heading,
   RadioButtonGroup,
+  RangeInput,
+  Select,
   TextInput,
 } from "grommet";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import fs from "fs";
-import path from "path";
 import Head from "next/head";
+import Avatar from "avataaars";
 
 export default function SignIn({ avatars }) {
   const [nameError, setNameError] = useState();
@@ -25,11 +25,74 @@ export default function SignIn({ avatars }) {
     name: router.query.name ? router.query.name : "",
     password: "",
     password2: "",
+    topLength: "Kopfbedeckung",
+    hairColor: 0,
+    topType: 1,
+    eyeType: 3,
+    skinColor: 0,
   });
+
+  const hairColorArray = [
+    "Black",
+    "BrownDark",
+    "Brown",
+    "Red",
+    "Blonde",
+    "BlondeGolden",
+    "PastelPink",
+    "SilverGray",
+  ];
+
+  const eyeTypeArray = [
+    "Close",
+    "Default",
+    "EyeRoll",
+    "Happy",
+    "Hearts",
+    "Wink",
+    "Side",
+  ];
+
+  const hairTypes = {
+    Lang: [
+      "LongHairBigHair",
+      "LongHairBob",
+      "LongHairCurly",
+      "LongHairCurvy",
+      "LongHairFro",
+      "LongHairStraight",
+    ],
+    Kurz: [
+      "ShortHairDreads02",
+      "ShortHairShaggyMullet",
+      "ShortHairShortCurly",
+      "ShortHairShortFlat",
+      "ShortHairShortWaved",
+      "ShortHairTheCaesar",
+    ],
+    Kopfbedeckung: [
+      "Eyepatch",
+      "Hat",
+      "WinterHat1",
+      "WinterHat2",
+      "WinterHat3",
+      "WinterHat4",
+    ],
+  };
+
+  const skinColorArray = [
+    "Black",
+    "Pale",
+    "Yellow",
+    "Tanned",
+    "Light",
+    "Brown",
+    "DarkBrown",
+  ];
 
   return (
     <Layout loading={loading}>
-       <Head>
+      <Head>
         <title>HarmoLyze - Registrieren</title>
       </Head>
       <Box fill pad="medium" align="center" justify="center" gap="large">
@@ -46,7 +109,16 @@ export default function SignIn({ avatars }) {
             onSubmit={({ value }) => {
               setLoading(true);
               createUser(
-                value,
+                {
+                  name: value.name,
+                  password: value.password,
+                  avatar: {
+                    skinColor: skinColorArray[value.skinColor],
+                    hairColor: hairColorArray[value.hairColor],
+                    eyeType: eyeTypeArray[value.eyeType],
+                    topType: hairTypes[value.topLength][value.topType],
+                  },
+                },
                 () => {
                   signIn("credentials", {
                     name: value.name,
@@ -113,32 +185,54 @@ export default function SignIn({ avatars }) {
               <TextInput name="password2" type="password" />
             </FormField>
 
-            <FormField label="Avatar" name="image">
+            <FormField label="Avatar - Haarlänge" name="topLength">
               <RadioButtonGroup
-                name="image"
-                direction="row"
-                gap="xsmall"
-                justify="between"
-                options={avatars.map((src) => ({
-                  id: `$avatar${src}`,
-                  value: src,
-                }))}
-              >
-                {(option, { checked, hover }) => {
-                  let props;
-
-                  if (checked)
-                    props = {
-                      elevation: "large",
-                      animation: { type: "pulse", size: "medium" },
-                    };
-                  else if (hover) props = { elevation: "medium" };
-                  else props = {};
-
-                  return <Avatar {...props} src={option.value} />;
-                }}
-              </RadioButtonGroup>
+                name="topLength"
+                options={["Kurz", "Lang", "Kopfbedeckung"]}
+              />
             </FormField>
+
+            <FormField
+              label={
+                value.topLength === "Kopfbedeckung"
+                  ? "Avatar - Kopfbedeckung"
+                  : "Avatar - Frisur"
+              }
+              name="topType"
+            >
+              <RangeInput
+                name="topType"
+                max={hairTypes[value.topLength].length - 1}
+              ></RangeInput>
+            </FormField>
+
+            {value.topLength !== "Kopfbedeckung" && (
+              <FormField label="Avatar - Haarfarbe" name="hairColor">
+                <RangeInput name="hairColor" max={hairColorArray.length - 1} />
+              </FormField>
+            )}
+
+            <FormField label="Avatar - Augen" name="eyeType">
+              <RangeInput name="eyeType" max={eyeTypeArray.length - 1} />
+            </FormField>
+
+            <FormField label="Avatar - Hautfarbe" name="skinColor">
+              <RangeInput name="skinColor" max={skinColorArray.length - 1} />
+            </FormField>
+
+            <Box>
+              <Avatar
+                style={{ width: "100px", height: "100px" }}
+                avatarStyle="Circle"
+                hatColor="Black"
+                clotheType="Hoodie"
+                clotheColor="Heather"
+                hairColor={hairColorArray[value.hairColor]}
+                topType={hairTypes[value.topLength][value.topType]}
+                eyeType={eyeTypeArray[value.eyeType]}
+                skinColor={skinColorArray[value.skinColor]}
+              />
+            </Box>
 
             <Box
               direction="row"
@@ -183,16 +277,4 @@ async function createUser(user, onSuccess, onFailure) {
     const err = await res.json();
     onFailure(err);
   }
-}
-
-export async function getStaticProps() {
-  const avatarDirectory = "public/avatars";
-
-  const avatars = fs
-    .readdirSync(path.join(process.cwd(), avatarDirectory))
-    .map((filename) => `/avatars/${filename}`);
-
-  return {
-    props: { avatars }, // will be passed to the page component as props
-  };
 }
