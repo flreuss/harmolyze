@@ -22,7 +22,18 @@ import React from "react";
 import { useRouter } from "next/router";
 import Avatar from "avataaars";
 
-const customTheme = deepMerge(grommet, {});
+const customTheme = deepMerge(grommet, {
+  global: {
+    breakpoints: {
+      small: {
+        value: 767,
+      },
+      medium: {
+        value: 1536,
+      },
+    },
+  },
+});
 
 export default function Layout({ children, user, status, homeIcon, loading }) {
   const router = useRouter();

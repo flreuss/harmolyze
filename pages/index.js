@@ -90,7 +90,13 @@ export default function Home({ tunebooks, session, score }) {
                     {(device) => (
                       <Grid
                         gap="small"
-                        columns={device === "small" ? "xsmall" : "small"}
+                        columns={
+                          device === "small"
+                            ? windowSize.height > windowSize.width
+                              ? ["49%","49%"]
+                              : ["23%","23%","23%","23%"]
+                            : "small"
+                        }
                         margin="medium"
                       >
                         {tunebook.tunes.map((tune, tuneIndex) => (
@@ -255,8 +261,7 @@ export default function Home({ tunebooks, session, score }) {
                     },
                     () =>
                       setNotification({
-                        text:
-                          "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                        text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
                         color: "status-error",
                       })
                   );
@@ -419,7 +424,7 @@ export async function getServerSideProps(context) {
               title: 1,
               points: 1,
               createdBy: 1,
-              image:1,
+              image: 1,
               _id: { $toString: "$tunes_docs._id" },
               highscore: { $first: "$highscore" },
             },
