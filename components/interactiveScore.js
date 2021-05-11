@@ -16,6 +16,7 @@ import {
 import { replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
+import { getSolutionFuncs } from "../lib/solutions";
 
 export default function InteractiveScore({
   abc,
@@ -35,6 +36,7 @@ export default function InteractiveScore({
   var simultaneousNotesMap;
   var notesHighlighted = [];
   var synthControl;
+  var solutionFuncs;
 
   //State
   const windowSize = useWindowSize();
@@ -117,7 +119,7 @@ export default function InteractiveScore({
     if (
       newChordString.length > 0 &&
       (!abcelem.chord ||
-      riemannFuncArray[0].toString() !== abcelem.chord[0].name)
+        riemannFuncArray[0].toString() !== abcelem.chord[0].name)
     ) {
       let newAbcElem = abcelem;
       newAbcElem.abselem.abcelem.chord = riemannFuncArray[0].toString();
@@ -158,6 +160,7 @@ export default function InteractiveScore({
         onClose: (riemannFuncArray) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFuncArray),
         edit: showSolution ? visualObjs[0].getKeySignature().mode : undefined,
+        solutionFuncs,
         defaultValues: lowestAdjacentNote.chord
           ? showSolution
             ? lowestAdjacentNote.chord[0].name
@@ -237,6 +240,26 @@ export default function InteractiveScore({
             ) {
               elem.highlight(undefined, "#ff4040");
               notesHighlighted.push(elem);
+            }
+          });
+
+          //TODO: Muss nur einmal gerechnet werden
+          solutionFuncs = [];
+
+          solutionVoicesArray.forEachElem((elem) => {
+            if (
+              elem.abcelem.chord &&
+              !chordOf(elem, initialVoicesArray, simultaneousNotesMap)
+            ) {
+              //TODO: Wähle aus den Chord den leichtesten aus und füge den zum Array hinzu
+              elem.abcelem.chord.forEach((chord) =>
+                solutionFuncs.push(
+                  RiemannFunc.fromString(
+                    visualObjs[0].getKeySignature().mode,
+                    chord.name
+                  )
+                )
+              );
             }
           });
         }
@@ -320,6 +343,13 @@ export default function InteractiveScore({
           defaultValues={openSelectionDialog.defaultValues}
           edit={openSelectionDialog.edit}
           target={document.querySelector("main")}
+          baseFuncTypes={
+            openSelectionDialog.solutionFuncs
+              ? openSelectionDialog.solutionFuncs.map(
+                  (func) => func.baseFunc.type
+                )
+              : undefined
+          }
         />
       )}
     </Grid>

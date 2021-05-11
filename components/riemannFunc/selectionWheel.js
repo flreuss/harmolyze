@@ -1,99 +1,161 @@
 import React from "react";
-import { colorToRgbObj, convertObjToString, produceRgbShade, produceRgbShades, tinycolor } from "../../lib/tinycolorUtils";
+import { BASE_FUNC_TYPES } from "../../lib/riemannFunc";
+import {
+  convertObjToString,
+  produceRgbShades,
+  tinycolor,
+} from "../../lib/tinycolorUtils";
 
 import ColorWheel from "../colorWheel";
 
-export default function SelectionWheel({ value, onChange, mode, radius, lineWidth }) {
+export default function SelectionWheel({
+  value,
+  onChange,
+  mode,
+  radius,
+  lineWidth,
+  baseFuncTypes,
+}) {
   // Important global variable! Do not delete!
   let colorWheel;
 
+  function getOptionTree() {
+    const colors = {
+      dominant: "#A2423D",
+      subdominant: "#00873D",
+      tonic: "#00739D",
+    };
+
+    let optionTree = ["m", "min", "minor"].includes(mode)
+      ? [
+          {
+            color: colors.dominant,
+            values: ["D", "/D", "(D)"],
+            children: [],
+          },
+          {
+            color: colors.subdominant,
+            values: ["s"],
+            children: [],
+          },
+          {
+            color: colors.tonic,
+            values: ["t"],
+            children: [],
+          },
+        ]
+      : [
+          {
+            color: colors.dominant,
+            values: ["D", "/D", "(D)"],
+            children: [],
+          },
+          {
+            color: colors.subdominant,
+            values: ["S"],
+            children: [],
+          },
+          {
+            color: colors.tonic,
+            values: ["T"],
+            children: [],
+          },
+        ];
+
+    if (
+      !baseFuncTypes ||
+      baseFuncTypes.some(
+        (type) =>
+          type.name === BASE_FUNC_TYPES.PARALLEL.name ||
+          type.name === BASE_FUNC_TYPES.MEDIANT.name
+      )
+    ) {
+      optionTree[0].children.push(
+        {
+          color: convertObjToString(
+            produceRgbShades(tinycolor(colors.dominant), 2)[0]
+          ),
+          values: ["Dp"],
+        },
+        {
+          color: convertObjToString(
+            produceRgbShades(tinycolor(colors.dominant), 2)[1]
+          ),
+          values: ["Dg"],
+        }
+      );
+
+      optionTree[1].children.push(
+        {
+          color: convertObjToString(
+            produceRgbShades(tinycolor(colors.subdominant), 2)[0]
+          ),
+          values: ["m", "min", "minor"].includes(mode) ? ["sG"] : ["Sg"],
+        },
+        {
+          color: convertObjToString(
+            produceRgbShades(tinycolor(colors.subdominant), 2)[1]
+          ),
+          values: ["m", "min", "minor"].includes(mode) ? ["sP"] : ["Sp"],
+        }
+      );
+      optionTree[2].children.push(
+        {
+          color: convertObjToString(
+            produceRgbShades(tinycolor(colors.tonic), 2)[0]
+          ),
+          values: ["m", "min", "minor"].includes(mode) ? ["Tp"] : ["tP"],
+        },
+        {
+          color: convertObjToString(
+            produceRgbShades(tinycolor(colors.tonic), 2)[1]
+          ),
+          values: ["m", "min", "minor"].includes(mode) ? ["Tg"] : ["tG"],
+        }
+      );
+    }
+
+    if (
+      !baseFuncTypes ||
+      baseFuncTypes.some((type) => type.name === BASE_FUNC_TYPES.MEDIANT.name)
+    ) {
+      optionTree[0].children[0].values.push("DP", "dG", "dg");
+      optionTree[0].children[1].values.push("DG", "dP", "dp");
+
+      if (["m", "min", "minor"].includes(mode)) {
+        optionTree[1].children[0].values.push("sg", "Sp", "SP");
+        optionTree[1].children[1].values.push("sp", "Sg", "SG");
+
+        optionTree[2].children[0].values.push("tg", "Tp", "TP");
+        optionTree[2].children[1].values.push("tp", "Tg", "TG");
+      } else {
+        optionTree[1].children[0].values.push("SP", "sG", "sg");
+        optionTree[1].children[1].values.push("SG", "sP", "sp");
+
+        optionTree[2].children[0].values.push("TP", "tG", "tg");
+        optionTree[2].children[1].values.push("TG", "tP", "tp");
+      }
+    }
+
+    if (
+      !baseFuncTypes ||
+      baseFuncTypes.some((type) => type.name === BASE_FUNC_TYPES.VARIANT.name)
+    ) {
+      optionTree[0].values.push("d");
+      optionTree[1].values.push(
+        ["m", "min", "minor"].includes(mode) ? "S" : "s"
+      );
+      optionTree[2].values.push(
+        ["m", "min", "minor"].includes(mode) ? "T" : "t"
+      );
+    }
+
+    return optionTree;
+  }
+
   return (
     <ColorWheel
-      options={
-        ["m", "min", "minor"].includes(mode)
-          ? [
-              {
-                color: "#A2423D",
-                values: ["D", "(D)", "/D", "d"],
-                children: [
-                  { color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[0]), values: ["Dp", "DP", "dG", "dg"] },
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[1]),
-                    values: ["Dg", "DG", "dP", "dp"],
-                  },
-                ],
-              },
-              {
-                color: "#00873D",
-                values: ["s", "S"],
-                children: [
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[0]),
-                    values: ["sG", "sg", "Sp", "SP"],
-                  },
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[1]),
-                    values: ["sP", "sp", "Sg", "SG"],
-                  },
-                ],
-              },
-              {
-                color: "#00739D",
-                values: ["t", "T"],
-                children: [
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[0]),
-                    values: ["tG", "tg", "Tp", "TP"],
-                  },
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[1]),
-                    values: ["tP", "tp", "Tg", "TG"],
-                  },
-                ],
-              },
-            ]
-          : [
-              {
-                color: "#A2423D",
-                values: ["D", "(D)", "/D", "d"],
-                children: [
-                  { color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[0]), values: ["Dp", "DP", "dG", "dg"] },
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#A2423D"),2)[1]),
-                    values: ["Dg", "DG", "dP", "dp"],
-                  },
-                ],
-              },
-              {
-                color: "#00873D",
-                values: ["S", "s"],
-                children: [
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[0]),
-                    values: ["Sp", "SP", "sG", "sg"],
-                  },
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00873D"),2)[1]),
-                    values: ["Sg", "SG", "sP", "sp"],
-                  },
-                ],
-              },
-              {
-                color: "#00739D",
-                values: ["T", "t"],
-                children: [
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[0]),
-                    values: ["Tp", "TP", "tG", "tg"],
-                  },
-                  {
-                    color: convertObjToString(produceRgbShades(tinycolor("#00739D"),2)[1]),
-                    values: ["Tg", "TG", "tP", "tp"],
-                  },
-                ],
-              },
-            ]
-      }
+      options={getOptionTree()}
       radius={radius}
       padding={10}
       lineWidth={lineWidth}

@@ -23,6 +23,7 @@ export default function RiemannFuncSelectionDialog({
   windowSize,
   device,
   edit,
+  baseFuncTypes,
 }) {
   const [riemannFuncArray, setRiemannFuncArray] = useState(
     defaultValues.map((riemannFunc) => ({
@@ -82,6 +83,7 @@ export default function RiemannFuncSelectionDialog({
                 device={device}
                 riemannFunc={riemannFunc}
                 windowSize={windowSize}
+                baseFuncTypes={baseFuncTypes}
                 setRiemannFunc={(riemannFunc) => {
                   let array = [...riemannFuncArray];
                   array[index] = riemannFunc;
@@ -100,6 +102,7 @@ export default function RiemannFuncSelectionDialog({
           <Tab title="Hinzufügen..." icon={<Add />}>
             <SelectionPanel
               device={device}
+              baseFuncTypes={baseFuncTypes}
               riemannFunc={new CondensedFunc(edit)}
               windowSize={windowSize}
               setRiemannFunc={(riemannFunc) => {
@@ -120,6 +123,7 @@ export default function RiemannFuncSelectionDialog({
       ) : (
         <SelectionPanel
           device={device}
+          baseFuncTypes={baseFuncTypes}
           riemannFunc={riemannFuncArray[0]}
           windowSize={windowSize}
           setRiemannFunc={(riemannFunc) => {
@@ -189,6 +193,7 @@ function SelectionPanel({
   device,
   pad,
   gap,
+  baseFuncTypes,
 }) {
   return (
     <Box pad={pad} gap={gap}>
@@ -235,6 +240,7 @@ function SelectionPanel({
       ) : (
         <SelectionWheel
           key={`SelectionWheel${uid}`}
+          baseFuncTypes={baseFuncTypes}
           lineWidth={
             device === "small"
               ? Math.floor(
