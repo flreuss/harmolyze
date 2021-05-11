@@ -31,6 +31,7 @@ import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds, romanNumeral } from "../lib/stringUtils";
 import useWindowSize from "../lib/useWindowSize";
+import Avatar from "avataaars";
 
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
@@ -94,7 +95,8 @@ export default function Home({ tunebooks, session, score }) {
                       >
                         {tunebook.tunes.map((tune, tuneIndex) => (
                           <TuneCard
-                            image={tunebook.image}
+                            //TODO: Wenn kein Tune Image vorhanden ist dann nimm den Avatar des Nutzers der ihn angelegt hat
+                            image={"/tunes/placeholder.png"}
                             background={
                               tune.highscore ? "light-2" : "neutral-3"
                             }
@@ -417,11 +419,11 @@ export async function getServerSideProps(context) {
               title: 1,
               points: 1,
               createdBy: 1,
+              image:1,
               _id: { $toString: "$tunes_docs._id" },
               highscore: { $first: "$highscore" },
             },
             name: 1,
-            image: 1,
             permissions: 1,
           },
         },
@@ -430,7 +432,6 @@ export async function getServerSideProps(context) {
           $group: {
             _id: "$_id",
             name: { $first: "$name" },
-            image: { $first: "$image" },
             permissions: { $first: "$permissions" },
             tunes: { $push: "$tunes_docs" },
           },

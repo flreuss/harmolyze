@@ -188,10 +188,21 @@ export default function InteractiveScore({
 
   //Rendering
   function renderVisualObjs() {
+    let zoomFactor;
+    switch (device) {
+      case "medium":
+        zoomFactor = 1.5;
+        break;
+      case "large":
+        zoomFactor = 2;
+        break;
+      default:
+        zoomFactor = 1;
+    }
     const config = {
       ...configFromFile,
       clickListener: handleClick,
-      staffwidth: windowSize.width,
+      staffwidth: windowSize.width / zoomFactor,
     };
 
     try {
