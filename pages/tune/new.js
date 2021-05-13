@@ -99,14 +99,12 @@ export default function CreateTune({ tunebooks }) {
                 if (errtxt.length !== 0) {
                   setLoading(false);
                   setNotification({
-                    text:
-                      "Bei der Konvertierung der .musicxml-Datei ist ein Fehler aufgetreten.",
+                    text: "Bei der Konvertierung der .musicxml-Datei ist ein Fehler aufgetreten.",
                     color: "status-error",
                   });
                 } else {
                   tune.abc = res[0];
-                  //TODO: Fallback if empty (random number)
-                  tune.title = $(xmlDoc).find("work-title").text();
+                  tune.title = $(xmlDoc).find("work-title").text() || "Kadenz";
 
                   createTune(
                     tune,
@@ -116,8 +114,7 @@ export default function CreateTune({ tunebooks }) {
                     () => {
                       setLoading(false);
                       setNotification({
-                        text:
-                          "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
+                        text: "Bei der Datenbankanfrage ist ein Fehler aufgetreten",
                         color: "status-error",
                       });
                     }
