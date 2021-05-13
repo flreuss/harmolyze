@@ -211,7 +211,7 @@ export default function Home({ tunebooks, session, score }) {
                                   ]
                             }
                             showMenu={
-                              tune.createdBy === session.user._id ||
+                              tune.createdBy._id === session.user._id ||
                               session.user.groups.includes("admin")
                             }
                             title={`${tuneIndex + 1}. ${tune.title}`}
