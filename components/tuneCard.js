@@ -58,7 +58,7 @@ export default function TuneCard(props) {
       </CardHeader>
 
       <CardBody>
-        <Image src={props.image} fill="horizontal" />
+        {props.children}
       </CardBody>
 
       <CardFooter pad="small" justify="end" background={props.background}>

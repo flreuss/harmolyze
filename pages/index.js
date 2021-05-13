@@ -99,6 +99,7 @@ export default function Home({ tunebooks, session, score }) {
                   session.user.groups.includes("admin") ||
                   newActiveIndex.length === 0 ||
                   newActiveIndex[0] === 0 ||
+                  tunebooks[newActiveIndex]._id === 42 ||
                   tunebooks[newActiveIndex[0] - 1].tunes.slice(-1)[0].highscore
                 ) {
                   setActiveIndex(newActiveIndex);
@@ -119,6 +120,7 @@ export default function Home({ tunebooks, session, score }) {
                   disabled={
                     !session.user.groups.includes("admin") &&
                     tunebookIndex !== 0 &&
+                    tunebook._id !== 42 &&
                     !tunebooks[tunebookIndex - 1].tunes.slice(-1)[0].highscore
                   }
                   label={`${romanNumeral(tunebookIndex + 1)}. ${tunebook.name}`}
@@ -138,8 +140,6 @@ export default function Home({ tunebooks, session, score }) {
                       >
                         {tunebook.tunes.map((tune, tuneIndex) => (
                           <TuneCard
-                            //TODO: Wenn kein Tune Image vorhanden ist dann nimm den Avatar des Nutzers der ihn angelegt hat
-                            image={"/tunes/placeholder.png"}
                             background={
                               tune.highscore ? "light-2" : "neutral-3"
                             }
@@ -216,7 +216,36 @@ export default function Home({ tunebooks, session, score }) {
                             }
                             title={`${tuneIndex + 1}. ${tune.title}`}
                             key={tune._id}
-                          />
+                          >
+                            {tunebook._id === 42 ? (
+                              <Box fill="horizontal" pad="small">
+                                <Stack anchor="top-left">
+                                  <Avatar
+                                    style={{ width: "100%", height: "100%" }}
+                                    avatarStyle="Circle"
+                                    clotheType="Hoodie"
+                                    clotheColor="Heather"
+                                    {...tune.createdBy.avatar}
+                                  />
+                                  <Box
+                                    background="light-4"
+                                    pad="small"
+                                    margin={
+                                      device === "small" ? "medium" : "small"
+                                    }
+                                    round="full"
+                                  >
+                                    <Text>by</Text>
+                                  </Box>
+                                </Stack>
+                              </Box>
+                            ) : (
+                              <Image
+                                src={"/tunes/placeholder.png"}
+                                fill="horizontal"
+                              />
+                            )}
+                          </TuneCard>
                         ))}
                       </Grid>
                     )}
@@ -460,11 +489,22 @@ export async function getServerSideProps(context) {
           },
         },
         {
+          $lookup: {
+            from: "users",
+            let: { createdBy: "$tunes_docs.createdBy" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$_id", "$$createdBy"] } } },
+              { $project: { _id: 1, avatar: 1 } },
+            ],
+            as: "creator",
+          },
+        },
+        {
           $project: {
             tunes_docs: {
               title: 1,
               points: 1,
-              createdBy: 1,
+              createdBy: { $first: "$creator" },
               image: 1,
               _id: { $toString: "$tunes_docs._id" },
               highscore: { $first: "$highscore" },
