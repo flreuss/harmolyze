@@ -15,48 +15,43 @@ export default function SelectionWheel({
   radius,
   lineWidth,
   baseFuncTypes,
+  disabled,
 }) {
   // Important global variable! Do not delete!
   let colorWheel;
 
-  function getOptionTree() {
-    const colors = {
-      dominant: "#A2423D",
-      subdominant: "#00873D",
-      tonic: "#00739D",
-    };
-
+  function getOptionTree(dominantColor, subdominantColor, tonicColor) {
     let optionTree = ["m", "min", "minor"].includes(mode)
       ? [
           {
-            color: colors.dominant,
+            color: dominantColor,
             values: ["D", "/D", "(D)"],
             children: [],
           },
           {
-            color: colors.subdominant,
+            color: subdominantColor,
             values: ["s"],
             children: [],
           },
           {
-            color: colors.tonic,
+            color: tonicColor,
             values: ["t"],
             children: [],
           },
         ]
       : [
           {
-            color: colors.dominant,
+            color: dominantColor,
             values: ["D", "/D", "(D)"],
             children: [],
           },
           {
-            color: colors.subdominant,
+            color: subdominantColor,
             values: ["S"],
             children: [],
           },
           {
-            color: colors.tonic,
+            color: tonicColor,
             values: ["T"],
             children: [],
           },
@@ -73,13 +68,13 @@ export default function SelectionWheel({
       optionTree[0].children.push(
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(colors.dominant), 2)[0]
+            produceRgbShades(tinycolor(dominantColor), 2)[0]
           ),
           values: ["Dp"],
         },
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(colors.dominant), 2)[1]
+            produceRgbShades(tinycolor(dominantColor), 2)[1]
           ),
           values: ["Dg"],
         }
@@ -88,13 +83,13 @@ export default function SelectionWheel({
       optionTree[1].children.push(
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(colors.subdominant), 2)[0]
+            produceRgbShades(tinycolor(subdominantColor), 2)[0]
           ),
           values: ["m", "min", "minor"].includes(mode) ? ["sG"] : ["Sg"],
         },
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(colors.subdominant), 2)[1]
+            produceRgbShades(tinycolor(subdominantColor), 2)[1]
           ),
           values: ["m", "min", "minor"].includes(mode) ? ["sP"] : ["Sp"],
         }
@@ -102,13 +97,13 @@ export default function SelectionWheel({
       optionTree[2].children.push(
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(colors.tonic), 2)[0]
+            produceRgbShades(tinycolor(tonicColor), 2)[0]
           ),
           values: ["m", "min", "minor"].includes(mode) ? ["Tp"] : ["tP"],
         },
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(colors.tonic), 2)[1]
+            produceRgbShades(tinycolor(tonicColor), 2)[1]
           ),
           values: ["m", "min", "minor"].includes(mode) ? ["Tg"] : ["tG"],
         }
@@ -155,8 +150,17 @@ export default function SelectionWheel({
 
   return (
     <ColorWheel
-      options={getOptionTree()}
+      options={
+        disabled
+          ? getOptionTree(
+              "rgb(94, 94, 94)",
+              "rgb(86, 86, 86)",
+              "rgb(85, 85, 85)"
+            )
+          : getOptionTree("#A2423D", "#00873D", "#00739D")
+      }
       radius={radius}
+      disabled={disabled}
       padding={10}
       lineWidth={lineWidth}
       onValueSelected={onChange}

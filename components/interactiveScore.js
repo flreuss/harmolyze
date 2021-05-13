@@ -157,11 +157,11 @@ export default function InteractiveScore({
         elem.highlight(undefined, configFromFile.selectionColor);
         notesHighlighted.push(elem);
       });
-      //TODO: Wenn der Chord schon almostSolved ist, dann kann die Base Function nicht mehr geändert werden (ausgegraut)
       setOpenSelectionDialog({
         onClose: (riemannFuncArray) =>
           handleSelectionDialogClose(lowestAdjacentNote, riemannFuncArray),
         edit: showSolution ? visualObjs[0].getKeySignature().mode : undefined,
+        selectionWheelDisabled: hasClass(abcelem.abselem, "abcjs-almostSolved"),
         solutionFuncs,
         defaultValues: lowestAdjacentNote.chord
           ? showSolution
@@ -344,6 +344,7 @@ export default function InteractiveScore({
           onClose={openSelectionDialog.onClose}
           defaultValues={openSelectionDialog.defaultValues}
           edit={openSelectionDialog.edit}
+          selectionWheelDisabled={openSelectionDialog.selectionWheelDisabled}
           target={document.querySelector("main")}
           baseFuncTypes={
             openSelectionDialog.solutionFuncs

@@ -228,39 +228,45 @@ class ColorWheel extends Component {
 
   // MARK - mouse-events:
   onCanvasHover({ clientX, clientY }) {
-    const evt = this.getRelativeMousePos(clientX, clientY);
+    const { disabled } = this.props;
+    if (!disabled) {
+      const evt = this.getRelativeMousePos(clientX, clientY);
 
-    // Cases for mouse-location:
-    if (this.outerWheelBounds.inside(evt.fromCenter)) {
-      this.canvasEl.style.cursor = "pointer";
-    } else if (
-      this.innerWheelBounds.inside(evt.fromCenter) &&
-      this.state.innerWheelOpen
-    ) {
-      this.canvasEl.style.cursor = "pointer";
-    } else if (
-      this.centerCircleBounds.inside(evt.fromCenter) &&
-      this.state.centerCircleOpen
-    ) {
-      this.canvasEl.style.cursor = "pointer";
-    } else {
-      this.canvasEl.style.cursor = "auto";
+      // Cases for mouse-location:
+      if (this.outerWheelBounds.inside(evt.fromCenter)) {
+        this.canvasEl.style.cursor = "pointer";
+      } else if (
+        this.innerWheelBounds.inside(evt.fromCenter) &&
+        this.state.innerWheelOpen
+      ) {
+        this.canvasEl.style.cursor = "pointer";
+      } else if (
+        this.centerCircleBounds.inside(evt.fromCenter) &&
+        this.state.centerCircleOpen
+      ) {
+        this.canvasEl.style.cursor = "pointer";
+      } else {
+        this.canvasEl.style.cursor = "auto";
+      }
     }
   }
 
   onCanvasClick({ clientX, clientY }) {
-    const evt = this.getRelativeMousePos(clientX, clientY);
+    const { disabled } = this.props;
+    if (!disabled) {
+      const evt = this.getRelativeMousePos(clientX, clientY);
 
-    // Cases for click-events:
-    if (this.outerWheelBounds.inside(evt.fromCenter)) {
-      this.outerWheelClicked(evt.onCanvas);
-    } else if (
-      this.innerWheelBounds.inside(evt.fromCenter) &&
-      this.state.innerWheelOpen
-    ) {
-      this.innerWheelClicked(evt.onCanvas);
-    } else if (this.centerCircleBounds.inside(evt.fromCenter)) {
-      this.centerCircleClicked();
+      // Cases for click-events:
+      if (this.outerWheelBounds.inside(evt.fromCenter)) {
+        this.outerWheelClicked(evt.onCanvas);
+      } else if (
+        this.innerWheelBounds.inside(evt.fromCenter) &&
+        this.state.innerWheelOpen
+      ) {
+        this.innerWheelClicked(evt.onCanvas);
+      } else if (this.centerCircleBounds.inside(evt.fromCenter)) {
+        this.centerCircleClicked();
+      }
     }
   }
 

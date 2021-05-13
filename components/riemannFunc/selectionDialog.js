@@ -24,6 +24,7 @@ export default function RiemannFuncSelectionDialog({
   device,
   edit,
   baseFuncTypes,
+  selectionWheelDisabled,
 }) {
   const [riemannFuncArray, setRiemannFuncArray] = useState(
     defaultValues.map((riemannFunc) => ({
@@ -123,6 +124,7 @@ export default function RiemannFuncSelectionDialog({
       ) : (
         <SelectionPanel
           device={device}
+          selectionWheelDisabled={selectionWheelDisabled}
           baseFuncTypes={baseFuncTypes}
           riemannFunc={riemannFuncArray[0]}
           windowSize={windowSize}
@@ -194,6 +196,7 @@ function SelectionPanel({
   pad,
   gap,
   baseFuncTypes,
+  selectionWheelDisabled
 }) {
   return (
     <Box pad={pad} gap={gap}>
@@ -240,6 +243,7 @@ function SelectionPanel({
       ) : (
         <SelectionWheel
           key={`SelectionWheel${uid}`}
+          disabled={selectionWheelDisabled}
           baseFuncTypes={baseFuncTypes}
           lineWidth={
             device === "small"
