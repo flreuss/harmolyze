@@ -41,7 +41,7 @@ export default function Success(props) {
           <Tip content="Fehler">
             <Box direction="row" gap="xsmall">
               <StatusCritical />
-              <Text>{router.query.mistakes}</Text>
+              <Text>{router.query.mistakeCount}</Text>
             </Box>
           </Tip>
           <Tip content="Benötigte Zeit">

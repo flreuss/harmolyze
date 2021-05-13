@@ -43,6 +43,7 @@ export default function Home({ tunebooks, session, score }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
   const [openMoveDialog, setOpenMoveDialog] = useState(undefined);
   const [activeIndex, setActiveIndex] = useState([
+    //TODO: Es sollte mir das Tunebook öffnen, in dem zuletzt ein Attempt stattgefunden hat
     tunebooks.findIndex((tunebook) =>
       tunebook.tunes.some((tune) => !tune.highscore)
     ),
@@ -178,7 +179,7 @@ export default function Home({ tunebooks, session, score }) {
                                 ? [
                                     {
                                       icon: <StatusCritical />,
-                                      label: tune.highscore.mistakes,
+                                      label: tune.highscore.mistakeCount,
                                     },
                                     {
                                       icon: <Clock />,
@@ -427,14 +428,14 @@ export async function getServerSideProps(context) {
               {
                 $group: {
                   _id: null,
-                  mistakes: { $min: "$mistakes" },
+                  mistakeCount: { $min: "$mistakeCount" },
                   time: { $min: "$time" },
                   last: { $max: "$validatedAt" },
                 },
               },
               {
                 $project: {
-                  mistakes: 1,
+                  mistakeCount: 1,
                   time: 1,
                   last: { $toString: "$last" },
                 },

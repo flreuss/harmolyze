@@ -126,7 +126,8 @@ export default function InteractiveScore({
         newChordString.length === 0 ? "" : riemannFuncArray[0].toString();
       onChange(
         replace(abc, newChordString, abcelem.startChar, oldChordStringLength),
-        validate(newAbcElem.abselem)
+        validate(newAbcElem.abselem),
+        solutionFuncs.length
       );
     }
 

@@ -8,7 +8,8 @@ export default async (req, res) => {
     ...req.body,
     validatedAt: new Date(req.body.validatedAt),
     time: +req.body.time,
-    mistakes: +req.body.mistakes,
+    mistakeCount: +req.body.mistakeCount,
+    solvedCount: +req.body.solvedCount,
     tune_id: ObjectId(req.body.tune_id),
   };
   if (session && newAttempt.user_id === session.user._id) {

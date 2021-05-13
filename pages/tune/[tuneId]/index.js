@@ -14,7 +14,8 @@ import Head from "next/head";
 export default function DisplayTune({ tune, session, lastAttempt }) {
   const defaultAttempt = {
     progress: 0,
-    mistakes: 0,
+    mistakeCount: 0,
+    solvedCount: 0,
     user_id: session.user._id,
     tune_id: tune._id,
     abc: getInitial(tune.abc),
@@ -44,10 +45,9 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
     createAttempt(
       attempt,
       () => {
-        //TODO: if completely solved
-        if (false)
+        if (attempt.progress === 1)
           router.push(
-            `/tune/${tune._id}/success?tune_title=${tune.title}&mistakes=${nextAttempt.mistakes}&time=${nextAttempt.time}`
+            `/tune/${tune._id}/success?tune_title=${tune.title}&mistakeCount=${attempt.mistakeCount}&time=${attempt.time}`
           );
       },
       () =>
@@ -63,7 +63,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
         <Box direction="row" gap="small" align="center">
           <Box direction="row" gap="xsmall">
             <StatusCritical />
-            <Text>{attempt.mistakes}</Text>
+            <Text>{attempt.mistakeCount}</Text>
           </Box>
           <Box direction="row" gap="xsmall">
             <Clock />
@@ -108,15 +108,21 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               solved={attempt.solved}
               almostSolved={attempt.almostSolved}
               device={device}
-              onChange={(newAbc, [elems, abcjsClass]) => {
+              onChange={(newAbc, [elems, abcjsClass], total) => {
                 const nextAttempt = {
                   showMistakes: true,
-                  mistakes:
+                  solvedCount:
+                    abcjsClass == "abcjs-solved"
+                      ? attempt.solvedCount + 1
+                      : attempt.solvedCount,
+                  mistakeCount:
                     abcjsClass == "abcjs-mistake"
-                      ? attempt.mistakes + 1
-                      : attempt.mistakes,
-                  //TODO: Wie berechnen jetzt?
-                  progress: 0,
+                      ? attempt.mistakeCount + 1
+                      : attempt.mistakeCount,
+                  progress:
+                    abcjsClass == "abcjs-solved"
+                      ? (attempt.solvedCount + 1) / total
+                      : attempt.progress,
                   solved:
                     abcjsClass == "abcjs-solved"
                       ? attempt.solved.concat(elems)
