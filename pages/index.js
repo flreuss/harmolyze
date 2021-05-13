@@ -89,7 +89,9 @@ export default function Home({ tunebooks, session, score }) {
                   setActiveIndex(newActiveIndex);
                 } else {
                   setNotification({
-                    text: `Zum Freischalten letzte Aufgabe aus ${romanNumeral(newActiveIndex[0])}. lösen.`,
+                    text: `Zum Freischalten letzte Aufgabe aus ${romanNumeral(
+                      newActiveIndex[0]
+                    )}. lösen.`,
                     color: "accent-1",
                   });
                 }
@@ -125,29 +127,9 @@ export default function Home({ tunebooks, session, score }) {
                             background={
                               tune.highscore ? "light-2" : "neutral-3"
                             }
-                            disabled={
-                              tune.highscore &&
-                              Date.now() - new Date(tune.highscore.last) <=
-                                7 * (24 * 60 * 60 * 1000)
-                            }
-                            onClick={(disabled) => {
-                              if (!disabled) {
-                                setLoading(true);
-                                router.push(`/tune/${tune._id}`);
-                              } else {
-                                const thresholdForRetry =
-                                  7 * (24 * 60 * 60 * 1000);
-                                const timeSinceLastAttempt =
-                                  Date.now() - new Date(tune.highscore.last);
-                                const daysTilRetry = Math.floor(
-                                  (thresholdForRetry - timeSinceLastAttempt) /
-                                    (24 * 60 * 60 * 1000)
-                                );
-                                setNotification({
-                                  text: `Sie können die Aufgabe in ${daysTilRetry} Tagen erneut versuchen.`,
-                                  color: "accent-1",
-                                });
-                              }
+                            onClick={() => {
+                              setLoading(true);
+                              router.push(`/tune/${tune._id}`);
                             }}
                             menuItems={[
                               {
