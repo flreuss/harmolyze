@@ -96,6 +96,7 @@ export default function Home({ tunebooks, session, score }) {
               activeIndex={activeIndex}
               onActive={(newActiveIndex) => {
                 if (
+                  session.user.groups.includes("admin") ||
                   newActiveIndex.length === 0 ||
                   newActiveIndex[0] === 0 ||
                   tunebooks[newActiveIndex[0] - 1].tunes.slice(-1)[0].highscore
@@ -116,6 +117,7 @@ export default function Home({ tunebooks, session, score }) {
                   key={tunebook._id}
                   gap="small"
                   disabled={
+                    !session.user.groups.includes("admin") &&
                     tunebookIndex !== 0 &&
                     !tunebooks[tunebookIndex - 1].tunes.slice(-1)[0].highscore
                   }
