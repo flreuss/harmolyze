@@ -43,10 +43,23 @@ export default function Home({ tunebooks, session, score }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(undefined);
   const [openMoveDialog, setOpenMoveDialog] = useState(undefined);
   const [activeIndex, setActiveIndex] = useState([
-    //TODO: Es sollte mir das Tunebook öffnen, in dem zuletzt ein Attempt stattgefunden hat
-    tunebooks.findIndex((tunebook) =>
-      tunebook.tunes.some((tune) => !tune.highscore)
-    ),
+    //Finde das tunebook, in dem zuletzt ein Attempt vollendet wurde
+    tunebooks.reduce(
+      (tunebook1, tunebook2) =>
+        Math.max(
+          ...tunebook1.tunes.map((tune) =>
+            tune.highscore ? Date.parse(tune.highscore.last) : 0
+          )
+        ) >
+        Math.max(
+          ...tunebook2.tunes.map((tune) =>
+            tune.highscore ? Date.parse(tune.highscore.last) : 0
+          )
+        )
+          ? tunebook1
+          : tunebook2,
+      tunebooks[0]
+    )._id,
   ]);
 
   return (

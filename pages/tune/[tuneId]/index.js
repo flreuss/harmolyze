@@ -29,7 +29,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const router = useRouter();
 
-  //TODO: Component will unmount, update attempt
+  //TODO: Component will unmount, update attempt (because of time property)
 
   useEffect(() => {
     let interval = null;
@@ -101,7 +101,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
           {(device) => (
             <InteractiveScore
               abc={attempt.abc}
-              //TODO: Move into Score component
               initial={getInitial(tune.abc)}
               solution={getSolution(tune.abc)}
               showMistakes={attempt.showMistakes}
