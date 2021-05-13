@@ -10,6 +10,7 @@ import {
   Select,
   ResponsiveContext,
   Image,
+  Heading,
 } from "grommet";
 import { getSession } from "next-auth/client";
 import Notification from "../components/notification";
@@ -23,6 +24,7 @@ import {
   Clock,
   DocumentTransfer,
   Edit,
+  Lock,
   Money,
   StatusCritical,
   Trash,
@@ -78,12 +80,29 @@ export default function Home({ tunebooks, session, score }) {
           >
             <Accordion
               activeIndex={activeIndex}
-              onActive={(newActiveIndex) => setActiveIndex(newActiveIndex)}
+              onActive={(newActiveIndex) => {
+                if (
+                  newActiveIndex.length === 0 ||
+                  newActiveIndex[0] === 0 ||
+                  tunebooks[newActiveIndex[0] - 1].tunes.slice(-1)[0].highscore
+                ) {
+                  setActiveIndex(newActiveIndex);
+                } else {
+                  setNotification({
+                    text: `Zum Freischalten letzte Aufgabe aus ${romanNumeral(newActiveIndex[0])}. lösen.`,
+                    color: "accent-1",
+                  });
+                }
+              }}
             >
               {tunebooks.map((tunebook, tunebookIndex) => (
-                <AccordionPanel
+                <RichPanel
                   key={tunebook._id}
                   gap="small"
+                  disabled={
+                    tunebookIndex !== 0 &&
+                    !tunebooks[tunebookIndex - 1].tunes.slice(-1)[0].highscore
+                  }
                   label={`${romanNumeral(tunebookIndex + 1)}. ${tunebook.name}`}
                 >
                   <ResponsiveContext.Consumer>
@@ -204,7 +223,7 @@ export default function Home({ tunebooks, session, score }) {
                       </Grid>
                     )}
                   </ResponsiveContext.Consumer>
-                </AccordionPanel>
+                </RichPanel>
               ))}
             </Accordion>
           </Box>
@@ -232,7 +251,7 @@ export default function Home({ tunebooks, session, score }) {
           color={notification.color}
           onClose={() => setNotification(undefined)}
           text={notification.text}
-          timeout={3000}
+          timeout={3500}
         />
       )}
       {openMoveDialog && (
@@ -320,6 +339,36 @@ export default function Home({ tunebooks, session, score }) {
     </Layout>
   );
 }
+
+const RichPanel = ({ children, label, disabled }) => {
+  const [hovering, setHovering] = useState(false);
+
+  const renderPanelTitle = () => (
+    <Box
+      direction="row"
+      align="center"
+      gap="small"
+      pad={{ horizontal: "small" }}
+    >
+      <Heading level={4} color={hovering || disabled ? "dark-3" : "dark-1"}>
+        {label}
+      </Heading>
+      {disabled && <Lock />}
+    </Box>
+  );
+
+  return (
+    <AccordionPanel
+      label={renderPanelTitle()}
+      onMouseOver={() => setHovering(true)}
+      onMouseOut={() => setHovering(false)}
+      onFocus={() => setHovering(true)}
+      onBlur={() => setHovering(false)}
+    >
+      {children}
+    </AccordionPanel>
+  );
+};
 
 async function deleteTune(tune, onSuccess, onFailure) {
   const res = await fetch("/api/secured/tune", {
