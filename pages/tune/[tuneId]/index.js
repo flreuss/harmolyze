@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Meter, ResponsiveContext, Text } from "grommet";
+import {
+  Box,
+  Button,
+  Heading,
+  Image,
+  Meter,
+  ResponsiveContext,
+  Text,
+  Tip,
+} from "grommet";
 import InteractiveScore from "../../../components/interactiveScore";
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -7,9 +16,17 @@ import Layout from "../../../components/layout";
 import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { millisToMinutesAndSeconds } from "../../../lib/stringUtils";
-import { Clock, Edit, Previous, StatusCritical } from "grommet-icons";
+import {
+  Clock,
+  Edit,
+  Home,
+  Money,
+  Previous,
+  StatusCritical,
+} from "grommet-icons";
 import { getInitial, getSolution } from "../../../lib/solutions";
 import Head from "next/head";
+import Link from "next/link";
 
 export default function DisplayTune({ tune, session, lastAttempt }) {
   const defaultAttempt = {
@@ -33,23 +50,20 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
 
   useEffect(() => {
     let interval = null;
-    interval = setInterval(() => {
-      setAttempt((attempt) => ({ ...attempt, time: attempt.time + 1000 }));
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
+    if (attempt.progress < 1) {
+      interval = setInterval(() => {
+        setAttempt((attempt) => ({ ...attempt, time: attempt.time + 1000 }));
+      }, 1000);
+      return () => {
+        clearInterval(interval);
+      };
+    }
   }, [attempt.time]);
 
   useEffect(() => {
     createAttempt(
       attempt,
-      () => {
-        if (attempt.progress === 1)
-          router.push(
-            `/tune/${tune._id}/success?tune_title=${tune.title}&mistakeCount=${attempt.mistakeCount}&time=${attempt.time}`
-          );
-      },
+      () => {},
       () =>
         setNotification("Bei der Datenbankanfrage ist ein Fehler aufgetreten")
     );
@@ -60,25 +74,31 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       homeIcon={<Previous />}
       loading={loading}
       status={
-        <Box direction="row" gap="small" align="center">
-          <Box direction="row" gap="xsmall">
-            <StatusCritical />
-            <Text>{attempt.mistakeCount}</Text>
+        attempt.progress < 1 && (
+          <Box direction="row" gap="small" align="center">
+            <Tip content="Fehler">
+              <Box direction="row" gap="xsmall">
+                <StatusCritical />
+                <Text>{attempt.mistakeCount}</Text>
+              </Box>
+            </Tip>
+            <Tip content="Benötigte Zeit">
+              <Box direction="row" gap="xsmall">
+                <Clock />
+                <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
+              </Box>
+            </Tip>
+            {session.user.groups.includes("admin") && (
+              <Button
+                icon={<Edit />}
+                onClick={() => {
+                  router.push(`/tune/${tune._id}/edit`);
+                }}
+                hoverIndicator
+              />
+            )}
           </Box>
-          <Box direction="row" gap="xsmall">
-            <Clock />
-            <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
-          </Box>
-          {session.user.groups.includes("admin") && (
-            <Button
-              icon={<Edit />}
-              onClick={() => {
-                router.push(`/tune/${tune._id}/edit`);
-              }}
-              hoverIndicator
-            />
-          )}
-        </Box>
+        )
       }
       user={session.user}
     >
@@ -98,49 +118,124 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
         justify="center"
       >
         <ResponsiveContext.Consumer>
-          {(device) => (
-            <InteractiveScore
-              abc={attempt.abc}
-              initial={getInitial(tune.abc)}
-              solution={getSolution(tune.abc)}
-              showMistakes={attempt.showMistakes}
-              solved={attempt.solved}
-              almostSolved={attempt.almostSolved}
-              device={device}
-              onChange={(newAbc, [elems, abcjsClass], total) => {
-                const nextAttempt = {
-                  showMistakes: true,
-                  solvedCount:
-                    abcjsClass == "abcjs-solved"
-                      ? attempt.solvedCount + 1
-                      : attempt.solvedCount,
-                  mistakeCount:
-                    abcjsClass == "abcjs-mistake"
-                      ? attempt.mistakeCount + 1
-                      : attempt.mistakeCount,
-                  progress:
-                    abcjsClass == "abcjs-solved"
-                      ? (attempt.solvedCount + 1) / total
-                      : attempt.progress,
-                  solved:
-                    abcjsClass == "abcjs-solved"
-                      ? attempt.solved.concat(elems)
-                      : attempt.solved,
-                  almostSolved:
-                    abcjsClass == "abcjs-almostSolved"
-                      ? attempt.almostSolved.concat(elems)
-                      : attempt.almostSolved,
-                  validatedAt: new Date(),
-                  abc: newAbc,
-                  tune_id: tune._id,
-                };
-                setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
-              }}
-            />
-          )}
+          {(device) =>
+            attempt.progress < 1 ? (
+              <InteractiveScore
+                abc={attempt.abc}
+                initial={getInitial(tune.abc)}
+                solution={getSolution(tune.abc)}
+                showMistakes={attempt.showMistakes}
+                solved={attempt.solved}
+                almostSolved={attempt.almostSolved}
+                device={device}
+                onChange={(newAbc, [elems, abcjsClass], total) => {
+                  const nextAttempt = {
+                    showMistakes: true,
+                    solvedCount:
+                      abcjsClass == "abcjs-solved"
+                        ? attempt.solvedCount + 1
+                        : attempt.solvedCount,
+                    mistakeCount:
+                      abcjsClass == "abcjs-mistake"
+                        ? attempt.mistakeCount + 1
+                        : attempt.mistakeCount,
+                    progress:
+                      abcjsClass == "abcjs-solved"
+                        ? (attempt.solvedCount + 1) / total
+                        : attempt.progress,
+                    solved:
+                      abcjsClass == "abcjs-solved"
+                        ? attempt.solved.concat(elems)
+                        : attempt.solved,
+                    almostSolved:
+                      abcjsClass == "abcjs-almostSolved"
+                        ? attempt.almostSolved.concat(elems)
+                        : attempt.almostSolved,
+                    validatedAt: new Date(),
+                    abc: newAbc,
+                    tune_id: tune._id,
+                  };
+                  setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
+                }}
+              />
+            ) : (
+              <Success tune={tune} attempt={attempt} />
+            )
+          }
         </ResponsiveContext.Consumer>
       </Box>
     </Layout>
+  );
+}
+
+function Success({ tune, attempt }) {
+  const successGifs = [
+    "https://media.giphy.com/media/Q81NcsY6YxK7jxnr4v/giphy.gif",
+    "https://media.giphy.com/media/KEVNWkmWm6dm8/giphy.gif",
+    "https://media.giphy.com/media/o75ajIFH0QnQC3nCeD/giphy.gif",
+    "https://media.giphy.com/media/uudzUtVcsLAoo/giphy.gif",
+    "https://media.giphy.com/media/gd0Dqg6rYhttBVCZqd/giphy.gif",
+    "https://media.giphy.com/media/l4HodBpDmoMA5p9bG/giphy.gif",
+    "https://media.giphy.com/media/l3q2Z6S6n38zjPswo/giphy.gif",
+    "https://media.giphy.com/media/T0WzQ475t9Cw/giphy.gif",
+    "https://media.giphy.com/media/2U0MJobOh2sta/giphy.gif",
+    "https://media.giphy.com/media/3ohhwo4PzDFaz2sADu/giphy.gif",
+    "https://media.giphy.com/media/XreQmk7ETCak0/giphy.gif",
+    "https://media.giphy.com/media/37nRXpCEP9H1f1WVrb/giphy.gif",
+    "https://media.giphy.com/media/MSCzxrLEF25feISTIz/giphy.gif",
+    "https://media.giphy.com/media/l0MYxef0mpdcnQnvi/giphy.gif",
+    "https://media.giphy.com/media/gjsVqF6Xf2ywOb83tw/giphy.gif",
+  ];
+
+  const [gif, setGif] = useState(
+    successGifs[Math.floor(Math.random() * successGifs.length)]
+  );
+
+  return (
+    <Box
+      animation={{ type: "fadeIn", size: "medium" }}
+      fill
+      align="center"
+      justify="center"
+      gap="medium"
+      pad="medium"
+    >
+      <Heading textAlign="center" level={2}>
+        🎉 Du hast "{tune.title}" gelöst! 🎉
+      </Heading>
+      <Image src={gif} fit="contain" pad="medium" fill />
+
+      <Box
+        direction="row"
+        gap="medium"
+        pad={{ horizontal: "medium", vertical: "small" }}
+      >
+        <Box direction="row" gap="xsmall">
+          <Money />
+          <Text>{tune.points}</Text>
+        </Box>
+        <Tip content="Fehler">
+          <Box direction="row" gap="xsmall">
+            <StatusCritical />
+            <Text>{attempt.mistakeCount}</Text>
+          </Box>
+        </Tip>
+        <Tip content="Benötigte Zeit">
+          <Box direction="row" gap="xsmall">
+            <Clock />
+            <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
+          </Box>
+        </Tip>
+      </Box>
+      <Link href="/" passHref>
+        <Button
+          size="small"
+          hoverIndicator
+          label="Zurück zum Start"
+          icon={<Home />}
+        />
+      </Link>
+    </Box>
   );
 }
 
@@ -184,6 +279,7 @@ export async function getServerSideProps(context) {
           abc: 1,
           title: 1,
           lastModifiedAt: 1,
+          points: 1,
         },
       }
     );
@@ -206,6 +302,7 @@ export async function getServerSideProps(context) {
       //Removes instrument names from abc strings
       abc: tune.abc.replace(/s?nm=".*"/g, ""),
       title: tune.title,
+      points: tune.points,
     };
 
     return {
