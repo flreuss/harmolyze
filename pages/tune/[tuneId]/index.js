@@ -46,8 +46,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const router = useRouter();
 
-  //TODO: Component will unmount, update attempt (because of time property)
-
   useEffect(() => {
     let interval = null;
     if (attempt.progress < 1) {
@@ -200,9 +198,14 @@ function Success({ tune, attempt }) {
       gap="medium"
       pad="medium"
     >
-      <Heading textAlign="center" level={2}>
-        🎉 Du hast "{tune.title}" gelöst! 🎉
-      </Heading>
+      <Box direction="row" gap="small" align="center">
+        <Heading level={2}>🎉</Heading>
+        <Heading textAlign="center" level={2}>
+          Du hast "{tune.title}" gelöst!
+        </Heading>
+        <Heading level={2}>🎉</Heading>
+      </Box>
+
       <Image src={gif} fit="contain" pad="medium" fill />
 
       <Box

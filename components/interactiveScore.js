@@ -32,11 +32,11 @@ export default function InteractiveScore({
   //Global
   var visualObjs;
   var voicesArray;
-  //TODO: Memoized (useMemo), muss nur bei resize neu berechnet werden
+  //OPTIMIZE: Memoized (useMemo), muss nur bei resize neu berechnet werden
   var simultaneousNotesMap;
   var notesHighlighted = [];
   var synthControl;
-  var solutionFuncs;
+  var solutionFuncs = [];
 
   //State
   const windowSize = useWindowSize();
@@ -117,9 +117,13 @@ export default function InteractiveScore({
     );
 
     if (
-      newChordString.length === 0 ||
-      !abcelem.chord ||
-      riemannFuncArray[0].toString() !== abcelem.chord[0].name
+      (riemannFuncArray[0] !== undefined || abcelem.chord !== undefined) &&
+      !riemannFuncArray.forEach(
+        (riemannFunc, index) =>
+        abcelem.chord &&
+          abcelem.chord[index] &&
+          riemannFunc.toString() === abcelem.chord[index].name
+      )
     ) {
       let newAbcElem = abcelem;
       newAbcElem.abselem.abcelem.chord =
@@ -245,21 +249,27 @@ export default function InteractiveScore({
             }
           });
 
-          //TODO: Muss nur einmal gerechnet werden
-          solutionFuncs = [];
-
+          //OPTIMIZE: Muss nur einmal gerechnet werden
           solutionVoicesArray.forEachElem((elem) => {
             if (
               elem.abcelem.chord &&
               !chordOf(elem, initialVoicesArray, simultaneousNotesMap)
             ) {
-              //TODO: Wähle aus den Chord den leichtesten aus und füge den zum Array hinzu
-              elem.abcelem.chord.forEach((chord) =>
-                solutionFuncs.push(
-                  RiemannFunc.fromString(
-                    visualObjs[0].getKeySignature().mode,
-                    chord.name
-                  )
+              solutionFuncs.push(
+                RiemannFunc.fromString(
+                  visualObjs[0].getKeySignature().mode,
+                  elem.abcelem.chord.reduce((chord1, chord2) => {
+                    return RiemannFunc.fromString(
+                      visualObjs[0].getKeySignature().mode,
+                      chord1.name
+                    ).getPoints() <
+                      RiemannFunc.fromString(
+                        visualObjs[0].getKeySignature().mode,
+                        chord2.name
+                      ).getPoints()
+                      ? chord1
+                      : chord2;
+                  }).name
                 )
               );
             }
@@ -271,7 +281,6 @@ export default function InteractiveScore({
         }
       }
     } catch (err) {
-      //TODO: Notify user of error via notification
       console.error(err);
     }
   }
