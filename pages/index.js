@@ -50,7 +50,7 @@ export default function Home({ tunebooks, session, score }) {
           ...tunebook1.tunes.map((tune) =>
             tune.highscore ? Date.parse(tune.highscore.last) : 0
           )
-        ) >
+        ) >=
         Math.max(
           ...tunebook2.tunes.map((tune) =>
             tune.highscore ? Date.parse(tune.highscore.last) : 0
