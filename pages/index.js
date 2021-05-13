@@ -93,8 +93,8 @@ export default function Home({ tunebooks, session, score }) {
                         columns={
                           device === "small"
                             ? windowSize.height > windowSize.width
-                              ? ["49%","49%"]
-                              : ["23%","23%","23%","23%"]
+                              ? ["49%", "49%"]
+                              : ["23%", "23%", "23%", "23%"]
                             : "small"
                         }
                         margin="medium"
@@ -114,13 +114,7 @@ export default function Home({ tunebooks, session, score }) {
                             onClick={(disabled) => {
                               if (!disabled) {
                                 setLoading(true);
-                                router.push(
-                                  `/tune/${tune._id}${
-                                    tune.createdBy === session.user._id
-                                      ? "/edit"
-                                      : ""
-                                  }`
-                                );
+                                router.push(`/tune/${tune._id}`);
                               } else {
                                 const thresholdForRetry =
                                   7 * (24 * 60 * 60 * 1000);

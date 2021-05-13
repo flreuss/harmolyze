@@ -117,12 +117,13 @@ export default function InteractiveScore({
     );
 
     if (
-      newChordString.length > 0 &&
-      (!abcelem.chord ||
-        riemannFuncArray[0].toString() !== abcelem.chord[0].name)
+      newChordString.length === 0 ||
+      !abcelem.chord ||
+      riemannFuncArray[0].toString() !== abcelem.chord[0].name
     ) {
       let newAbcElem = abcelem;
-      newAbcElem.abselem.abcelem.chord = riemannFuncArray[0].toString();
+      newAbcElem.abselem.abcelem.chord =
+        newChordString.length === 0 ? "" : riemannFuncArray[0].toString();
       onChange(
         replace(abc, newChordString, abcelem.startChar, oldChordStringLength),
         validate(newAbcElem.abselem)
