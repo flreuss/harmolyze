@@ -265,7 +265,7 @@ class ColorWheel extends Component {
       ) {
         this.innerWheelClicked(evt.onCanvas);
       } else if (this.centerCircleBounds.inside(evt.fromCenter)) {
-        this.centerCircleClicked();
+        this.centerCircleClicked(evt.onCanvas);
       }
     }
   }
@@ -336,11 +336,20 @@ class ColorWheel extends Component {
     }
   }
 
-  centerCircleClicked() {
-    const value =
-      this.state.value < this.state.option.values.length - 1
-        ? this.state.value + 1
-        : 0;
+  centerCircleClicked(evtPos) {
+    let value;
+    if (evtPos.x < this.canvasEl.width / 2) {
+      value =
+        this.state.value > 0
+          ? this.state.value - 1
+          : this.state.option.values.length - 1;
+    } else {
+      value =
+        this.state.value < this.state.option.values.length - 1
+          ? this.state.value + 1
+          : 0;
+    }
+
     this.props.onValueSelected(this.state.option.values[value]);
     this.setState(
       {
@@ -599,11 +608,50 @@ class ColorWheel extends Component {
     this.ctx.stroke();
     this.ctx.closePath();
 
+    if (this.state.option.values.length > 1) {
+      drawTriangle(
+        this.ctx,
+        width / 2 + 0.65 * this.centerCircleRadius,
+        height / 2,
+        0.2 * this.centerCircleRadius,
+        0.2 * this.centerCircleRadius,
+        "white",
+        1
+      );
+      drawTriangle(
+        this.ctx,
+        width / 2 - 0.65 * this.centerCircleRadius,
+        height / 2,
+        0.2 * this.centerCircleRadius,
+        0.2 * this.centerCircleRadius,
+        "white",
+        -1
+      );
+    }
+
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
     this.ctx.font = `${this.centerCircleRadius / 1.7}px Riemann`;
     this.ctx.fillStyle = "white";
     this.ctx.fillText(option.values[value], width / 2, height / 2);
+
+    function drawTriangle(
+      context,
+      x,
+      y,
+      triangleWidth,
+      triangleHeight,
+      fillStyle,
+      direction
+    ) {
+      context.beginPath();
+      context.moveTo(x, y - triangleHeight / 2);
+      context.lineTo(x, y + triangleHeight / 2);
+      context.lineTo(x + direction * triangleWidth, y);
+      context.closePath();
+      context.fillStyle = fillStyle;
+      context.fill();
+    }
   }
 
   render() {

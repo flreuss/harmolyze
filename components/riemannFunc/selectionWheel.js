@@ -83,29 +83,29 @@ export default function SelectionWheel({
       optionTree[1].children.push(
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(subdominantColor), 2)[0]
+            produceRgbShades(tinycolor(subdominantColor), 2)[1]
           ),
-          values: ["m", "min", "minor"].includes(mode) ? ["sG"] : ["Sg"],
+          values: ["m", "min", "minor"].includes(mode) ? ["sG"] : ["Sp"],
         },
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(subdominantColor), 2)[1]
+            produceRgbShades(tinycolor(subdominantColor), 2)[0]
           ),
-          values: ["m", "min", "minor"].includes(mode) ? ["sP"] : ["Sp"],
+          values: ["m", "min", "minor"].includes(mode) ? ["sP"] : ["Sg"],
         }
       );
       optionTree[2].children.push(
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(tonicColor), 2)[0]
+            produceRgbShades(tinycolor(tonicColor), 2)[1]
           ),
-          values: ["m", "min", "minor"].includes(mode) ? ["Tp"] : ["tP"],
+          values: ["m", "min", "minor"].includes(mode) ? ["tG"] : ["Tp"],
         },
         {
           color: convertObjToString(
-            produceRgbShades(tinycolor(tonicColor), 2)[1]
+            produceRgbShades(tinycolor(tonicColor), 2)[0]
           ),
-          values: ["m", "min", "minor"].includes(mode) ? ["Tg"] : ["tG"],
+          values: ["m", "min", "minor"].includes(mode) ? ["tP"] : ["Tg"],
         }
       );
     }
