@@ -196,7 +196,7 @@ function SelectionPanel({
   pad,
   gap,
   baseFuncTypes,
-  selectionWheelDisabled
+  selectionWheelDisabled,
 }) {
   return (
     <Box pad={pad} gap={gap}>
@@ -264,22 +264,20 @@ function SelectionPanel({
               : Math.floor(Math.min(windowSize.height, windowSize.width) / 5)
           }
           value={
-            riemannFunc.isSecondaryDominant
-              ? `(${riemannFunc.baseFuncString})`
-              : riemannFunc.incomplete
-              ? `/${riemannFunc.baseFuncString}`
-              : riemannFunc.baseFuncString
+            riemannFunc.baseFuncString
+              ? `${riemannFunc.isSecondaryDominant ? "(" : ""}${
+                  riemannFunc.incomplete ? "/" : ""
+                }${riemannFunc.baseFuncString}${
+                  riemannFunc.isSecondaryDominant ? ")" : ""
+                }`
+              : undefined
           }
           onChange={(val) => {
             setRiemannFunc({
               ...riemannFunc,
-              baseFuncString: val.startsWith("(")
-                ? val.slice(1, -1)
-                : val.startsWith("/")
-                ? val.slice(1)
-                : val,
+              baseFuncString: /\(?\/?(\w*)\)?/.exec(val)[1],
               isSecondaryDominant: val.startsWith("("),
-              incomplete: val.startsWith("/"),
+              incomplete: val.includes("/"),
             });
           }}
           mode={riemannFunc.mode}

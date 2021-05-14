@@ -25,7 +25,7 @@ export default function SelectionWheel({
       ? [
           {
             color: dominantColor,
-            values: ["D", "/D", "(D)"],
+            values: ["D", "/D", "(D)", "(/D)"],
             children: [],
           },
           {
@@ -42,7 +42,7 @@ export default function SelectionWheel({
       : [
           {
             color: dominantColor,
-            values: ["D", "/D", "(D)"],
+            values: ["D", "/D", "(D)", "(/D)"],
             children: [],
           },
           {
