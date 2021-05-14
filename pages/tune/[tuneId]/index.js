@@ -27,6 +27,7 @@ import {
 import { getInitial, getSolution } from "../../../lib/solutions";
 import Head from "next/head";
 import Link from "next/link";
+import useWindowSize from "../../../lib/useWindowSize";
 
 export default function DisplayTune({ tune, session, lastAttempt }) {
   const defaultAttempt = {
@@ -45,6 +46,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const router = useRouter();
+  const windowSize = useWindowSize();
 
   useEffect(() => {
     let interval = null;
@@ -74,6 +76,18 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       status={
         attempt.progress < 1 && (
           <Box direction="row" gap="small" align="center">
+            <Tip content="Punkte">
+              <Box direction="row" gap="xsmall">
+                <Money />
+                <Text>{`${Math.round(
+                  attempt.progress * tune.points
+                )}`}</Text>
+                {windowSize.width > 360 && (
+                  <Text truncate>{` / ${tune.points}`}</Text>
+                )}
+              </Box>
+            </Tip>
+
             <Tip content="Fehler">
               <Box direction="row" gap="xsmall">
                 <StatusCritical />
