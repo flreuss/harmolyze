@@ -45,6 +45,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
 
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
+  const [animation, setAnimation] = useState();
   const router = useRouter();
   const windowSize = useWindowSize();
 
@@ -77,11 +78,9 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
         attempt.progress < 1 && (
           <Box direction="row" gap="small" align="center">
             <Tip content="Punkte">
-              <Box direction="row" gap="xsmall">
+              <Box direction="row" gap="xsmall" animation={animation}>
                 <Money />
-                <Text>{`${Math.round(
-                  attempt.progress * tune.points
-                )}`}</Text>
+                <Text>{`${Math.round(attempt.progress * tune.points)}`}</Text>
                 {windowSize.width > 360 && (
                   <Text truncate>{` / ${tune.points}`}</Text>
                 )}
@@ -141,6 +140,13 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                 almostSolved={attempt.almostSolved}
                 device={device}
                 onChange={(newAbc, [elems, abcjsClass], total) => {
+                  if (abcjsClass == "abcjs-solved") {
+                    setAnimation("jiggle");
+                    setInterval(() => {
+                      setAnimation(undefined);
+                    }, 700);
+                  }
+
                   const nextAttempt = {
                     showMistakes: true,
                     solvedCount:
