@@ -83,17 +83,21 @@ export default function InteractiveScore({
         if (solutionChords.includes(filledInChord)) {
           abcjsClass = "abcjs-solved";
         } else if (
-          solutionChords.some(
-            (solutionChord) =>
-              RiemannFunc.fromString(
-                visualObjs[0].getKeySignature().mode,
-                solutionChord
-              ).baseFunc.short ===
-              RiemannFunc.fromString(
-                visualObjs[0].getKeySignature().mode,
-                filledInChord
-              ).baseFunc.short
-          )
+          solutionChords.some((solutionChord) => {
+            const solFunc = RiemannFunc.fromString(
+              visualObjs[0].getKeySignature().mode,
+              solutionChord
+            );
+            const filledInFunc = RiemannFunc.fromString(
+              visualObjs[0].getKeySignature().mode,
+              filledInChord
+            );
+            return (
+              solFunc.baseFunc.short === filledInFunc.baseFunc.short &&
+              solFunc.incomplete === filledInFunc.incomplete &&
+              solFunc.isSecondaryDominant === filledInFunc.isSecondaryDominant
+            );
+          })
         ) {
           abcjsClass = "abcjs-almostSolved";
         } else {
@@ -120,7 +124,7 @@ export default function InteractiveScore({
       (riemannFuncArray[0] !== undefined || abcelem.chord !== undefined) &&
       !riemannFuncArray.forEach(
         (riemannFunc, index) =>
-        abcelem.chord &&
+          abcelem.chord &&
           abcelem.chord[index] &&
           riemannFunc.toString() === abcelem.chord[index].name
       )
