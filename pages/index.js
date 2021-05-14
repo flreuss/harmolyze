@@ -141,7 +141,11 @@ export default function Home({ tunebooks, session, score }) {
                         {tunebook.tunes.map((tune, tuneIndex) => (
                           <TuneCard
                             background={
-                              tune.highscore ? "light-2" : "neutral-3"
+                              tuneIndex === tunebook.tunes.length - 1
+                                ? "neutral-4"
+                                : tune.highscore
+                                ? "light-2"
+                                : "neutral-3"
                             }
                             onClick={() => {
                               setLoading(true);
