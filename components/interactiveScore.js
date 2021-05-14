@@ -356,7 +356,7 @@ export default function InteractiveScore({
           selectionWheelDisabled={openSelectionDialog.selectionWheelDisabled}
           target={document.querySelector("main")}
           baseFuncTypes={
-            openSelectionDialog.solutionFuncs
+            openSelectionDialog.solutionFuncs.length > 0
               ? openSelectionDialog.solutionFuncs.map(
                   (func) => func.baseFunc.type
                 )
