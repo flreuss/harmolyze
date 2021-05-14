@@ -48,12 +48,12 @@ export default function Home({ tunebooks, session, score }) {
       (tunebook1, tunebook2) =>
         Math.max(
           ...tunebook1.tunes.map((tune) =>
-            tune.highscore ? Date.parse(tune.highscore.last) : 0
+            tune.bestAttempt ? Date.parse(tune.bestAttempt.last) : 0
           )
         ) >=
         Math.max(
           ...tunebook2.tunes.map((tune) =>
-            tune.highscore ? Date.parse(tune.highscore.last) : 0
+            tune.bestAttempt ? Date.parse(tune.bestAttempt.last) : 0
           )
         )
           ? tunebook1
@@ -79,7 +79,9 @@ export default function Home({ tunebooks, session, score }) {
             value={
               tunebooks
                 .flatMap((tunebook) => tunebook.tunes)
-                .filter((tune) => tune.highscore).length
+                .filter(
+                  (tune) => tune.bestAttempt && tune.bestAttempt.progress === 1
+                ).length
             }
             max={tunebooks.flatMap((tunebook) => tunebook.tunes).length}
             size="full"
@@ -100,7 +102,10 @@ export default function Home({ tunebooks, session, score }) {
                   newActiveIndex.length === 0 ||
                   newActiveIndex[0] === 0 ||
                   tunebooks[newActiveIndex]._id === 42 ||
-                  tunebooks[newActiveIndex[0] - 1].tunes.slice(-1)[0].highscore
+                  (tunebooks[newActiveIndex[0] - 1].tunes.slice(-1)[0]
+                    .bestAttempt &&
+                    tunebooks[newActiveIndex[0] - 1].tunes.slice(-1)[0]
+                      .bestAttempt.progress === 1)
                 ) {
                   setActiveIndex(newActiveIndex);
                 } else {
@@ -121,7 +126,10 @@ export default function Home({ tunebooks, session, score }) {
                     !session.user.groups.includes("admin") &&
                     tunebookIndex !== 0 &&
                     tunebook._id !== 42 &&
-                    !tunebooks[tunebookIndex - 1].tunes.slice(-1)[0].highscore
+                    (!tunebooks[tunebookIndex - 1].tunes.slice(-1)[0]
+                      .bestAttempt ||
+                      tunebooks[tunebookIndex - 1].tunes.slice(-1)[0]
+                        .bestAttempt.progress < 1)
                   }
                   label={`${romanNumeral(tunebookIndex + 1)}. ${tunebook.name}`}
                 >
@@ -143,7 +151,8 @@ export default function Home({ tunebooks, session, score }) {
                             background={
                               tuneIndex === tunebook.tunes.length - 1
                                 ? "neutral-4"
-                                : tune.highscore
+                                : tune.bestAttempt &&
+                                  tune.bestAttempt.progress === 1
                                 ? "light-2"
                                 : "neutral-3"
                             }
@@ -194,23 +203,29 @@ export default function Home({ tunebooks, session, score }) {
                               },
                             ]}
                             footerItems={
-                              tune.highscore
+                              tune.bestAttempt &&
+                              tune.bestAttempt.progress === 1
                                 ? [
                                     {
                                       icon: <StatusCritical />,
-                                      label: tune.highscore.mistakeCount,
+                                      label: tune.bestAttempt.mistakeCount,
                                     },
                                     {
                                       icon: <Clock />,
                                       label: millisToMinutesAndSeconds(
-                                        tune.highscore.time
+                                        tune.bestAttempt.time
                                       ),
                                     },
                                   ]
                                 : [
                                     {
                                       icon: <Money />,
-                                      label: tune.points,
+                                      label: tune.bestAttempt
+                                        ? `${Math.round(
+                                            tune.bestAttempt.progress *
+                                              tune.points
+                                          )} / ${tune.points}`
+                                        : tune.points,
                                     },
                                   ]
                             }
@@ -468,28 +483,30 @@ export async function getServerSideProps(context) {
                     $and: [
                       { $eq: ["$user_id", session.user._id] },
                       { $eq: ["$tune_id", "$$tune_id"] },
-                      { $eq: ["$progress", 1] },
                     ],
                   },
                 },
               },
               {
                 $group: {
-                  _id: null,
+                  _id: "$progress",
                   mistakeCount: { $min: "$mistakeCount" },
                   time: { $min: "$time" },
                   last: { $max: "$validatedAt" },
                 },
               },
+              { $sort: { _id: -1 } },
+              { $limit: 1 },
               {
                 $project: {
                   mistakeCount: 1,
                   time: 1,
+                  progress: "$_id",
                   last: { $toString: "$last" },
                 },
               },
             ],
-            as: "highscore",
+            as: "bestAttempt",
           },
         },
         {
@@ -511,7 +528,7 @@ export async function getServerSideProps(context) {
               createdBy: { $first: "$creator" },
               image: 1,
               _id: { $toString: "$tunes_docs._id" },
-              highscore: { $first: "$highscore" },
+              bestAttempt: { $first: "$bestAttempt" },
             },
             name: 1,
             permissions: 1,
