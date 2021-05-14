@@ -35,19 +35,20 @@ export default function NumberMultiSelector({
       justify="stretch"
       fill="horizontal"
     >
-      {options.map((el) => (
+      {options.map((opt) => (
         <Field
-          value={el}
+          value={opt.value}
+          label={opt.label}
           onClick={(value) => handleClick(value)}
-          selected={values.includes(el)}
-          key={el}
+          selected={values.includes(opt.value)}
+          key={opt.label}
         />
       ))}
     </Box>
   );
 }
 
-function Field({ value, onClick, selected }) {
+function Field({ value, onClick, selected, label }) {
   return (
     <Box
       background={selected ? "brand" : "light-2"}
@@ -64,7 +65,7 @@ function Field({ value, onClick, selected }) {
       fill
       onClick={() => onClick(value)}
     >
-      <Text textAlign="center">{value.toString()}</Text>
+      <Text textAlign="center">{label}</Text>
     </Box>
   );
 }
