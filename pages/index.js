@@ -150,11 +150,11 @@ export default function Home({ tunebooks, session, score }) {
                           <TuneCard
                             background={
                               tuneIndex === tunebook.tunes.length - 1 &&
-                              tunebook.tunes.some((tune) => tune.bestAttempt)
+                              tunebook._id !== 42 &&
+                              tunebooks.some((tunebook) =>
+                                tunebook.tunes.some((tune) => tune.bestAttempt)
+                              )
                                 ? "neutral-4"
-                                : tune.bestAttempt &&
-                                  tune.bestAttempt.progress === 1
-                                ? "light-2"
                                 : "neutral-3"
                             }
                             animation={
@@ -228,12 +228,14 @@ export default function Home({ tunebooks, session, score }) {
                                 : [
                                     {
                                       icon: <Money />,
-                                      label: tune.bestAttempt
-                                        ? `${Math.round(
-                                            tune.bestAttempt.progress *
-                                              tune.points
-                                          )} / ${tune.points}`
-                                        : tune.points,
+                                      label:
+                                        tune.bestAttempt &&
+                                        tune.bestAttempt.progress > 0
+                                          ? `${Math.round(
+                                              tune.bestAttempt.progress *
+                                                tune.points
+                                            )} / ${tune.points}`
+                                          : tune.points,
                                     },
                                   ]
                             }
@@ -267,10 +269,30 @@ export default function Home({ tunebooks, session, score }) {
                                 </Stack>
                               </Box>
                             ) : (
-                              <Image
-                                src={"/tunes/placeholder.png"}
-                                fill="horizontal"
-                              />
+                              <Box>
+                                <Image
+                                  src={
+                                    tune.bestAttempt &&
+                                    tune.bestAttempt.progress > 0
+                                      ? `/tunes/${
+                                          tune.bestAttempt.progress === 1
+                                            ? "rgb"
+                                            : "grayscale"
+                                        }/${tune._id}.jpg`
+                                      : `/tunes/placeholder/${tunebookIndex}.png`
+                                  }
+                                  fill="horizontal"
+                                />
+                                <Meter
+                                  value={
+                                    tune.bestAttempt &&
+                                    tune.bestAttempt.progress
+                                  }
+                                  max={1}
+                                  size="full"
+                                  thickness="xsmall"
+                                />
+                              </Box>
                             )}
                           </TuneCard>
                         ))}
