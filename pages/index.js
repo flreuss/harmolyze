@@ -149,12 +149,20 @@ export default function Home({ tunebooks, session, score }) {
                         {tunebook.tunes.map((tune, tuneIndex) => (
                           <TuneCard
                             background={
-                              tuneIndex === tunebook.tunes.length - 1
+                              tuneIndex === tunebook.tunes.length - 1 &&
+                              tunebook.tunes.some((tune) => tune.bestAttempt)
                                 ? "neutral-4"
                                 : tune.bestAttempt &&
                                   tune.bestAttempt.progress === 1
                                 ? "light-2"
                                 : "neutral-3"
+                            }
+                            animation={
+                              tunebookIndex === 0 &&
+                              tuneIndex === 0 &&
+                              !tunebook.tunes.some((tune) => tune.bestAttempt)
+                                ? { type: "pulse", size: "medium" }
+                                : undefined
                             }
                             onClick={() => {
                               setLoading(true);

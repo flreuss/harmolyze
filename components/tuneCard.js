@@ -13,7 +13,7 @@ import { useState } from "react";
 import { MoreVertical } from "grommet-icons";
 
 export default function TuneCard(props) {
-  const [animation, setAnimation] = useState({
+  const [animation, setAnimation] = useState(props.animation || {
     type: "fadeIn",
     size: "medium",
   });
