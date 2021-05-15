@@ -17,7 +17,7 @@ import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
 import { signOut } from "next-auth/client";
-import { Analytics, Home, Logout } from "grommet-icons";
+import { Analytics, DocumentText, Home, Logout } from "grommet-icons";
 import React from "react";
 import { useRouter } from "next/router";
 import Avatar from "avataaars";
@@ -92,6 +92,17 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
                   align: { top: "bottom", right: "right" },
                 }}
                 items={[
+                  {
+                    label: "Credits",
+                    onClick: () => {
+                      router.push("/credits");
+                    },
+                    icon: (
+                      <Box pad={{ right: "small" }}>
+                        <DocumentText />
+                      </Box>
+                    ),
+                  },
                   {
                     label: "Abmelden",
                     onClick: () => {
