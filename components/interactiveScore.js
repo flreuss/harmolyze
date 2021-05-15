@@ -45,10 +45,8 @@ export default function InteractiveScore({
   useEffect(() => {
     renderVisualObjs();
     return () => {
-      if (synthControl) synthControl.pause();
       const ctx = synth.activeAudioContext();
-      //TODO: Flush content of the AudioContext after suspension (then...)
-      if (ctx.state !== "closed") ctx.suspend().then(() => {});
+      if (ctx.state !== "closed") ctx.close();
     };
   }, [abc, solved]);
   useLayoutEffect(() => {
@@ -216,9 +214,9 @@ export default function InteractiveScore({
     };
 
     try {
-      if (document.getElementById("scoreContainer")) {
+      if (document.getElementById(`scoreContainer${location.pathname.slice(-24)}`)) {
         console.log("Rendering VisualObjs...");
-        visualObjs = renderAbc("scoreContainer", abc, config);
+        visualObjs = renderAbc(`scoreContainer${location.pathname.slice(-24)}`, abc, config);
         voicesArray = new NotesVoicesArray(visualObjs[0]);
         simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
 
@@ -280,7 +278,7 @@ export default function InteractiveScore({
           });
         }
 
-        if (document.getElementById("audioContainer")) {
+        if (document.getElementById(`audioContainer${location.pathname.slice(-24)}`)) {
           loadAudio(visualObjs);
         }
       }
@@ -293,8 +291,8 @@ export default function InteractiveScore({
     if (synth.supportsAudio()) {
       synthControl = new synth.SynthController();
       synthControl.load(
-        "#audioContainer",
-        new CursorControl("#scoreContainer"),
+        `#audioContainer${location.pathname.slice(-24)}`,
+        new CursorControl(`#scoreContainer${location.pathname.slice(-24)}`),
         {
           displayRestart: true,
           displayPlay: true,
@@ -303,23 +301,27 @@ export default function InteractiveScore({
         }
       );
     } else {
-      document.querySelector("#audioContainer").innerHTML =
+      document.querySelector(`#audioContainer${location.pathname.slice(-24)}`).innerHTML =
         "<div class='audio-error'>Audio is not supported in this browser.</div>";
     }
 
     synthControl.disable(true);
     const visualObj = visualObjs[0];
 
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioContext = new AudioContext();
+
     let midiBuffer = new synth.CreateSynth();
     midiBuffer
       .init({
         visualObj,
+        audioContext,
       })
       .then((response) => {
         console.log(response);
         if (synthControl) {
           synthControl
-            .setTune(visualObj, false)
+            .setTune(visualObj, false, { audioContext })
             .then(() => {
               console.log("Audio successfully loaded.");
             })
@@ -341,14 +343,14 @@ export default function InteractiveScore({
       gap="none"
       rows={["auto", "auto"]}
     >
-      <Box id="scoreContainer" />
+      <Box id={`scoreContainer${location.pathname.slice(-24)}`} />
       <Box
         fill="horizontal"
         align="center"
         alignSelf="start"
         pad={{ bottom: "small", horizontal: "large" }}
       >
-        <Box fill="horizontal" id="audioContainer" />
+        <Box fill="horizontal" id={`audioContainer${location.pathname.slice(-24)}`} />
       </Box>
       {openSelectionDialog && (
         <SelectionDialog
