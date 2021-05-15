@@ -1591,12 +1591,7 @@ export default function Credits() {
             </a>
           </span>
         </p>
-        <p>
-          <span></span>
-        </p>
-        <p>
-          <span></span>
-        </p>
+<br />
       </Box>
     </Layout>
   );
