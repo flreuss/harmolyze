@@ -28,6 +28,7 @@ export default function InteractiveScore({
   device,
   onChange,
   showSolution,
+  id
 }) {
   //Global
   var visualObjs;
@@ -214,9 +215,9 @@ export default function InteractiveScore({
     };
 
     try {
-      if (document.getElementById(`scoreContainer${location.pathname.slice(-24)}`)) {
+      if (document.getElementById(`scoreContainer${id}`)) {
         console.log("Rendering VisualObjs...");
-        visualObjs = renderAbc(`scoreContainer${location.pathname.slice(-24)}`, abc, config);
+        visualObjs = renderAbc(`scoreContainer${id}`, abc, config);
         voicesArray = new NotesVoicesArray(visualObjs[0]);
         simultaneousNotesMap = new SimultaneousNotesMap(voicesArray);
 
@@ -278,7 +279,7 @@ export default function InteractiveScore({
           });
         }
 
-        if (document.getElementById(`audioContainer${location.pathname.slice(-24)}`)) {
+        if (document.getElementById(`audioContainer${id}`)) {
           loadAudio(visualObjs);
         }
       }
@@ -291,8 +292,8 @@ export default function InteractiveScore({
     if (synth.supportsAudio()) {
       synthControl = new synth.SynthController();
       synthControl.load(
-        `#audioContainer${location.pathname.slice(-24)}`,
-        new CursorControl(`#scoreContainer${location.pathname.slice(-24)}`),
+        `#audioContainer${id}`,
+        new CursorControl(`#scoreContainer${id}`),
         {
           displayRestart: true,
           displayPlay: true,
@@ -301,7 +302,7 @@ export default function InteractiveScore({
         }
       );
     } else {
-      document.querySelector(`#audioContainer${location.pathname.slice(-24)}`).innerHTML =
+      document.querySelector(`#audioContainer${id}`).innerHTML =
         "<div class='audio-error'>Audio is not supported in this browser.</div>";
     }
 
@@ -343,14 +344,14 @@ export default function InteractiveScore({
       gap="none"
       rows={["auto", "auto"]}
     >
-      <Box id={`scoreContainer${location.pathname.slice(-24)}`} />
+      <Box id={`scoreContainer${id}`} />
       <Box
         fill="horizontal"
         align="center"
         alignSelf="start"
         pad={{ bottom: "small", horizontal: "large" }}
       >
-        <Box fill="horizontal" id={`audioContainer${location.pathname.slice(-24)}`} />
+        <Box fill="horizontal" id={`audioContainer${id}`} />
       </Box>
       {openSelectionDialog && (
         <SelectionDialog

@@ -132,6 +132,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
             attempt.progress < 1 ? (
               <InteractiveScore
                 abc={attempt.abc}
+                id={tune._id}
                 initial={getInitial(tune.abc)}
                 solution={getSolution(tune.abc)}
                 showMistakes={attempt.showMistakes}
