@@ -308,7 +308,7 @@ export default function InteractiveScore({
     synthControl.disable(true);
     const visualObj = visualObjs[0];
 
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const AudioContext = window.AudioContext || window.webkitAudioContext||window.mozAudioContext;
     const audioContext = new AudioContext();
 
     let midiBuffer = new synth.CreateSynth();

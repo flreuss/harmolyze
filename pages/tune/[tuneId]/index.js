@@ -75,7 +75,16 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       homeIcon={<Previous />}
       loading={loading}
       status={
-        attempt.progress < 1 && (
+        attempt.progress < 1 &&
+        (session.user.groups.includes("admin") ? (
+          <Button
+            icon={<Edit />}
+            onClick={() => {
+              router.push(`/tune/${tune._id}/edit`);
+            }}
+            hoverIndicator
+          />
+        ) : (
           <Box direction="row" gap="small" align="center">
             <Tip content="Punkte">
               <Box direction="row" gap="xsmall" animation={animation}>
@@ -86,7 +95,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                 )}
               </Box>
             </Tip>
-
             <Tip content="Fehler">
               <Box direction="row" gap="xsmall">
                 <StatusCritical />
@@ -99,17 +107,8 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                 <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
               </Box>
             </Tip>
-            {session.user.groups.includes("admin") && (
-              <Button
-                icon={<Edit />}
-                onClick={() => {
-                  router.push(`/tune/${tune._id}/edit`);
-                }}
-                hoverIndicator
-              />
-            )}
           </Box>
-        )
+        ))
       }
       user={session.user}
     >
