@@ -359,6 +359,12 @@ export default function InteractiveScore({
           edit={openSelectionDialog.edit}
           selectionWheelDisabled={openSelectionDialog.selectionWheelDisabled}
           target={document.querySelector("main")}
+          alterations={
+            openSelectionDialog.solutionFuncs.length === 0 ||
+            openSelectionDialog.solutionFuncs.some((func) =>
+              func.addTones.some((tone) => !Number.isInteger(tone))
+            )
+          }
           baseFuncTypes={
             openSelectionDialog.solutionFuncs.length > 0
               ? openSelectionDialog.solutionFuncs.map(
