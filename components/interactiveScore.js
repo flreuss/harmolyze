@@ -123,11 +123,11 @@ export default function InteractiveScore({
 
     if (
       (riemannFuncArray[0] !== undefined || abcelem.chord !== undefined) &&
-      !riemannFuncArray.forEach(
+      riemannFuncArray.some(
         (riemannFunc, index) =>
-          abcelem.chord &&
-          abcelem.chord[index] &&
-          riemannFunc.toString() === abcelem.chord[index].name
+          !abcelem.chord ||
+          !abcelem.chord[index] ||
+          riemannFunc.toString() !== abcelem.chord[index].name
       )
     ) {
       let newAbcElem = abcelem;
