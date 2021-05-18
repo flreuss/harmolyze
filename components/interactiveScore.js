@@ -286,13 +286,13 @@ export default function InteractiveScore({
             }
           });
         }
-
-        if (document.getElementById(`audioContainer${id}`)) {
-          loadAudio(visualObjs);
-        }
       }
     } catch (err) {
       console.error(err);
+    }
+
+    if (document.getElementById(`audioContainer${id}`)) {
+      loadAudio(visualObjs);
     }
   }
 
