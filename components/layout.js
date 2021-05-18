@@ -76,17 +76,17 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
           </Nav>
 
           <Box direction="row" align="center" gap="medium">
-            {status}
+            {user && user.gamified && status}
             {user && (
               <Menu
-                label={
+                label={user.gamified ?
                   <Avatar
                     style={{ width: "50px", height: "50px" }}
                     avatarStyle="Circle"
                     clotheType="Hoodie"
                     clotheColor="Heather"
                     {...user.avatar}
-                  />
+                  /> : <Text>{user._id}</Text>
                 }
                 dropProps={{
                   align: { top: "bottom", right: "right" },

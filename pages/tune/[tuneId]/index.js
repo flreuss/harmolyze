@@ -46,6 +46,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const [animation, setAnimation] = useState();
+  const [directFeedback, setDirectFeedback] = useState(session.user.gamified);
   const router = useRouter();
   const windowSize = useWindowSize();
 
@@ -115,12 +116,14 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       <Head>
         <title>HarmoLyze - {tune.title}</title>
       </Head>
-      <Meter
-        value={Math.floor(attempt.progress * 100)}
-        max={100}
-        size="full"
-        thickness="small"
-      />
+      {session.user.gamified && (
+        <Meter
+          value={Math.floor(attempt.progress * 100)}
+          max={100}
+          size="full"
+          thickness="small"
+        />
+      )}
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -133,6 +136,8 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               <InteractiveScore
                 abc={attempt.abc}
                 id={tune._id}
+                directFeedback={directFeedback}
+                evolvedUI={session.user.gamified}
                 initial={getInitial(tune.abc)}
                 solution={getSolution(tune.abc)}
                 showMistakes={attempt.showMistakes}
@@ -174,10 +179,15 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                     tune_id: tune._id,
                   };
                   setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
+                  setDirectFeedback(session.user.gamified);
                 }}
               />
             ) : (
-              <Success tune={tune} attempt={attempt} />
+              <Success
+                tune={tune}
+                attempt={attempt}
+                gamified={session.user.gamified}
+              />
             )
           }
         </ResponsiveContext.Consumer>
@@ -186,7 +196,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   );
 }
 
-function Success({ tune, attempt }) {
+function Success({ tune, attempt, gamified }) {
   const successGifs = [
     "https://media.giphy.com/media/Q81NcsY6YxK7jxnr4v/giphy.gif",
     "https://media.giphy.com/media/KEVNWkmWm6dm8/giphy.gif",
@@ -226,30 +236,32 @@ function Success({ tune, attempt }) {
         <Heading level={2}>🎉</Heading>
       </Box>
 
-      <Image src={gif} fit="contain" pad="medium" fill />
+      {gamified && <Image src={gif} fit="contain" pad="medium" fill />}
 
-      <Box
-        direction="row"
-        gap="medium"
-        pad={{ horizontal: "medium", vertical: "small" }}
-      >
-        <Box direction="row" gap="xsmall">
-          <Money />
-          <Text>{tune.points}</Text>
+      {gamified && (
+        <Box
+          direction="row"
+          gap="medium"
+          pad={{ horizontal: "medium", vertical: "small" }}
+        >
+          <Box direction="row" gap="xsmall">
+            <Money />
+            <Text>{tune.points}</Text>
+          </Box>
+          <Tip content="Fehler">
+            <Box direction="row" gap="xsmall">
+              <StatusCritical />
+              <Text>{attempt.mistakeCount}</Text>
+            </Box>
+          </Tip>
+          <Tip content="Benötigte Zeit">
+            <Box direction="row" gap="xsmall">
+              <Clock />
+              <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
+            </Box>
+          </Tip>
         </Box>
-        <Tip content="Fehler">
-          <Box direction="row" gap="xsmall">
-            <StatusCritical />
-            <Text>{attempt.mistakeCount}</Text>
-          </Box>
-        </Tip>
-        <Tip content="Benötigte Zeit">
-          <Box direction="row" gap="xsmall">
-            <Clock />
-            <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
-          </Box>
-        </Tip>
-      </Box>
+      )}
       <Link href="/" passHref>
         <Button
           size="small"

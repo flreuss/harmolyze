@@ -31,6 +31,7 @@ export default function SignIn({ avatars }) {
     eyeType: 3,
     skinColor: 0,
   });
+  const [gamified, setGamified] = useState(Math.random() < 0.5);
 
   const hairColorArray = [
     "Black",
@@ -118,6 +119,7 @@ export default function SignIn({ avatars }) {
                     eyeType: eyeTypeArray[value.eyeType],
                     topType: hairTypes[value.topLength][value.topType],
                   },
+                  gamified,
                 },
                 () => {
                   signIn("credentials", {
@@ -185,54 +187,64 @@ export default function SignIn({ avatars }) {
               <TextInput name="password2" type="password" />
             </FormField>
 
-            <FormField label="Avatar - Haarlänge" name="topLength">
-              <RadioButtonGroup
-                name="topLength"
-                options={["Kurz", "Lang", "Kopfbedeckung"]}
-              />
-            </FormField>
+            {gamified && (
+              <FormField label="Avatar - Haarlänge" name="topLength">
+                <RadioButtonGroup
+                  name="topLength"
+                  options={["Kurz", "Lang", "Kopfbedeckung"]}
+                />
+              </FormField>
+            )}
 
-            <FormField
-              label={
-                value.topLength === "Kopfbedeckung"
-                  ? "Avatar - Kopfbedeckung"
-                  : "Avatar - Frisur"
-              }
-              name="topType"
-            >
-              <RangeInput
+            {gamified && (
+              <FormField
+                label={
+                  value.topLength === "Kopfbedeckung"
+                    ? "Avatar - Kopfbedeckung"
+                    : "Avatar - Frisur"
+                }
                 name="topType"
-                max={hairTypes[value.topLength].length - 1}
-              ></RangeInput>
-            </FormField>
+              >
+                <RangeInput
+                  name="topType"
+                  max={hairTypes[value.topLength].length - 1}
+                ></RangeInput>
+              </FormField>
+            )}
 
-            {value.topLength !== "Kopfbedeckung" && (
+            {gamified && value.topLength !== "Kopfbedeckung" && (
               <FormField label="Avatar - Haarfarbe" name="hairColor">
                 <RangeInput name="hairColor" max={hairColorArray.length - 1} />
               </FormField>
             )}
 
-            <FormField label="Avatar - Augen" name="eyeType">
-              <RangeInput name="eyeType" max={eyeTypeArray.length - 1} />
-            </FormField>
+            {gamified && (
+              <FormField label="Avatar - Augen" name="eyeType">
+                <RangeInput name="eyeType" max={eyeTypeArray.length - 1} />
+              </FormField>
+            )}
 
-            <FormField label="Avatar - Hautfarbe" name="skinColor">
-              <RangeInput name="skinColor" max={skinColorArray.length - 1} />
-            </FormField>
+            {gamified && (
+              <FormField label="Avatar - Hautfarbe" name="skinColor">
+                <RangeInput name="skinColor" max={skinColorArray.length - 1} />
+              </FormField>
+            )}
 
-            <Box>
-              <Avatar
-                style={{ width: "100px", height: "100px" }}
-                avatarStyle="Circle"
-                hatColor="Black"
-                clotheType="Hoodie"
-                clotheColor="Heather"
-                hairColor={hairColorArray[value.hairColor]}
-                topType={hairTypes[value.topLength][value.topType]}
-                eyeType={eyeTypeArray[value.eyeType]}
-                skinColor={skinColorArray[value.skinColor]}
-              />
-            </Box>
+            {gamified && (
+              <Box>
+                <Avatar
+                  style={{ width: "100px", height: "100px" }}
+                  avatarStyle="Circle"
+                  hatColor="Black"
+                  clotheType="Hoodie"
+                  clotheColor="Heather"
+                  hairColor={hairColorArray[value.hairColor]}
+                  topType={hairTypes[value.topLength][value.topType]}
+                  eyeType={eyeTypeArray[value.eyeType]}
+                  skinColor={skinColorArray[value.skinColor]}
+                />
+              </Box>
+            )}
 
             <Box
               direction="row"

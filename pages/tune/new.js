@@ -38,6 +38,8 @@ export default function CreateTune({ tunebooks }) {
   if (load) return null;
   if (!load && !session)
     return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>;
+  if (session && !session.user.gamified)
+  return <p>Sie haben nicht die nötige Berechtigung, um auf diese Seite zuzugreifen.</p>;
 
   return (
     <Layout

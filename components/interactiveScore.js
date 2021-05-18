@@ -1,6 +1,6 @@
 import { renderAbc, synth } from "abcjs";
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { Box, Button, Grid, Text } from "grommet";
+import { Box, Button, Grid } from "grommet";
 import SelectionDialog from "./riemannFunc/selectionDialog";
 import configFromFile from "./interactiveScore.config.json";
 import RiemannFunc, { CondensedFunc } from "../lib/riemannFunc";
@@ -16,7 +16,6 @@ import {
 import { replace } from "../lib/stringUtils";
 import CursorControl from "../lib/cursorControl";
 import useWindowSize from "../lib/useWindowSize";
-import { getSolutionFuncs } from "../lib/solutions";
 
 export default function InteractiveScore({
   abc,
@@ -28,7 +27,9 @@ export default function InteractiveScore({
   device,
   onChange,
   showSolution,
-  id
+  id,
+  evolvedUI,
+  directFeedback,
 }) {
   //Global
   var visualObjs;
@@ -42,6 +43,7 @@ export default function InteractiveScore({
   //State
   const windowSize = useWindowSize();
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
+  const [highlightNotes, setHighlightNotes] = useState(directFeedback);
 
   useEffect(() => {
     renderVisualObjs();
@@ -49,7 +51,7 @@ export default function InteractiveScore({
       const ctx = synth.activeAudioContext();
       if (ctx.state !== "closed") ctx.close();
     };
-  }, [abc, solved]);
+  }, [abc, solved, highlightNotes]);
   useLayoutEffect(() => {
     renderVisualObjs();
   }, [windowSize, device]);
@@ -131,6 +133,7 @@ export default function InteractiveScore({
       let newAbcElem = abcelem;
       newAbcElem.abselem.abcelem.chord =
         newChordString.length === 0 ? "" : riemannFuncArray[0].toString();
+      setHighlightNotes(false);
       onChange(
         replace(abc, newChordString, abcelem.startChar, oldChordStringLength),
         validate(newAbcElem.abselem),
@@ -235,15 +238,20 @@ export default function InteractiveScore({
               chordOf(elem, initialVoicesArray, simultaneousNotesMap)
             ) {
               addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
-            } else if (solved.some((solvedPos) => pos.equals(solvedPos))) {
+            } else if (
+              (highlightNotes || directFeedback) &&
+              solved.some((solvedPos) => pos.equals(solvedPos))
+            ) {
               addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
             } else if (
+              (highlightNotes || directFeedback) &&
               almostSolved.some((almostSolvedPos) =>
                 pos.equals(almostSolvedPos)
               )
             ) {
               addClasses(elem, ["abcjs-almostSolved"]);
             } else if (
+              (highlightNotes || directFeedback) &&
               showMistakes &&
               chordOf(elem, voicesArray, simultaneousNotesMap)
             ) {
@@ -309,7 +317,10 @@ export default function InteractiveScore({
     synthControl.disable(true);
     const visualObj = visualObjs[0];
 
-    const AudioContext = window.AudioContext || window.webkitAudioContext||window.mozAudioContext;
+    const AudioContext =
+      window.AudioContext ||
+      window.webkitAudioContext ||
+      window.mozAudioContext;
     const audioContext = new AudioContext();
 
     let midiBuffer = new synth.CreateSynth();
@@ -352,6 +363,16 @@ export default function InteractiveScore({
         pad={{ bottom: "small", horizontal: "large" }}
       >
         <Box fill="horizontal" id={`audioContainer${id}`} />
+        {!directFeedback && (
+          <Button
+            margin="medium"
+            label="Überprüfen"
+            primary
+            onClick={() => {
+              setHighlightNotes(true);
+            }}
+          />
+        )}
       </Box>
       {openSelectionDialog && (
         <SelectionDialog
@@ -364,12 +385,13 @@ export default function InteractiveScore({
           target={document.querySelector("main")}
           alterations={
             openSelectionDialog.solutionFuncs.length === 0 ||
+            !evolvedUI ||
             openSelectionDialog.solutionFuncs.some((func) =>
               func.addTones.some((tone) => !Number.isInteger(tone))
             )
           }
           baseFuncTypes={
-            openSelectionDialog.solutionFuncs.length > 0
+            openSelectionDialog.solutionFuncs.length > 0 && evolvedUI
               ? openSelectionDialog.solutionFuncs.map(
                   (func) => func.baseFunc.type
                 )
