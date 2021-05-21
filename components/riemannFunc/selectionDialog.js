@@ -120,7 +120,7 @@ export default function RiemannFuncSelectionDialog({
                   ? "medium"
                   : { horizontal: "medium", vertical: "small" }
               }
-              gap="small"
+              gap={windowSize.height >= 700 ? "medium" : "small"}
             />
           </Tab>
         </Tabs>
@@ -143,7 +143,7 @@ export default function RiemannFuncSelectionDialog({
               ? "medium"
               : { horizontal: "medium", vertical: "small" }
           }
-          gap={windowSize.height >= 700 ? "medium" : "small"}
+          gap={windowSize.height >= 800 ? "medium" : "small"}
         />
       )}
 
