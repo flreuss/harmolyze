@@ -29,7 +29,6 @@ export default function InteractiveScore({
   showSolution,
   id,
   evolvedUI,
-  directFeedback,
 }) {
   //Global
   var visualObjs;
@@ -43,7 +42,6 @@ export default function InteractiveScore({
   //State
   const windowSize = useWindowSize();
   const [openSelectionDialog, setOpenSelectionDialog] = useState(undefined);
-  const [highlightNotes, setHighlightNotes] = useState(directFeedback);
 
   useEffect(() => {
     renderVisualObjs();
@@ -51,7 +49,7 @@ export default function InteractiveScore({
       const ctx = synth.activeAudioContext();
       if (ctx.state !== "closed") ctx.close();
     };
-  }, [abc, solved, highlightNotes]);
+  }, [abc, solved]);
   useLayoutEffect(() => {
     renderVisualObjs();
   }, [windowSize, device]);
@@ -138,7 +136,6 @@ export default function InteractiveScore({
       let newAbcElem = abcelem;
       newAbcElem.abselem.abcelem.chord =
         newChordString.length === 0 ? "" : riemannFuncArray[0].toString();
-      setHighlightNotes(false);
       onChange(
         replace(abc, newChordString, abcelem.startChar, oldChordStringLength),
         validate(newAbcElem.abselem),
@@ -244,19 +241,16 @@ export default function InteractiveScore({
             ) {
               addClasses(elem, ["abcjs-given", "abcjs-disabled"]);
             } else if (
-              (highlightNotes || directFeedback) &&
               solved.some((solvedPos) => pos.equals(solvedPos))
             ) {
               addClasses(elem, ["abcjs-solved", "abcjs-disabled"]);
             } else if (
-              (highlightNotes || directFeedback) &&
               almostSolved.some((almostSolvedPos) =>
                 pos.equals(almostSolvedPos)
               )
             ) {
               addClasses(elem, ["abcjs-almostSolved"]);
             } else if (
-              (highlightNotes || directFeedback) &&
               showMistakes &&
               chordOf(elem, voicesArray, simultaneousNotesMap)
             ) {
@@ -368,16 +362,6 @@ export default function InteractiveScore({
         pad={{ bottom: "small", horizontal: "large" }}
       >
         <Box fill="horizontal" id={`audioContainer${id}`} />
-        {!directFeedback && (
-          <Button
-            margin="medium"
-            label="Überprüfen"
-            primary
-            onClick={() => {
-              setHighlightNotes(true);
-            }}
-          />
-        )}
       </Box>
       {openSelectionDialog && (
         <SelectionDialog

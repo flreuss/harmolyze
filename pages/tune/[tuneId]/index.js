@@ -46,7 +46,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const [animation, setAnimation] = useState();
-  const [directFeedback, setDirectFeedback] = useState(session.user.gamified);
   const router = useRouter();
   const windowSize = useWindowSize();
 
@@ -136,7 +135,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               <InteractiveScore
                 abc={attempt.abc}
                 id={tune._id}
-                directFeedback={directFeedback}
                 evolvedUI={session.user.gamified}
                 initial={getInitial(tune.abc)}
                 solution={getSolution(tune.abc)}
@@ -179,7 +177,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                     tune_id: tune._id,
                   };
                   setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
-                  setDirectFeedback(session.user.gamified);
                 }}
               />
             ) : (
