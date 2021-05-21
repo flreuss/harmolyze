@@ -111,6 +111,7 @@ export default function InteractiveScore({
   }
 
   function handleSelectionDialogClose(abcelem, riemannFuncArray) {
+    synthControl.setProgress(0);
     const oldChordStringLength = abcelem.chord
       ? abcelem.chord[0].name.split("\n").reduce((acc, current) => {
           return acc + current.length + 3;
@@ -218,7 +219,7 @@ export default function InteractiveScore({
     };
 
     try {
-      if (document.getElementById(`scoreContainer${id}`)) {
+      if (windowSize && document.getElementById(`scoreContainer${id}`)) {
         console.log("Rendering VisualObjs...");
         visualObjs = renderAbc(`scoreContainer${id}`, abc, config);
         voicesArray = new NotesVoicesArray(visualObjs[0]);
@@ -291,7 +292,7 @@ export default function InteractiveScore({
       console.error(err);
     }
 
-    if (document.getElementById(`audioContainer${id}`)) {
+    if (windowSize && document.getElementById(`audioContainer${id}`)) {
       loadAudio(visualObjs);
     }
   }

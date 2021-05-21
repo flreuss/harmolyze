@@ -1591,6 +1591,45 @@ export default function Credits() {
             </a>
           </span>
         </p>
+        <p>
+          <span></span>
+        </p>
+        <p>
+          <span>User für User</span>
+        </p>
+        <p>
+          <span>
+            Default Tunes by
+          </span>
+          <span>
+            <a href="https://www.meyer-gitarre.de/musiklehre/akkorde/dsieben/index.html">
+              &nbsp;
+            </a>
+          </span>
+          <span>
+            <a href="https://www.meyer-gitarre.de/musiklehre/akkorde/dsieben/index.html">
+            U. Meyer 
+            </a>
+          </span>
+          <span>&nbsp;on</span>
+          <span>
+            <a href="https://www.meyer-gitarre.de/index.html">
+              &nbsp;
+            </a>
+          </span>
+          <span>
+            <a href="https://www.meyer-gitarre.de/index.html">
+              Meyer-Gitarre
+            </a>
+          </span>
+        </p>
+        <p>
+          <span>
+            <a href="https://www.google.com/url?q=https://unsplash.com/photos/uIcbTOhMHOU&amp;sa=D&amp;source=editors&amp;ust=1621108468634000&amp;usg=AOvVaw3n0V_QfH9o5d7VbQs9WITf">
+              https://unsplash.com/photos/uIcbTOhMHOU
+            </a>
+          </span>
+        </p>
 <br />
       </Box>
     </Layout>
