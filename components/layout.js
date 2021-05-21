@@ -35,7 +35,14 @@ const customTheme = deepMerge(grommet, {
   },
 });
 
-export default function Layout({ children, user, status, homeIcon, loading }) {
+export default function Layout({
+  children,
+  user,
+  status,
+  homeIcon,
+  loading,
+  emotion,
+}) {
   const router = useRouter();
 
   return (
@@ -79,14 +86,20 @@ export default function Layout({ children, user, status, homeIcon, loading }) {
             {user && user.gamified && status}
             {user && (
               <Menu
-                label={user.gamified ?
-                  <Avatar
-                    style={{ width: "50px", height: "50px" }}
-                    avatarStyle="Circle"
-                    clotheType="Hoodie"
-                    clotheColor="Heather"
-                    {...user.avatar}
-                  /> : <Text>{user._id}</Text>
+                label={
+                  user.gamified ? (
+                    <Avatar
+                      style={{ width: "50px", height: "50px" }}
+                      avatarStyle="Circle"
+                      clotheType="Hoodie"
+                      clotheColor="Heather"
+                      mouthType={emotion ? "Smile" : "Default"}
+                      {...user.avatar}
+                      eyeType={emotion || user.avatar.eyeType}
+                    />
+                  ) : (
+                    <Text>{user._id}</Text>
+                  )
                 }
                 dropProps={{
                   align: { top: "bottom", right: "right" },

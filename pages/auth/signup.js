@@ -47,11 +47,11 @@ export default function SignIn({ avatars }) {
   const eyeTypeArray = [
     "Close",
     "Default",
+    "Dizzy",
     "EyeRoll",
-    "Happy",
-    "Hearts",
     "Wink",
     "Side",
+    "WinkWacky",
   ];
 
   const hairTypes = {

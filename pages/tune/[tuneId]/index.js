@@ -46,6 +46,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const [animation, setAnimation] = useState();
+  const [emotion, setEmotion] = useState();
   const router = useRouter();
   const windowSize = useWindowSize();
 
@@ -62,6 +63,28 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   }, [attempt.time]);
 
   useEffect(() => {
+    let interval = null;
+    if (emotion !== "Hearts") {
+      interval = setInterval(() => {
+        setEmotion(undefined);
+      }, 1200);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [emotion]);
+
+  useEffect(() => {
+    let interval = null;
+    interval = setInterval(() => {
+      setAnimation(undefined);
+    }, 700);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [animation]);
+
+  useEffect(() => {
     createAttempt(
       attempt,
       () => {},
@@ -74,6 +97,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
     <Layout
       homeIcon={<Previous />}
       loading={loading}
+      emotion={emotion}
       status={
         attempt.progress < 1 &&
         (session.user.groups.includes("admin") ? (
@@ -143,13 +167,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                 almostSolved={attempt.almostSolved}
                 device={device}
                 onChange={(newAbc, [elems, abcjsClass], total) => {
-                  if (abcjsClass == "abcjs-solved") {
-                    setAnimation("jiggle");
-                    setInterval(() => {
-                      setAnimation(undefined);
-                    }, 700);
-                  }
-
                   const nextAttempt = {
                     showMistakes: true,
                     solvedCount:
@@ -176,6 +193,16 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                     abc: newAbc,
                     tune_id: tune._id,
                   };
+
+                  if (abcjsClass == "abcjs-solved") {
+                    setAnimation("jiggle");
+                    if (nextAttempt.progress === 1) {
+                      setEmotion("Hearts");
+                    } else {
+                      setEmotion("Happy");
+                    }
+                  }
+
                   setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
                 }}
               />
