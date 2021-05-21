@@ -120,9 +120,6 @@ export default function InteractiveScore({
       ""
     );
 
-    console.log(abcelem);
-    console.log(riemannFuncArray);
-
     if (
       ((riemannFuncArray[0] !== undefined || abcelem.chord !== undefined) &&
         riemannFuncArray.some(

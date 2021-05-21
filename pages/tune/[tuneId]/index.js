@@ -357,7 +357,6 @@ export async function getServerSideProps(context) {
 
     const lastAttempt =
       attempts.length > 0 && attempts[0].progress !== 1 ? attempts[0] : null;
-    console.log(lastAttempt);
     tune = {
       _id: tune._id,
       //Removes instrument names from abc strings
