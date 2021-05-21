@@ -241,10 +241,12 @@ function Success({ tune, attempt, gamified }) {
           gap="medium"
           pad={{ horizontal: "medium", vertical: "small" }}
         >
-          <Box direction="row" gap="xsmall">
-            <Money />
-            <Text>{tune.points}</Text>
-          </Box>
+          <Tip content="Punkte">
+            <Box direction="row" gap="xsmall">
+              <Money />
+              <Text>{tune.points}</Text>
+            </Box>
+          </Tip>
           <Tip content="Fehler">
             <Box direction="row" gap="xsmall">
               <StatusCritical />
