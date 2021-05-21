@@ -122,14 +122,18 @@ export default function InteractiveScore({
       ""
     );
 
+    console.log(abcelem);
+    console.log(riemannFuncArray);
+
     if (
-      (riemannFuncArray[0] !== undefined || abcelem.chord !== undefined) &&
-      riemannFuncArray.some(
-        (riemannFunc, index) =>
-          !abcelem.chord ||
-          !abcelem.chord[index] ||
-          riemannFunc.toString() !== abcelem.chord[index].name
-      )
+      ((riemannFuncArray[0] !== undefined || abcelem.chord !== undefined) &&
+        riemannFuncArray.some(
+          (riemannFunc, index) =>
+            !abcelem.chord ||
+            !abcelem.chord[index] ||
+            riemannFunc.toString() !== abcelem.chord[index].name
+        )) ||
+      (abcelem.chord && riemannFuncArray.length === 0)
     ) {
       let newAbcElem = abcelem;
       newAbcElem.abselem.abcelem.chord =
