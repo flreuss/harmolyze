@@ -284,13 +284,12 @@ export default function Home({ tunebooks, session, score }) {
                                     </Box>
                                   </Stack>
                                 </Box>
-                              ) : (
+                              ) : session.user.gamified ? (
                                 <Box>
                                   <Image
                                     src={
                                       tune.bestAttempt &&
-                                      tune.bestAttempt.progress > 0 &&
-                                      session.user.gamified
+                                      tune.bestAttempt.progress > 0
                                         ? `/tunes/${
                                             tune.bestAttempt.progress === 1
                                               ? "rgb"
@@ -303,7 +302,6 @@ export default function Home({ tunebooks, session, score }) {
                                   <Meter
                                     value={
                                       tune.bestAttempt &&
-                                      session.user.gamified &&
                                       tune.bestAttempt.progress
                                     }
                                     max={1}
@@ -311,7 +309,7 @@ export default function Home({ tunebooks, session, score }) {
                                     thickness="xsmall"
                                   />
                                 </Box>
-                              )}
+                              ) : undefined}
                             </TuneCard>
                           ))}
                         </Grid>
