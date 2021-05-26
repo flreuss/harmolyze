@@ -180,7 +180,15 @@ export default function Home({ tunebooks, session, score }) {
                               }
                               onClick={() => {
                                 setLoading(true);
-                                router.push(`/tune/${tune._id}`);
+                                router.push(
+                                  `/tune/${tune._id}${
+                                    !tunebooks.some(tunebook => tunebook.tunes.some(
+                                      (tune) => tune.bestAttempt
+                                    ))
+                                      ? "?onboarding=true"
+                                      : ""
+                                  }`
+                                );
                               }}
                               menuItems={[
                                 {

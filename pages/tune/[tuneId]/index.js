@@ -28,6 +28,7 @@ import { getInitial, getSolution } from "../../../lib/solutions";
 import Head from "next/head";
 import Link from "next/link";
 import useWindowSize from "../../../lib/useWindowSize";
+import Notification from "../../../components/notification";
 
 export default function DisplayTune({ tune, session, lastAttempt }) {
   const defaultAttempt = {
@@ -43,6 +44,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
     time: 0,
   };
 
+  const [notification, setNotification] = useState();
   const [loading, setLoading] = useState(false);
   const [attempt, setAttempt] = useState(lastAttempt || defaultAttempt);
   const [animation, setAnimation] = useState();
@@ -61,6 +63,13 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       };
     }
   }, [attempt.time]);
+
+  useEffect(() => {
+    if (router.query.onboarding === "true")
+      setNotification(
+        "Klicke auf eine schwarze Note, um ein Funktionszeichen hinzuzufügen."
+      );
+  }, [router]);
 
   useEffect(() => {
     let interval = null;
@@ -195,6 +204,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                   };
 
                   if (abcjsClass == "abcjs-solved") {
+                    setNotification(undefined);
                     setAnimation("jiggle");
                     if (nextAttempt.progress === 1) {
                       setEmotion("Hearts");
@@ -202,6 +212,19 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
                       setEmotion("Happy");
                     }
                   }
+
+                  if (
+                    router.query.onboarding === "true" &&
+                    abcjsClass === "abcjs-almostSolved"
+                  )
+                    setNotification(
+                      "Fast richtig! Aber: Basston oder Zusatztöne stimmen noch nicht ganz."
+                    );
+                  if (
+                    router.query.onboarding === "true" &&
+                    abcjsClass === "abcjs-mistake"
+                  )
+                    setNotification("Leider nein! Überprüfe deine Auswahl!");
 
                   setAttempt((attempt) => ({ ...attempt, ...nextAttempt }));
                 }}
@@ -216,6 +239,13 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
           }
         </ResponsiveContext.Consumer>
       </Box>
+      {notification && (
+        <Notification
+          onClose={() => setNotification(undefined)}
+          text={notification}
+          color="brand"
+        />
+      )}
     </Layout>
   );
 }

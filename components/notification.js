@@ -4,7 +4,7 @@ import { Box, Button, Layer, Text } from "grommet";
 
 export default function Notification({ onClose, timeout, text, color }) {
   useEffect(() => {
-    setTimeout(onClose, timeout);
+    if (timeout) setTimeout(onClose, timeout);
   });
 
   return (
