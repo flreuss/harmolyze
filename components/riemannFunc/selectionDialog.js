@@ -266,7 +266,7 @@ function SelectionPanel({
               ? Math.floor(
                   Math.min(0.6 * windowSize.height, windowSize.width) / 2.3
                 )
-              : Math.floor(Math.min(windowSize.height, windowSize.width) / 5)
+              : Math.floor(Math.min(windowSize.height, windowSize.width) / 4.7)
           }
           value={
             riemannFunc.baseFuncString

@@ -59,6 +59,7 @@ export default function Layout({
         <Header
           gridArea="header"
           background="brand"
+          height={{ min: "xxsmall" }}
           pad={{ horizontal: "small" }}
         >
           <Nav gap="small" direction="row">
