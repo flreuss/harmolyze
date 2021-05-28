@@ -102,7 +102,7 @@ export default function SignIn() {
               margin={{ top: "medium", bottom: "medium" }}
             >
               <Anchor
-                onClick={() => alert("Legen Sie einen neuen Account an.")}
+                onClick={() => alert("Bitte sende eine E-Mail mit deinem Benutzername an: florian.reuss@uni-potsdam.de")}
               >
                 Passwort vergessen?
               </Anchor>
