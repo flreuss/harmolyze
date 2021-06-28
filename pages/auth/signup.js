@@ -118,7 +118,7 @@ export default function SignIn({ avatars }) {
                     eyeType: eyeTypeArray[value.eyeType],
                     topType: hairTypes[value.topLength][value.topType],
                   },
-                  true,
+                  gamified: true,
                 },
                 () => {
                   signIn("credentials", {
