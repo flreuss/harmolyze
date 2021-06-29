@@ -13,7 +13,6 @@ export default async (req, res) => {
           createdAt: new Date(),
           avatar: req.body.avatar,
           groups: ["global"],
-          gamified: req.body.gamified,
         };
         const users = await db.collection("users").insertOne(user);
         //201 Created

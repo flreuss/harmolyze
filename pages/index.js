@@ -75,21 +75,18 @@ export default function Home({ tunebooks, session, score }) {
     >
       <Stack anchor="bottom-right" fill>
         <Box fill>
-          {session.user.gamified && (
-            <Meter
-              value={
-                tunebooks
-                  .flatMap((tunebook) => tunebook.tunes)
-                  .filter(
-                    (tune) =>
-                      tune.bestAttempt && tune.bestAttempt.progress === 1
-                  ).length
-              }
-              max={tunebooks.flatMap((tunebook) => tunebook.tunes).length}
-              size="full"
-              thickness="small"
-            />
-          )}
+          <Meter
+            value={
+              tunebooks
+                .flatMap((tunebook) => tunebook.tunes)
+                .filter(
+                  (tune) => tune.bestAttempt && tune.bestAttempt.progress === 1
+                ).length
+            }
+            max={tunebooks.flatMap((tunebook) => tunebook.tunes).length}
+            size="full"
+            thickness="small"
+          />
           <Box
             pad="large"
             background="radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
@@ -102,7 +99,6 @@ export default function Home({ tunebooks, session, score }) {
               onActive={(newActiveIndex) => {
                 if (
                   session.user.groups.includes("admin") ||
-                  !session.user.gamified ||
                   newActiveIndex.length === 0 ||
                   newActiveIndex[0] === 0 ||
                   tunebooks[newActiveIndex]._id === 42 ||
@@ -122,230 +118,218 @@ export default function Home({ tunebooks, session, score }) {
                 }
               }}
             >
-              {tunebooks
-                .filter(
-                  (tunebook) => tunebook._id !== 42 || session.user.gamified
-                )
-                .map((tunebook, tunebookIndex) => (
-                  <RichPanel
-                    key={tunebook._id}
-                    gap="small"
-                    disabled={
-                      !session.user.groups.includes("admin") &&
-                      session.user.gamified &&
-                      tunebookIndex !== 0 &&
-                      tunebook._id !== 42 &&
-                      (!tunebooks[tunebookIndex - 1].tunes.slice(-1)[0]
-                        .bestAttempt ||
-                        tunebooks[tunebookIndex - 1].tunes.slice(-1)[0]
-                          .bestAttempt.progress < 1)
-                    }
-                    label={`${romanNumeral(tunebookIndex + 1)}. ${
-                      tunebook.name
-                    }`}
-                  >
-                    <ResponsiveContext.Consumer>
-                      {(device) => (
-                        <Grid
-                          gap="small"
-                          columns={
-                            device === "small"
-                              ? windowSize.height > windowSize.width
-                                ? ["49%", "49%"]
-                                : ["23%", "23%", "23%", "23%"]
-                              : "small"
-                          }
-                          margin="medium"
-                        >
-                          {tunebook.tunes.map((tune, tuneIndex) => (
-                            <TuneCard
-                              background={
-                                tuneIndex === tunebook.tunes.length - 1 &&
-                                tunebook._id !== 42 &&
-                                session.user.gamified &&
-                                tunebooks.some((tunebook) =>
-                                  tunebook.tunes.some(
-                                    (tune) => tune.bestAttempt
-                                  )
-                                )
-                                  ? "neutral-4"
-                                  : "neutral-3"
-                              }
-                              animation={
-                                tunebookIndex === 0 &&
-                                tuneIndex === 0 &&
-                                !tunebook.tunes.some((tune) => tune.bestAttempt)
-                                  ? { type: "pulse", size: "medium" }
-                                  : undefined
-                              }
-                              onClick={() => {
-                                setLoading(true);
-                                router.push(
-                                  `/tune/${tune._id}${
-                                    !tunebooks.some(tunebook => tunebook.tunes.some(
+              {tunebooks.map((tunebook, tunebookIndex) => (
+                <RichPanel
+                  key={tunebook._id}
+                  gap="small"
+                  disabled={
+                    !session.user.groups.includes("admin") &&
+                    tunebookIndex !== 0 &&
+                    tunebook._id !== 42 &&
+                    (!tunebooks[tunebookIndex - 1].tunes.slice(-1)[0]
+                      .bestAttempt ||
+                      tunebooks[tunebookIndex - 1].tunes.slice(-1)[0]
+                        .bestAttempt.progress < 1)
+                  }
+                  label={`${romanNumeral(tunebookIndex + 1)}. ${tunebook.name}`}
+                >
+                  <ResponsiveContext.Consumer>
+                    {(device) => (
+                      <Grid
+                        gap="small"
+                        columns={
+                          device === "small"
+                            ? windowSize.height > windowSize.width
+                              ? ["49%", "49%"]
+                              : ["23%", "23%", "23%", "23%"]
+                            : "small"
+                        }
+                        margin="medium"
+                      >
+                        {tunebook.tunes.map((tune, tuneIndex) => (
+                          <TuneCard
+                            background={
+                              tuneIndex === tunebook.tunes.length - 1 &&
+                              tunebook._id !== 42 &&
+                              tunebooks.some((tunebook) =>
+                                tunebook.tunes.some((tune) => tune.bestAttempt)
+                              )
+                                ? "neutral-4"
+                                : "neutral-3"
+                            }
+                            animation={
+                              tunebookIndex === 0 &&
+                              tuneIndex === 0 &&
+                              !tunebook.tunes.some((tune) => tune.bestAttempt)
+                                ? { type: "pulse", size: "medium" }
+                                : undefined
+                            }
+                            onClick={() => {
+                              setLoading(true);
+                              router.push(
+                                `/tune/${tune._id}${
+                                  !tunebooks.some((tunebook) =>
+                                    tunebook.tunes.some(
                                       (tune) => tune.bestAttempt
-                                    ))
-                                      ? "?onboarding=true"
-                                      : ""
-                                  }`
-                                );
-                              }}
-                              menuItems={[
-                                {
-                                  label: "Bearbeiten",
-                                  onClick: (evt) => {
-                                    setLoading(true);
-                                    router.push(`/tune/${tune._id}/edit`);
-                                    //Prevent onClick event from bubbling up to the parent Card
-                                    evt.stopPropagation();
-                                  },
-                                  icon: (
-                                    <Box pad={{ right: "medium" }}>
-                                      <Edit />
-                                    </Box>
-                                  ),
+                                    )
+                                  )
+                                    ? "?onboarding=true"
+                                    : ""
+                                }`
+                              );
+                            }}
+                            menuItems={[
+                              {
+                                label: "Bearbeiten",
+                                onClick: (evt) => {
+                                  setLoading(true);
+                                  router.push(`/tune/${tune._id}/edit`);
+                                  //Prevent onClick event from bubbling up to the parent Card
+                                  evt.stopPropagation();
                                 },
-                                {
-                                  label: "Verschieben",
-                                  onClick: (evt) => {
-                                    setOpenMoveDialog({ tune, tunebook });
-                                    //Prevent onClick event from bubbling up to the parent Card
-                                    evt.stopPropagation();
-                                  },
-                                  icon: (
-                                    <Box pad={{ right: "medium" }}>
-                                      <DocumentTransfer />
-                                    </Box>
-                                  ),
+                                icon: (
+                                  <Box pad={{ right: "medium" }}>
+                                    <Edit />
+                                  </Box>
+                                ),
+                              },
+                              {
+                                label: "Verschieben",
+                                onClick: (evt) => {
+                                  setOpenMoveDialog({ tune, tunebook });
+                                  //Prevent onClick event from bubbling up to the parent Card
+                                  evt.stopPropagation();
                                 },
-                                {
-                                  label: "Löschen",
-                                  onClick: (evt) => {
-                                    setOpenDeleteDialog({ tune });
-                                    //Prevent onClick event from bubbling up to the parent Card
-                                    evt.stopPropagation();
-                                  },
-                                  icon: (
-                                    <Box pad={{ right: "medium" }}>
-                                      <Trash />
-                                    </Box>
-                                  ),
+                                icon: (
+                                  <Box pad={{ right: "medium" }}>
+                                    <DocumentTransfer />
+                                  </Box>
+                                ),
+                              },
+                              {
+                                label: "Löschen",
+                                onClick: (evt) => {
+                                  setOpenDeleteDialog({ tune });
+                                  //Prevent onClick event from bubbling up to the parent Card
+                                  evt.stopPropagation();
                                 },
-                              ]}
-                              footerItems={
-                                session.user.gamified
-                                  ? tune.bestAttempt &&
-                                    tune.bestAttempt.progress === 1
-                                    ? [
-                                        {
-                                          icon: <StatusCritical />,
-                                          label: tune.bestAttempt.mistakeCount,
-                                        },
-                                        {
-                                          icon: <Clock />,
-                                          label: millisToMinutesAndSeconds(
-                                            tune.bestAttempt.time
-                                          ),
-                                        },
-                                      ]
-                                    : [
-                                        {
-                                          icon: <Money />,
-                                          label:
-                                            tune.bestAttempt &&
-                                            tune.bestAttempt.progress > 0
-                                              ? `${Math.round(
-                                                  tune.bestAttempt.progress *
-                                                    tune.points
-                                                )} / ${tune.points}`
-                                              : tune.points,
-                                        },
-                                      ]
-                                  : []
-                              }
-                              showMenu={
-                                tune.createdBy._id === session.user._id ||
-                                session.user.groups.includes("admin")
-                              }
-                              title={`${tuneIndex + 1}. ${tune.title}`}
-                              key={tune._id}
-                            >
-                              {tunebook._id === 42 ? (
-                                <Box fill="horizontal" pad="small">
-                                  <Stack anchor="top-left">
-                                    <Avatar
-                                      style={{ width: "100%", height: "100%" }}
-                                      avatarStyle="Circle"
-                                      clotheType="Hoodie"
-                                      clotheColor="Heather"
-                                      {...tune.createdBy.avatar}
-                                    />
-                                    <Box
-                                      background="light-4"
-                                      pad="small"
-                                      margin={
-                                        device === "small" ? "medium" : "small"
-                                      }
-                                      round="full"
-                                    >
-                                      <Text>by</Text>
-                                    </Box>
-                                  </Stack>
-                                </Box>
-                              ) : session.user.gamified ? (
-                                <Box>
-                                  <Image
-                                    src={
-                                      tune.bestAttempt &&
-                                      tune.bestAttempt.progress > 0
-                                        ? `/tunes/${
-                                            tune.bestAttempt.progress === 1
-                                              ? "rgb"
-                                              : "grayscale"
-                                          }/${tune._id}.jpg`
-                                        : `/tunes/placeholder/${tunebookIndex}.png`
-                                    }
-                                    fill="horizontal"
+                                icon: (
+                                  <Box pad={{ right: "medium" }}>
+                                    <Trash />
+                                  </Box>
+                                ),
+                              },
+                            ]}
+                            footerItems={
+                              tune.bestAttempt &&
+                              tune.bestAttempt.progress === 1
+                                ? [
+                                    {
+                                      icon: <StatusCritical />,
+                                      label: tune.bestAttempt.mistakeCount,
+                                    },
+                                    {
+                                      icon: <Clock />,
+                                      label: millisToMinutesAndSeconds(
+                                        tune.bestAttempt.time
+                                      ),
+                                    },
+                                  ]
+                                : [
+                                    {
+                                      icon: <Money />,
+                                      label:
+                                        tune.bestAttempt &&
+                                        tune.bestAttempt.progress > 0
+                                          ? `${Math.round(
+                                              tune.bestAttempt.progress *
+                                                tune.points
+                                            )} / ${tune.points}`
+                                          : tune.points,
+                                    },
+                                  ]
+                            }
+                            showMenu={
+                              tune.createdBy._id === session.user._id ||
+                              session.user.groups.includes("admin")
+                            }
+                            title={`${tuneIndex + 1}. ${tune.title}`}
+                            key={tune._id}
+                          >
+                            {tunebook._id === 42 ? (
+                              <Box fill="horizontal" pad="small">
+                                <Stack anchor="top-left">
+                                  <Avatar
+                                    style={{ width: "100%", height: "100%" }}
+                                    avatarStyle="Circle"
+                                    clotheType="Hoodie"
+                                    clotheColor="Heather"
+                                    {...tune.createdBy.avatar}
                                   />
-                                  <Meter
-                                    value={
-                                      tune.bestAttempt &&
-                                      tune.bestAttempt.progress
+                                  <Box
+                                    background="light-4"
+                                    pad="small"
+                                    margin={
+                                      device === "small" ? "medium" : "small"
                                     }
-                                    max={1}
-                                    size="full"
-                                    thickness="xsmall"
-                                  />
-                                </Box>
-                              ) : undefined}
-                            </TuneCard>
-                          ))}
-                        </Grid>
-                      )}
-                    </ResponsiveContext.Consumer>
-                  </RichPanel>
-                ))}
+                                    round="full"
+                                  >
+                                    <Text>by</Text>
+                                  </Box>
+                                </Stack>
+                              </Box>
+                            ) : (
+                              <Box>
+                                <Image
+                                  src={
+                                    tune.bestAttempt &&
+                                    tune.bestAttempt.progress > 0
+                                      ? `/tunes/${
+                                          tune.bestAttempt.progress === 1
+                                            ? "rgb"
+                                            : "grayscale"
+                                        }/${tune._id}.jpg`
+                                      : `/tunes/placeholder/${tunebookIndex}.png`
+                                  }
+                                  fill="horizontal"
+                                />
+                                <Meter
+                                  value={
+                                    tune.bestAttempt &&
+                                    tune.bestAttempt.progress
+                                  }
+                                  max={1}
+                                  size="full"
+                                  thickness="xsmall"
+                                />
+                              </Box>
+                            )}
+                          </TuneCard>
+                        ))}
+                      </Grid>
+                    )}
+                  </ResponsiveContext.Consumer>
+                </RichPanel>
+              ))}
             </Accordion>
           </Box>
         </Box>
-        {session.user.gamified && (
-          <Link href="/tune/new" passHref>
-            <Box
-              round="full"
-              overflow="hidden"
-              background="brand"
-              margin="medium"
-            >
-              <Button
-                icon={<Add />}
-                hoverIndicator
-                onClick={() => {
-                  setLoading(true);
-                }}
-              />
-            </Box>
-          </Link>
-        )}
+        <Link href="/tune/new" passHref>
+          <Box
+            round="full"
+            overflow="hidden"
+            background="brand"
+            margin="medium"
+          >
+            <Button
+              icon={<Add />}
+              hoverIndicator
+              onClick={() => {
+                setLoading(true);
+              }}
+            />
+          </Box>
+        </Link>
       </Stack>
 
       {notification && (

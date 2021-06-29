@@ -148,14 +148,12 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
       <Head>
         <title>HarmoLyze - {tune.title}</title>
       </Head>
-      {session.user.gamified && (
         <Meter
           value={Math.floor(attempt.progress * 100)}
           max={100}
           size="full"
           thickness="small"
         />
-      )}
       <Box
         animation={{ type: "fadeIn", size: "medium" }}
         fill
@@ -168,7 +166,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               <InteractiveScore
                 abc={attempt.abc}
                 id={tune._id}
-                evolvedUI={session.user.gamified}
+                evolvedUI={true}
                 initial={getInitial(tune.abc)}
                 solution={getSolution(tune.abc)}
                 showMistakes={attempt.showMistakes}
@@ -233,7 +231,6 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
               <Success
                 tune={tune}
                 attempt={attempt}
-                gamified={session.user.gamified}
               />
             )
           }
@@ -250,7 +247,7 @@ export default function DisplayTune({ tune, session, lastAttempt }) {
   );
 }
 
-function Success({ tune, attempt, gamified }) {
+function Success({ tune, attempt }) {
   const successGifs = [
     "https://media.giphy.com/media/Q81NcsY6YxK7jxnr4v/giphy.gif",
     "https://media.giphy.com/media/KEVNWkmWm6dm8/giphy.gif",
@@ -290,34 +287,32 @@ function Success({ tune, attempt, gamified }) {
         <Heading level={2}>🎉</Heading>
       </Box>
 
-      {gamified && <Image src={gif} fit="contain" pad="medium" fill />}
+      <Image src={gif} fit="contain" pad="medium" fill />
 
-      {gamified && (
-        <Box
-          direction="row"
-          gap="medium"
-          pad={{ horizontal: "medium", vertical: "small" }}
-        >
-          <Tip content="Punkte">
-            <Box direction="row" gap="xsmall">
-              <Money />
-              <Text>{tune.points}</Text>
-            </Box>
-          </Tip>
-          <Tip content="Fehler">
-            <Box direction="row" gap="xsmall">
-              <StatusCritical />
-              <Text>{attempt.mistakeCount}</Text>
-            </Box>
-          </Tip>
-          <Tip content="Benötigte Zeit">
-            <Box direction="row" gap="xsmall">
-              <Clock />
-              <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
-            </Box>
-          </Tip>
-        </Box>
-      )}
+      <Box
+        direction="row"
+        gap="medium"
+        pad={{ horizontal: "medium", vertical: "small" }}
+      >
+        <Tip content="Punkte">
+          <Box direction="row" gap="xsmall">
+            <Money />
+            <Text>{tune.points}</Text>
+          </Box>
+        </Tip>
+        <Tip content="Fehler">
+          <Box direction="row" gap="xsmall">
+            <StatusCritical />
+            <Text>{attempt.mistakeCount}</Text>
+          </Box>
+        </Tip>
+        <Tip content="Benötigte Zeit">
+          <Box direction="row" gap="xsmall">
+            <Clock />
+            <Text>{millisToMinutesAndSeconds(attempt.time)}</Text>
+          </Box>
+        </Tip>
+      </Box>
       <Link href="/" passHref>
         <Button
           size="small"

@@ -84,23 +84,19 @@ export default function Layout({
           </Nav>
 
           <Box direction="row" align="center" gap="medium">
-            {user && user.gamified && status}
+            {user && status}
             {user && (
               <Menu
                 label={
-                  user.gamified ? (
-                    <Avatar
-                      style={{ width: "50px", height: "50px" }}
-                      avatarStyle="Circle"
-                      clotheType="Hoodie"
-                      clotheColor="Heather"
-                      mouthType={emotion ? "Smile" : "Default"}
-                      {...user.avatar}
-                      eyeType={emotion || user.avatar.eyeType}
-                    />
-                  ) : (
-                    <Text>{user._id}</Text>
-                  )
+                  <Avatar
+                    style={{ width: "50px", height: "50px" }}
+                    avatarStyle="Circle"
+                    clotheType="Hoodie"
+                    clotheColor="Heather"
+                    mouthType={emotion ? "Smile" : "Default"}
+                    {...user.avatar}
+                    eyeType={emotion || user.avatar.eyeType}
+                  />
                 }
                 dropProps={{
                   align: { top: "bottom", right: "right" },
