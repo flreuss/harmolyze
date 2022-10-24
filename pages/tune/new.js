@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/client";
+import { useSession } from "next-auth/react";
 import Layout from "../../components/layout";
 import React, { useState } from "react";
 import Notification from "../../components/notification";
@@ -31,13 +31,11 @@ export default function CreateTune({ tunebooks }) {
   const [notification, setNotification] = useState(undefined);
   const [value, setValue] = useState(defaultTune);
   const [loading, setLoading] = useState();
-  const [session, load] = useSession();
+  const { data: session, status } = useSession()
 
   const router = useRouter();
 
-  if (load) return null;
-  if (!load && !session)
-    return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>;
+  if (status === "loading") return null;
 
   return (
     <Layout

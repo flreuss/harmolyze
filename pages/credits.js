@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/client";
+import { useSession } from "next-auth/react";
 import Layout from "../components/layout";
 import React from "react";
 import { Previous } from "grommet-icons";
@@ -6,11 +6,9 @@ import Head from "next/head";
 import { Box, Heading } from "grommet";
 
 export default function Credits() {
-  const [session, load] = useSession();
+  const { data: session, status } = useSession();
 
-  if (load) return null;
-  if (!load && !session)
-    return <p>Bitte loggen Sie sich ein, um auf diese Seite zuzugreifen.</p>;
+  if (status === "loading") return null;
   return (
     <Layout homeIcon={<Previous />} user={session && session.user}>
       <Head>

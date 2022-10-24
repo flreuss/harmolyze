@@ -8,26 +8,24 @@
     "start": "next start"
   },
   "dependencies": {
-    "abcjs": "^6.0.0-beta.33",
-    "avataaars": "^1.2.2",
+    "abcjs": "^6.0.0-beta.39",
+    "avataaars": "^2.0.0",
     "bcryptjs": "^2.4.3",
-    "fs": "0.0.1-security",
-    "grommet": "^2.17.2",
-    "grommet-icons": "^4.5.0",
-    "mongodb": "^3.6.8",
-    "next": "^10.2.2",
-    "next-auth": "^3.23.2",
-    "react": "17.0.1",
-    "react-dom": "17.0.1",
-    "styled-components": "^5.3.0",
+    "fs": "^0.0.1-security",
+    "grommet": "^2.27.0",
+    "grommet-icons": "^4.8.0",
+    "mongodb": "^4.11.0",
+    "next": "^12.3.1",
+    "next-auth": "^4.15.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-is": "^18.2.0",
+    "styled-components": "^5.3.6",
     "tinycolor2": "^1.4.2",
     "xml2abc": "https://wim.vree.org/js/xml2abc.tgz"
   },
   "devDependencies": {
-    "node-sass": "^5.0.0"
-  },
-  "peerOptionalDependencies": {
-    "mongodb": "^3.6.4"
+    "node-sass": "^7.0.3"
   },
   "description": "Installation (einmalig):\r 1. Überprüfen Sie zunächst, ob Sie die nötige Administrator-Berechtigung für HarmoLyze besitzen. Hierfür muss in der Datenbank (MongoDB) für Ihren Benutzer das isAdmin-Flag auf true gesetzt sein.\r 2. Installieren Sie [MuseScore](https://musescore.org/de/download) auf Ihrem PC.\r 3. Installieren Sie das MuseScore-Plugin [ABC_ImpEx](https://github.com/mist13/ABC_ImpEx). _Hinweis: Damit das Plugin in MuseScore ausgeführt werden kann, müssen Sie (in Windows) weiterhin die Dateien [xml2abc.exe](https://wim.vree.org/svgParse/xml2abc.html) und [abc2xml.exe](https://wim.vree.org/svgParse/abc2xml.html) herunterladen und in den Plugin-Ordner (standardmäßig C:\\Program Files (x86)\\MuseScore 3\\plugins\\ABC_ImpEx) kopieren.",
   "main": "index.js",

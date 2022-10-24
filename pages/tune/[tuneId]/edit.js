@@ -4,7 +4,7 @@ import InteractiveScore from "../../../components/interactiveScore";
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 import Layout from "../../../components/layout";
-import { getSession } from "next-auth/client";
+import { getSession } from "next-auth/react";
 import { LinkPrevious, Previous, Undo, View } from "grommet-icons";
 import { calculatePoints } from "../../../lib/solutions";
 import { useRouter } from "next/router";

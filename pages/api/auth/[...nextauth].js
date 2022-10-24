@@ -1,11 +1,11 @@
 import NextAuth from "next-auth";
-import Providers from "next-auth/providers";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "../../../lib/mongodb";
 import bcrypt from "bcryptjs";
 
 export default NextAuth({
   providers: [
-    Providers.Credentials({
+    CredentialsProvider({
       async authorize(credentials) {
         const { db } = await connectToDatabase();
 
@@ -26,20 +26,20 @@ export default NextAuth({
       },
     }),
   ],
-  jwt: {
-    signingKey: process.env.JWT_SIGNING_PRIVATE_KEY,
+  session: {
+    strategy: "jwt"
   },
   pages: {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async session(session, token) {
+    async session({session, token}) {
       session.user.groups = token.groups;
       session.user.avatar = token.avatar;
       session.user._id = token._id;
       return session;
     },
-    async jwt(token, user) {
+    async jwt({token, user}) {
       if (user?.groups) token.groups = user.groups;
       if (user?.avatar) token.avatar = user.avatar;
       if (user?._id) token._id = user._id;

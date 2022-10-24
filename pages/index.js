@@ -12,7 +12,7 @@ import {
   Image,
   Heading,
 } from "grommet";
-import { getSession } from "next-auth/client";
+import { getSession } from "next-auth/react";
 import Notification from "../components/notification";
 import { useRouter } from "next/router";
 import { useState } from "react";

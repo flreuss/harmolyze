@@ -1,4 +1,4 @@
-import { getSession } from "next-auth/client";
+import { getSession } from "next-auth/react";
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 
@@ -29,7 +29,7 @@ export default async (req, res) => {
             }
           );
           //201 Created
-          res.status(201).json(attempts.ops[0]);
+          res.status(201).json(attempts.insertedId);
         } catch (err) {
           //500 Internal Server Error
           console.error(err);
