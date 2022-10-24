@@ -1,4 +1,3 @@
-import { useSession } from "next-auth/react";
 import Layout from "../components/layout";
 import React from "react";
 import { Previous } from "grommet-icons";

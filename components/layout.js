@@ -104,6 +104,17 @@ export default function Layout({
                 }}
                 items={[
                   {
+                    label: "Datenschutzerklärung",
+                    onClick: () => {
+                      router.push("/privacyPolicy");
+                    },
+                    icon: (
+                      <Box pad={{ right: "small" }}>
+                        <DocumentText />
+                      </Box>
+                    ),
+                  },
+                  {
                     label: "Impressum & Credits",
                     onClick: () => {
                       router.push("/credits");
