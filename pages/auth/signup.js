@@ -11,6 +11,7 @@ import {
   RangeInput,
   Select,
   TextInput,
+  Footer,
 } from "grommet";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -91,7 +92,9 @@ export default function SignIn({ avatars }) {
   ];
 
   return (
-    <Layout loading={loading}>
+    <Layout loading={loading} footer={<Footer background="light-4" justify="center" pad="small">
+    <Link href="/credits">Impressum</Link>
+  </Footer>}>
       <Head>
         <title>HarmoLyze - Registrieren</title>
       </Head>

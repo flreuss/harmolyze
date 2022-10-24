@@ -42,6 +42,7 @@ export default function Layout({
   homeIcon,
   loading,
   emotion,
+  footer
 }) {
   const router = useRouter();
 
@@ -103,7 +104,7 @@ export default function Layout({
                 }}
                 items={[
                   {
-                    label: "Credits",
+                    label: "Impressum & Credits",
                     onClick: () => {
                       router.push("/credits");
                     },
@@ -143,6 +144,7 @@ export default function Layout({
             </Layer>
           )}
         </Main>
+        {footer}
       </Grid>
     </Grommet>
   );
