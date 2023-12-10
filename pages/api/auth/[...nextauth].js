@@ -35,13 +35,11 @@ export default NextAuth({
   callbacks: {
     async session({session, token}) {
       session.user.groups = token.groups;
-      session.user.avatar = token.avatar;
       session.user._id = token._id;
       return session;
     },
     async jwt({token, user}) {
       if (user?.groups) token.groups = user.groups;
-      if (user?.avatar) token.avatar = user.avatar;
       if (user?._id) token._id = user._id;
       return token;
     },

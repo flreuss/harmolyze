@@ -17,10 +17,9 @@ import Link from "next/link";
 import { grommet } from "grommet/themes";
 import { deepMerge } from "grommet/utils";
 import { signOut } from "next-auth/react";
-import { Analytics, DocumentText, Home, Logout } from "grommet-icons";
+import { DocumentText, Logout } from "grommet-icons";
 import React from "react";
 import { useRouter } from "next/router";
-import Avatar from "avataaars";
 
 const customTheme = deepMerge(grommet, {
   global: {
@@ -88,17 +87,6 @@ export default function Layout({
             {user && status}
             {user && (
               <Menu
-                label={
-                  <Avatar
-                    style={{ width: "50px", height: "50px" }}
-                    avatarStyle="Circle"
-                    clotheType="Hoodie"
-                    clotheColor="Heather"
-                    mouthType={emotion ? "Smile" : "Default"}
-                    {...user.avatar}
-                    eyeType={emotion || user.avatar.eyeType}
-                  />
-                }
                 dropProps={{
                   align: { top: "bottom", right: "right" },
                 }}

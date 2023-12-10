@@ -28,12 +28,12 @@ import {
   Money,
   StatusCritical,
   Trash,
+  User,
 } from "grommet-icons";
 import Link from "next/link";
 import ConfirmationDialog from "../components/confirmationDialog";
 import { millisToMinutesAndSeconds, romanNumeral } from "../lib/stringUtils";
 import useWindowSize from "../lib/useWindowSize";
-import Avatar from "avataaars";
 
 export default function Home({ tunebooks, session, score }) {
   const router = useRouter();
@@ -67,9 +67,15 @@ export default function Home({ tunebooks, session, score }) {
       loading={loading}
       user={session.user}
       status={
+        <Box direction="row" gap="medium">
+          <Box direction="row" gap="xsmall">
+            <User />
+            <Text>{session.user._id}</Text>
+          </Box>
         <Box direction="row" gap="xsmall">
           <Money />
           <Text>{score}</Text>
+        </Box>
         </Box>
       }
     >
@@ -256,29 +262,6 @@ export default function Home({ tunebooks, session, score }) {
                             title={`${tuneIndex + 1}. ${tune.title}`}
                             key={tune._id}
                           >
-                            {tunebook._id === 42 ? (
-                              <Box fill="horizontal" pad="small">
-                                <Stack anchor="top-left">
-                                  <Avatar
-                                    style={{ width: "100%", height: "100%" }}
-                                    avatarStyle="Circle"
-                                    clotheType="Hoodie"
-                                    clotheColor="Heather"
-                                    {...tune.createdBy.avatar}
-                                  />
-                                  <Box
-                                    background="light-4"
-                                    pad="small"
-                                    margin={
-                                      device === "small" ? "medium" : "small"
-                                    }
-                                    round="full"
-                                  >
-                                    <Text>by</Text>
-                                  </Box>
-                                </Stack>
-                              </Box>
-                            ) : (
                               <Box>
                                 <Image
                                   src={
@@ -303,7 +286,6 @@ export default function Home({ tunebooks, session, score }) {
                                   thickness="xsmall"
                                 />
                               </Box>
-                            )}
                           </TuneCard>
                         ))}
                       </Grid>
@@ -555,7 +537,7 @@ export async function getServerSideProps(context) {
             let: { createdBy: "$tunes_docs.createdBy" },
             pipeline: [
               { $match: { $expr: { $eq: ["$_id", "$$createdBy"] } } },
-              { $project: { _id: 1, avatar: 1 } },
+              { $project: { _id: 1 } },
             ],
             as: "creator",
           },

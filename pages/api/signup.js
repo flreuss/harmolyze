@@ -11,7 +11,6 @@ export default async (req, res) => {
           _id: req.body.name,
           password: hashedPassword,
           createdAt: new Date(),
-          avatar: req.body.avatar,
           groups: ["global"],
         };
         const users = await db.collection("users").insertOne(user);

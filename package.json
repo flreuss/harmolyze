@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "abcjs": "^6.0.0-beta.39",
-    "avataaars": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "fs": "^0.0.1-security",
     "grommet": "^2.27.0",
