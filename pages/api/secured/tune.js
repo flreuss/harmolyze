@@ -1,9 +1,9 @@
-import { getSession } from "next-auth/react";
+import { getToken } from "next-auth/jwt"
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export default async (req, res) => {
-  const session = await getSession({ req });
+  const token = await getToken({ req })
   switch (req.method) {
     case "POST":
       const newTune = {
@@ -11,7 +11,7 @@ export default async (req, res) => {
         _id: new ObjectId(),
         lastModifiedAt: new Date(),
         createdAt: new Date(),
-        createdBy: session.user._id,
+        createdBy: token._id,
       };
       try {
         const { db } = await connectToDatabase();
@@ -20,7 +20,7 @@ export default async (req, res) => {
           .findOne({ _id: newTune.tunebook_id });
         if (
           tunebook.permissions.read.some((group) =>
-            session.user.groups.includes(group)
+            token.groups.includes(group)
           )
         ) {
           const tunes = await db.collection("tunes").insertOne(newTune);
@@ -47,8 +47,8 @@ export default async (req, res) => {
           .collection("tunes")
           .findOne({ _id: ObjectId(req.body._id) });
         if (
-          session.user._id === tune.createdBy ||
-          session.user.groups.includes("admin")
+          token._id === tune.createdBy ||
+          token.groups.includes("admin")
         ) {
           await db
             .collection("tunes")
@@ -75,8 +75,8 @@ export default async (req, res) => {
           .collection("tunes")
           .findOne({ _id: ObjectId(req.body._id) });
         if (
-          session.user._id === tune.createdBy ||
-          session.user.groups.includes("admin")
+          token._id === tune.createdBy ||
+          token.groups.includes("admin")
         ) {
           await db
             .collection("tunes")

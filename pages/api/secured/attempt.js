@@ -1,9 +1,9 @@
-import { getSession } from "next-auth/react";
+import { getToken } from "next-auth/jwt"
 import { connectToDatabase } from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export default async (req, res) => {
-  const session = await getSession({ req });
+  const token = await getToken({ req })
   const newAttempt = {
     ...req.body,
     validatedAt: new Date(req.body.validatedAt),
@@ -12,7 +12,7 @@ export default async (req, res) => {
     solvedCount: +req.body.solvedCount,
     tune_id: ObjectId(req.body.tune_id),
   };
-  if (session && newAttempt.user_id === session.user._id) {
+  if (token && newAttempt.user_id === token._id) {
     switch (req.method) {
       case "POST":
         try {
